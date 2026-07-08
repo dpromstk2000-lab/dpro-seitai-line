@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-6</title>
+  <script src="./config.js?v=step-seitai-4"></script>
+  <style>
+    :root{
+      --bg:#f4f8fb;
+      --card:#ffffff;
+      --ink:#102033;
+      --muted:#64748b;
+      --line:#dbe4ef;
+      --brand:#14a085;
+      --brand2:#0f766e;
+      --accent:#f59e0b;
+      --soft:#e9fbf6;
+      --soft2:#f1f5f9;
+      --ok:#16a34a;
+      --danger:#dc2626;
+      --warn:#f59e0b;
+      --shadow:0 18px 45px rgba(15,23,42,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+      background:
+        radial-gradient(circle at top left,rgba(20,160,133,.15),transparent 350px),
+        linear-gradient(180deg,#ecfdf7 0%,#f4f8fb 330px,#f4f8fb 100%);
+      color:var(--ink);
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .wrap{
+      width:min(1120px,100%);
+      margin:0 auto;
+      padding:0 16px;
+    }
+    header{
+      padding:20px 0 12px;
+    }
+    .hero{
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(219,228,239,.95);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      display:grid;
+      grid-template-columns:1.3fr .8fr;
+      gap:18px;
+      align-items:center;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 11px;
+      border-radius:999px;
+      background:var(--soft);
+      color:var(--brand2);
+      font-weight:900;
+      font-size:12px;
+      letter-spacing:.03em;
+    }
+    h1{
+      margin:12px 0 10px;
+      font-size:clamp(28px,5vw,44px);
+      line-height:1.12;
+      letter-spacing:-.04em;
+    }
+    .lead{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:15px;
+    }
+    .heroPanel{
+      background:linear-gradient(135deg,#0f766e,#14a085);
+      color:#fff;
+      border-radius:22px;
+      padding:18px;
+      min-height:150px;
+      display:grid;
+      align-content:center;
+      gap:10px;
+    }
+    .heroPanel .shop{
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:-.03em;
+    }
+    .heroPanel .mini{
+      opacity:.85;
+      font-size:12px;
+      line-height:1.6;
+    }
+    .heroChips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .heroChip{
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.22);
+      color:#fff;
+      padding:7px 9px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+    }
+    main{
+      padding:10px 0 42px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:16px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 10px 28px rgba(15,23,42,.05);
+      padding:18px;
+    }
+    .span4{grid-column:span 4}
+    .span5{grid-column:span 5}
+    .span7{grid-column:span 7}
+    .span8{grid-column:span 8}
+    .span12{grid-column:span 12}
+    h2{
+      margin:0 0 10px;
+      font-size:20px;
+      letter-spacing:-.02em;
+    }
+    h3{
+      margin:14px 0 8px;
+      font-size:15px;
+    }
+    .note{
+      margin:7px 0 0;
+      color:var(--muted);
+      line-height:1.75;
+      font-size:13px;
+    }
+    .stepTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .stepNo{
+      width:30px;
+      height:30px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      background:var(--brand);
+      color:white;
+      font-size:13px;
+      font-weight:950;
+      flex:0 0 auto;
+    }
+    .status{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background:#e2e8f0;
+      color:#334155;
+      font-size:12px;
+      font-weight:900;
+    }
+    .status.ok{background:#dcfce7;color:#166534}
+    .status.warn{background:#fef3c7;color:#92400e}
+    .status.ng{background:#fee2e2;color:#991b1b}
+    .btn{
+      border:0;
+      border-radius:13px;
+      padding:12px 15px;
+      font-weight:900;
+      background:#e2e8f0;
+      color:#0f172a;
+      transition:.15s transform,.15s opacity,.15s background;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.dark{background:#0f172a;color:#fff}
+    .btn.warn{background:var(--accent);color:#fff}
+    .btn.ghost{background:#fff;border:1px solid var(--line)}
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    label{
+      display:block;
+      font-size:13px;
+      font-weight:900;
+      margin:12px 0 6px;
+      color:#334155;
+    }
+    input,select,textarea{
+      width:100%;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--ink);
+      border-radius:14px;
+      padding:13px 13px;
+      outline:none;
+      font-size:15px;
+    }
+    textarea{
+      min-height:96px;
+      resize:vertical;
+      line-height:1.65;
+    }
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--brand);
+      box-shadow:0 0 0 4px rgba(20,160,133,.12);
+    }
+    .choiceGrid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .choice{
+      border:1px solid var(--line);
+      border-radius:17px;
+      padding:13px;
+      background:#fff;
+      transition:.15s;
+      min-height:92px;
+    }
+    .choice:hover{border-color:rgba(20,160,133,.55);transform:translateY(-1px)}
+    .choice.selected{
+      background:var(--soft);
+      border-color:var(--brand);
+      box-shadow:0 0 0 4px rgba(20,160,133,.10);
+    }
+    .choiceTop{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .choiceTitle{
+      font-weight:950;
+      line-height:1.45;
+    }
+    .choiceMeta{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.65;
+    }
+    .price{
+      display:inline-flex;
+      align-items:center;
+      padding:5px 8px;
+      border-radius:999px;
+      background:#f1f5f9;
+      color:#334155;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .staffList{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .staffCard{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      padding:13px;
+      transition:.15s;
+    }
+    .staffCard.selected{
+      background:var(--soft);
+      border-color:var(--brand);
+      box-shadow:0 0 0 4px rgba(20,160,133,.10);
+    }
+    .staffName{
+      font-weight:950;
+    }
+    .staffMini{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:5px;
+      line-height:1.55;
+    }
+    .concernGrid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+    .tag{
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:#fff;
+      padding:9px 11px;
+      color:#334155;
+      font-size:13px;
+      font-weight:900;
+      transition:.15s;
+    }
+    .tag.selected{
+      background:var(--soft);
+      color:var(--brand2);
+      border-color:var(--brand);
+    }
+    .slots{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:8px;
+      margin-top:12px;
+    }
+    .slot{
+      border:1px solid #bbf7d0;
+      background:#ecfdf5;
+      color:#047857;
+      border-radius:13px;
+      padding:10px 8px;
+      font-size:13px;
+      font-weight:950;
+      text-align:center;
+      transition:.15s;
+    }
+    .slot:hover{transform:translateY(-1px)}
+    .slot.selected{
+      background:var(--brand);
+      color:#fff;
+      border-color:var(--brand2);
+      box-shadow:0 8px 18px rgba(20,160,133,.22);
+    }
+    .slot small{
+      display:block;
+      font-weight:800;
+      opacity:.82;
+      font-size:10px;
+      margin-top:3px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .summary{
+      position:sticky;
+      top:10px;
+      display:grid;
+      gap:10px;
+    }
+    .summaryBox{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:17px;
+      padding:13px;
+    }
+    .summaryLabel{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:4px;
+    }
+    .summaryValue{
+      font-weight:950;
+      line-height:1.55;
+      word-break:break-word;
+    }
+    .divider{
+      height:1px;
+      background:var(--line);
+      margin:14px 0;
+    }
+    .confirmBox{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:17px;
+      padding:14px;
+      display:grid;
+      gap:8px;
+    }
+    .confirmRow{
+      display:grid;
+      grid-template-columns:130px 1fr;
+      gap:8px;
+      font-size:14px;
+      line-height:1.55;
+    }
+    .confirmRow div:first-child{
+      color:var(--muted);
+      font-weight:900;
+    }
+    .complete{
+      border:1px solid #bbf7d0;
+      background:linear-gradient(180deg,#ecfdf5,#ffffff);
+      border-radius:22px;
+      padding:18px;
+      display:none;
+    }
+    .complete.show{display:block}
+    .messageBox{
+      width:100%;
+      min-height:190px;
+      margin-top:10px;
+      background:#0f172a;
+      color:#d1fae5;
+      border-radius:16px;
+      padding:13px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:13px;
+      line-height:1.7;
+      white-space:pre-wrap;
+    }
+    .alert{
+      border-radius:16px;
+      padding:12px;
+      background:#fef3c7;
+      color:#92400e;
+      border:1px solid #fde68a;
+      font-size:13px;
+      line-height:1.65;
+      font-weight:800;
+    }
+    .alert.danger{
+      background:#fee2e2;
+      color:#991b1b;
+      border-color:#fecaca;
+    }
+    .alert.ok{
+      background:#dcfce7;
+      color:#166534;
+      border-color:#bbf7d0;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:#0f172a;
+      color:#fff;
+      border-radius:999px;
+      padding:12px 16px;
+      box-shadow:var(--shadow);
+      font-size:14px;
+      font-weight:900;
+      opacity:0;
+      pointer-events:none;
+      transition:.2s;
+      z-index:99;
+      max-width:calc(100% - 28px);
+      text-align:center;
+    }
+    .toast.show{
+      opacity:1;
+      bottom:30px;
+    }
+    .loading{
+      display:inline-block;
+      width:14px;
+      height:14px;
+      border:2px solid rgba(255,255,255,.55);
+      border-top-color:#fff;
+      border-radius:999px;
+      animation:spin .7s linear infinite;
+      vertical-align:-2px;
+      margin-right:6px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:920px){
+      .hero{grid-template-columns:1fr}
+      .span4,.span5,.span7,.span8{grid-column:span 12}
+      .choiceGrid,.staffList{grid-template-columns:1fr}
+      .slots{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .summary{position:static}
+    }
+    @media(max-width:520px){
+      .wrap{padding:0 12px}
+      header{padding-top:12px}
+      .hero,.card{border-radius:20px;padding:16px}
+      .grid{gap:12px}
+      .slots{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .confirmRow{grid-template-columns:1fr}
+      h1{font-size:30px}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <span class="badge">STEP SEITAI-6 / index.html</span>
+        <h1>DPRO 整骨院・整体 LINE<br>かんたん予約</h1>
+        <p class="lead">
+          メニュー、担当者、気になる内容、日時を選んで予約できます。
+          予約後はLINEで送る確認文面も表示されます。
+        </p>
+      </div>
+      <div class="heroPanel">
+        <div class="mini">店舗</div>
+        <div class="shop" id="heroShopName">DPRO整体院</div>
+        <div class="mini" id="heroShopNote">LINEから予約・回数券・次回来院フォローまで確認できるデモ整体院です。</div>
+        <div class="heroChips">
+          <span class="heroChip">スタッフ指名</span>
+          <span class="heroChip">おまかせ予約</span>
+          <span class="heroChip">回数券利用</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="grid">
+      <div class="span8">
+        <div class="grid">
+          <section class="card span12" id="sectionMenu">
+            <div class="stepTitle">
+              <span class="stepNo">1</span>
+              <div>
+                <h2>メニューを選択</h2>
+                <p class="note">所要時間に合わせて、予約可能な時間を自動で確認します。</p>
+              </div>
+            </div>
+            <div class="choiceGrid" id="menuList"></div>
+          </section>
+
+          <section class="card span12" id="sectionStaff">
+            <div class="stepTitle">
+              <span class="stepNo">2</span>
+              <div>
+                <h2>担当者を選択</h2>
+                <p class="note">指名なしの場合は、空いているスタッフに自動で割り当てます。</p>
+              </div>
+            </div>
+
+            <div class="choiceGrid">
+              <button type="button" class="choice selected" data-pref="any">
+                <div class="choiceTop">
+                  <div>
+                    <div class="choiceTitle">おまかせ</div>
+                    <div class="choiceMeta">一番取りやすい時間で予約します</div>
+                  </div>
+                  <span class="price">おすすめ</span>
+                </div>
+              </button>
+              <button type="button" class="choice" data-pref="same_as_last">
+                <div class="choiceTop">
+                  <div>
+                    <div class="choiceTitle">前回と同じ担当</div>
+                    <div class="choiceMeta">再来店の方向け。初回はおまかせ扱いです</div>
+                  </div>
+                </div>
+              </button>
+              <button type="button" class="choice" data-pref="specific">
+                <div class="choiceTop">
+                  <div>
+                    <div class="choiceTitle">スタッフ指名</div>
+                    <div class="choiceMeta">院長・スタッフを選んで予約します</div>
+                  </div>
+                </div>
+              </button>
+              <button type="button" class="choice" data-pref="female_preferred">
+                <div class="choiceTop">
+                  <div>
+                    <div class="choiceTitle">女性スタッフ希望</div>
+                    <div class="choiceMeta">対応可能な場合に女性スタッフで予約します</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div id="staffSelectArea" style="display:none;">
+              <h3>指名スタッフ</h3>
+              <div class="staffList" id="staffList"></div>
+            </div>
+          </section>
+
+          <section class="card span12" id="sectionConcern">
+            <div class="stepTitle">
+              <span class="stepNo">3</span>
+              <div>
+                <h2>気になる内容</h2>
+                <p class="note">当日の参考として、あてはまるものを選んでください。診断ではありません。</p>
+              </div>
+            </div>
+
+            <div class="concernGrid" id="concernList"></div>
+
+            <label for="requestNote">ご要望・気になること</label>
+            <textarea id="requestNote" placeholder="例：首と肩がつらいです。強めが苦手です。"></textarea>
+          </section>
+
+          <section class="card span12" id="sectionDate">
+            <div class="stepTitle">
+              <span class="stepNo">4</span>
+              <div>
+                <h2>日付と時間を選択</h2>
+                <p class="note">営業時間・定休日・スタッフ・ベッド空き状況を見て、予約できる時間だけ表示します。</p>
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="span5">
+                <label for="dateInput">予約日</label>
+                <input id="dateInput" type="date">
+              </div>
+              <div class="span7">
+                <label>予約枠</label>
+                <div class="row">
+                  <button type="button" class="btn primary" id="loadSlotsBtn">この日の空きを見る</button>
+                  <button type="button" class="btn ghost" id="findOpenDayBtn">空き日を探す</button>
+                  <span class="status" id="slotStatus">未確認</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="slotMessage" style="margin-top:12px;"></div>
+            <div class="slots" id="slotList"></div>
+          </section>
+
+          <section class="card span12" id="sectionCustomer">
+            <div class="stepTitle">
+              <span class="stepNo">5</span>
+              <div>
+                <h2>お客様情報</h2>
+                <p class="note">初回はお名前・電話番号を入力してください。次回以降の予約確認にも使います。</p>
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="span6">
+                <label for="customerName">お名前</label>
+                <input id="customerName" type="text" placeholder="例：佐藤 花子" autocomplete="name">
+              </div>
+              <div class="span6">
+                <label for="customerKana">フリガナ</label>
+                <input id="customerKana" type="text" placeholder="例：サトウ ハナコ">
+              </div>
+              <div class="span6">
+                <label for="phone">電話番号</label>
+                <input id="phone" type="tel" placeholder="例：090-0000-0000" autocomplete="tel">
+              </div>
+              <div class="span6">
+                <label for="customerMemo">任意メモ</label>
+                <input id="customerMemo" type="text" placeholder="例：LINEデモ予約">
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:14px;">
+              <button type="button" class="btn dark" id="confirmBtn">予約内容を確認する</button>
+              <button type="button" class="btn ghost" id="saveProfileBtn">お客様情報を保存</button>
+            </div>
+          </section>
+
+          <section class="card span12" id="sectionConfirm">
+            <div class="stepTitle">
+              <span class="stepNo">6</span>
+              <div>
+                <h2>予約内容の確認</h2>
+                <p class="note">内容に間違いがなければ、予約を送信してください。</p>
+              </div>
+            </div>
+
+            <div id="confirmBox" class="confirmBox">
+              <div class="note">まだ確認内容がありません。</div>
+            </div>
+
+            <div class="row" style="margin-top:14px;">
+              <button type="button" class="btn primary" id="submitBtn">この内容で予約する</button>
+              <button type="button" class="btn ghost" id="scrollTopBtn">上に戻って修正</button>
+            </div>
+          </section>
+
+          <section class="complete span12" id="completeBox">
+            <span class="badge">予約完了</span>
+            <h2 style="margin-top:12px;">予約を受け付けました</h2>
+            <p class="note">
+              下の文面は、店舗側がLINEで送る確認文面のイメージです。
+              デモ確認用にコピーできます。
+            </p>
+            <div class="messageBox" id="messageText"></div>
+            <div class="row" style="margin-top:12px;">
+              <button type="button" class="btn primary" id="copyMessageBtn">確認文面をコピー</button>
+              <button type="button" class="btn ghost" id="newReservationBtn">続けて予約する</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <aside class="span4">
+        <div class="summary">
+          <section class="card">
+            <h2>現在の選択</h2>
+            <div class="summaryBox">
+              <div class="summaryLabel">メニュー</div>
+              <div class="summaryValue" id="sumMenu">未選択</div>
+            </div>
+            <div class="summaryBox">
+              <div class="summaryLabel">担当者</div>
+              <div class="summaryValue" id="sumStaff">おまかせ</div>
+            </div>
+            <div class="summaryBox">
+              <div class="summaryLabel">気になる内容</div>
+              <div class="summaryValue" id="sumConcern">未選択</div>
+            </div>
+            <div class="summaryBox">
+              <div class="summaryLabel">予約日時</div>
+              <div class="summaryValue" id="sumDateTime">未選択</div>
+            </div>
+            <div class="divider"></div>
+            <div class="row">
+              <span class="status" id="apiStatus">読み込み中</span>
+            </div>
+            <p class="note" id="settingsNote">
+              店舗設定を読み込んでいます。
+            </p>
+          </section>
+
+          <section class="card">
+            <h2>予約の流れ</h2>
+            <div class="note">
+              1. メニューを選ぶ<br>
+              2. 担当者を選ぶ<br>
+              3. 気になる内容を選ぶ<br>
+              4. 日時を選ぶ<br>
+              5. お客様情報を入力<br>
+              6. 内容確認して予約
+            </div>
+          </section>
+        </div>
+      </aside>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast">OK</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const FALLBACK_CONFIG = {
+    serviceName: "DPRO 整骨院・整体 LINE",
+    shopCode: "dpro_seitai_demo",
+    shopName: "DPRO整体院",
+    apiBaseUrl: "https://dpro-seitai-line-api.dpromstk2000.workers.dev",
+    endpoints: {
+      publicSettings: "/api/public/settings",
+      appointmentOptions: "/api/public/appointment-options",
+      reservationCreate: "/api/reservations/create"
+    }
+  };
+
+  const CONFIG = window.DPRO_SEITAI_CONFIG || FALLBACK_CONFIG;
+  const $ = (id) => document.getElementById(id);
+
+  const state = {
+    settings: null,
+    menus: [],
+    staff: [],
+    selectedMenu: null,
+    staffPreference: "any",
+    selectedStaffCode: "",
+    selectedConcerns: [],
+    selectedDate: "",
+    slots: [],
+    selectedSlot: null,
+    lastReservationResult: null
+  };
+
+  const concernOptions = [
+    "肩こり",
+    "首まわり",
+    "腰痛",
+    "膝",
+    "産後骨盤",
+    "姿勢改善",
+    "全身疲労",
+    "メンテナンス",
+    "鍼灸相談",
+    "相談したい"
+  ];
+
+  function endpoint(key) {
+    return (CONFIG.endpoints && CONFIG.endpoints[key]) || FALLBACK_CONFIG.endpoints[key];
+  }
+
+  function trimSlash(value) {
+    return String(value || "").replace(/\/+$/, "");
+  }
+
+  function apiUrl(path, params = {}) {
+    const url = new URL(`${trimSlash(CONFIG.apiBaseUrl)}${path.startsWith("/") ? path : `/${path}`}`);
+    if (!url.searchParams.get("shop_code")) {
+      url.searchParams.set("shop_code", CONFIG.shopCode || "dpro_seitai_demo");
+    }
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value) !== "") {
+        url.searchParams.set(key, String(value));
+      }
+    });
+    return url.toString();
+  }
+
+  async function apiGet(path, params = {}) {
+    const res = await fetch(apiUrl(path, params), { method: "GET" });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.message || data.error || `API error ${res.status}`);
+    }
+    return data;
+  }
+
+  async function apiPost(path, body = {}, query = {}) {
+    const res = await fetch(apiUrl(path, query), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {})
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.message || data.error || `API error ${res.status}`);
+    }
+    return data;
+  }
+
+  function todayText() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function addDaysText(dateText, days) {
+    const [y, m, d] = dateText.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + Number(days || 0));
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  function formatPrice(price) {
+    const n = Number(price || 0);
+    if (!n) return "無料/回数券";
+    return `${n.toLocaleString("ja-JP")}円`;
+  }
+
+  function formatTime(value) {
+    return String(value || "").slice(0, 5);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function showToast(text) {
+    const t = $("toast");
+    t.textContent = text;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1900);
+  }
+
+  function setStatus(id, text, kind = "") {
+    const el = $(id);
+    el.textContent = text;
+    el.className = `status ${kind}`.trim();
+  }
+
+  function setBusy(button, busy, label) {
+    if (!button) return;
+    if (busy) {
+      button.dataset.oldText = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = `<span class="loading"></span>${label || "処理中..."}`;
+    } else {
+      button.disabled = false;
+      if (button.dataset.oldText) button.innerHTML = button.dataset.oldText;
+      delete button.dataset.oldText;
+    }
+  }
+
+  function saveProfile() {
+    const profile = {
+      customer_name: $("customerName").value.trim(),
+      customer_kana: $("customerKana").value.trim(),
+      phone: $("phone").value.trim(),
+      memo: $("customerMemo").value.trim()
+    };
+    localStorage.setItem("DPRO_SEITAI_CUSTOMER_PROFILE", JSON.stringify(profile));
+  }
+
+  function loadProfile() {
+    try {
+      const raw = localStorage.getItem("DPRO_SEITAI_CUSTOMER_PROFILE");
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      $("customerName").value = p.customer_name || "";
+      $("customerKana").value = p.customer_kana || "";
+      $("phone").value = p.phone || "";
+      $("customerMemo").value = p.memo || "";
+    } catch {}
+  }
+
+  function renderMenus() {
+    const box = $("menuList");
+    if (!state.menus.length) {
+      box.innerHTML = `<div class="alert danger">メニューを読み込めませんでした。</div>`;
+      return;
+    }
+
+    box.innerHTML = state.menus.map((menu, index) => {
+      const selected = state.selectedMenu && state.selectedMenu.menu_code === menu.menu_code;
+      return `
+        <button type="button" class="choice ${selected ? "selected" : ""}" data-menu-code="${escapeHtml(menu.menu_code)}">
+          <div class="choiceTop">
+            <div>
+              <div class="choiceTitle">${escapeHtml(menu.menu_name)}</div>
+              <div class="choiceMeta">${Number(menu.duration_minutes || 0)}分 / ${escapeHtml(menu.description || "")}</div>
+            </div>
+            <span class="price">${escapeHtml(formatPrice(menu.price_yen))}</span>
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    box.querySelectorAll("[data-menu-code]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const code = btn.dataset.menuCode;
+        state.selectedMenu = state.menus.find((m) => m.menu_code === code) || null;
+        state.selectedSlot = null;
+        state.slots = [];
+        renderMenus();
+        renderSlots();
+        updateSummary();
+        scrollToSection("sectionStaff");
+      });
+    });
+  }
+
+  function renderStaff() {
+    const box = $("staffList");
+    if (!state.staff.length) {
+      box.innerHTML = `<div class="alert">スタッフ情報を読み込み中です。</div>`;
+      return;
+    }
+
+    box.innerHTML = state.staff.map((staff) => {
+      const selected = state.selectedStaffCode === staff.staff_code;
+      return `
+        <button type="button" class="staffCard ${selected ? "selected" : ""}" data-staff-code="${escapeHtml(staff.staff_code)}">
+          <div class="staffName">${escapeHtml(staff.display_name || staff.staff_name || staff.staff_code)}</div>
+          <div class="staffMini">
+            1日最大 ${Number(staff.daily_limit || 0)}件 / ${escapeHtml(staff.note || "対応可能なメニューを担当します")}
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    box.querySelectorAll("[data-staff-code]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.selectedStaffCode = btn.dataset.staffCode;
+        state.selectedSlot = null;
+        state.slots = [];
+        renderStaff();
+        renderSlots();
+        updateSummary();
+      });
+    });
+  }
+
+  function renderConcerns() {
+    const box = $("concernList");
+    box.innerHTML = concernOptions.map((tag) => {
+      const selected = state.selectedConcerns.includes(tag);
+      return `<button type="button" class="tag ${selected ? "selected" : ""}" data-concern="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`;
+    }).join("");
+
+    box.querySelectorAll("[data-concern]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const value = btn.dataset.concern;
+        if (state.selectedConcerns.includes(value)) {
+          state.selectedConcerns = state.selectedConcerns.filter((item) => item !== value);
+        } else {
+          state.selectedConcerns.push(value);
+        }
+        renderConcerns();
+        updateSummary();
+      });
+    });
+  }
+
+  function setupStaffPreference() {
+    document.querySelectorAll("[data-pref]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-pref]").forEach((el) => el.classList.remove("selected"));
+        btn.classList.add("selected");
+
+        state.staffPreference = btn.dataset.pref;
+        if (state.staffPreference !== "specific") {
+          state.selectedStaffCode = "";
+        } else if (!state.selectedStaffCode && state.staff[0]) {
+          state.selectedStaffCode = state.staff[0].staff_code;
+        }
+
+        $("staffSelectArea").style.display = state.staffPreference === "specific" ? "block" : "none";
+        state.selectedSlot = null;
+        state.slots = [];
+
+        renderStaff();
+        renderSlots();
+        updateSummary();
+      });
+    });
+  }
+
+  function renderSlots() {
+    const box = $("slotList");
+    if (!state.slots.length) {
+      box.innerHTML = "";
+      return;
+    }
+
+    box.innerHTML = state.slots.map((slot) => {
+      const selected = state.selectedSlot && state.selectedSlot.time === slot.time;
+      return `
+        <button type="button" class="slot ${selected ? "selected" : ""}" data-slot-time="${escapeHtml(slot.time)}">
+          ${escapeHtml(slot.time)}
+          <small>${escapeHtml(slot.staff_name || "担当未定")} / ${escapeHtml(slot.resource_name || "")}</small>
+        </button>
+      `;
+    }).join("");
+
+    box.querySelectorAll("[data-slot-time]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.selectedSlot = state.slots.find((slot) => slot.time === btn.dataset.slotTime) || null;
+        renderSlots();
+        updateSummary();
+        scrollToSection("sectionCustomer");
+      });
+    });
+  }
+
+  function staffLabel() {
+    const prefMap = {
+      any: "おまかせ",
+      same_as_last: "前回と同じ担当",
+      specific: "スタッフ指名",
+      female_preferred: "女性スタッフ希望"
+    };
+
+    if (state.staffPreference === "specific") {
+      const staff = state.staff.find((s) => s.staff_code === state.selectedStaffCode);
+      return staff ? (staff.display_name || staff.staff_name) : "スタッフ指名";
+    }
+
+    return prefMap[state.staffPreference] || "おまかせ";
+  }
+
+  function updateSummary() {
+    $("sumMenu").textContent = state.selectedMenu
+      ? `${state.selectedMenu.menu_name}（${Number(state.selectedMenu.duration_minutes || 0)}分）`
+      : "未選択";
+
+    $("sumStaff").textContent = state.selectedSlot?.staff_name
+      ? `${staffLabel()} → ${state.selectedSlot.staff_name}`
+      : staffLabel();
+
+    $("sumConcern").textContent = state.selectedConcerns.length
+      ? state.selectedConcerns.join("、")
+      : "未選択";
+
+    $("sumDateTime").textContent = state.selectedDate && state.selectedSlot
+      ? `${state.selectedDate} ${state.selectedSlot.time}`
+      : state.selectedDate
+        ? `${state.selectedDate} / 時間未選択`
+        : "未選択";
+  }
+
+  function scrollToSection(id) {
+    const el = $(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  async function loadSettings() {
+    setStatus("apiStatus", "店舗設定確認中", "warn");
+    const data = await apiGet(endpoint("publicSettings"));
+    state.settings = data.settings || {};
+    state.menus = Array.isArray(data.menus) ? data.menus : [];
+    state.staff = Array.isArray(data.staff) ? data.staff : [];
+
+    $("heroShopName").textContent = data.shop?.shop_name || CONFIG.shopName || "DPRO整体院";
+    $("heroShopNote").textContent = data.shop?.public_note || "LINEから予約・回数券・次回来院フォローまで確認できるデモ整体院です。";
+
+    if (!state.selectedMenu && state.menus[0]) state.selectedMenu = state.menus[0];
+
+    renderMenus();
+    renderStaff();
+
+    const minDate = todayText();
+    $("dateInput").min = minDate;
+    $("dateInput").value = addDaysText(minDate, 1);
+    state.selectedDate = $("dateInput").value;
+
+    $("settingsNote").textContent = `予約は${Number(state.settings.reservation_max_months_ahead || 2)}か月先まで、${Number(state.settings.reservation_slot_minutes || 30)}分単位で受付します。`;
+    setStatus("apiStatus", "店舗設定OK", "ok");
+    updateSummary();
+  }
+
+  async function loadSlots(dateOverride) {
+    if (!state.selectedMenu) {
+      showToast("メニューを選んでください");
+      scrollToSection("sectionMenu");
+      return null;
+    }
+
+    const date = dateOverride || $("dateInput").value;
+    if (!date) {
+      showToast("日付を選んでください");
+      return null;
+    }
+
+    state.selectedDate = date;
+    state.selectedSlot = null;
+    state.slots = [];
+    renderSlots();
+    updateSummary();
+
+    setStatus("slotStatus", "確認中...", "warn");
+    $("slotMessage").innerHTML = "";
+
+    const data = await apiGet(endpoint("appointmentOptions"), {
+      date,
+      menu_code: state.selectedMenu.menu_code,
+      staff_preference: state.staffPreference,
+      staff_code: state.staffPreference === "specific" ? state.selectedStaffCode : ""
+    });
+
+    state.slots = Array.isArray(data.available_slots)
+      ? data.available_slots
+      : (Array.isArray(data.slots) ? data.slots.map((time) => ({ time })) : []);
+
+    if (data.is_available && state.slots.length) {
+      setStatus("slotStatus", "空きあり", "ok");
+      $("slotMessage").innerHTML = `<div class="alert ok">${escapeHtml(date)} の予約可能時間を表示しています。</div>`;
+    } else {
+      setStatus("slotStatus", "空きなし", "ng");
+      $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(data.reason || "この日は空き枠がありません。")}</div>`;
+    }
+
+    renderSlots();
+    updateSummary();
+    return data;
+  }
+
+  async function findOpenDay() {
+    if (!state.selectedMenu) {
+      showToast("メニューを選んでください");
+      return;
+    }
+
+    const start = todayText();
+    for (let i = 0; i < 28; i++) {
+      const date = addDaysText(start, i);
+      try {
+        const data = await loadSlots(date);
+        if (data && data.is_available && state.slots.length) {
+          $("dateInput").value = date;
+          state.selectedDate = date;
+          updateSummary();
+          showToast(`空き日：${date}`);
+          return;
+        }
+      } catch {}
+    }
+
+    showToast("28日以内に空き枠が見つかりませんでした");
+  }
+
+  function validateBeforeConfirm() {
+    if (!state.selectedMenu) return "メニューを選んでください。";
+    if (state.staffPreference === "specific" && !state.selectedStaffCode) return "指名スタッフを選んでください。";
+    if (!state.selectedDate) return "予約日を選んでください。";
+    if (!state.selectedSlot) return "予約時間を選んでください。";
+    if (!$("customerName").value.trim()) return "お名前を入力してください。";
+    if (!$("phone").value.trim()) return "電話番号を入力してください。";
+    return "";
+  }
+
+  function renderConfirm() {
+    const error = validateBeforeConfirm();
+    if (error) {
+      $("confirmBox").innerHTML = `<div class="alert danger">${escapeHtml(error)}</div>`;
+      showToast(error);
+      return false;
+    }
+
+    const staff = state.selectedSlot?.staff_name || staffLabel();
+    const resource = state.selectedSlot?.resource_name || "";
+    const concerns = state.selectedConcerns.length ? state.selectedConcerns.join("、") : "未選択";
+    const request = $("requestNote").value.trim() || "なし";
+
+    $("confirmBox").innerHTML = `
+      <div class="confirmRow"><div>お名前</div><div>${escapeHtml($("customerName").value.trim())} 様</div></div>
+      <div class="confirmRow"><div>電話番号</div><div>${escapeHtml($("phone").value.trim())}</div></div>
+      <div class="confirmRow"><div>メニュー</div><div>${escapeHtml(state.selectedMenu.menu_name)}（${Number(state.selectedMenu.duration_minutes || 0)}分）</div></div>
+      <div class="confirmRow"><div>日時</div><div>${escapeHtml(state.selectedDate)} ${escapeHtml(state.selectedSlot.time)}</div></div>
+      <div class="confirmRow"><div>担当</div><div>${escapeHtml(staff)}${resource ? ` / ${escapeHtml(resource)}` : ""}</div></div>
+      <div class="confirmRow"><div>気になる内容</div><div>${escapeHtml(concerns)}</div></div>
+      <div class="confirmRow"><div>ご要望</div><div>${escapeHtml(request)}</div></div>
+    `;
+
+    scrollToSection("sectionConfirm");
+    return true;
+  }
+
+  async function submitReservation() {
+    const error = validateBeforeConfirm();
+    if (error) {
+      $("confirmBox").innerHTML = `<div class="alert danger">${escapeHtml(error)}</div>`;
+      showToast(error);
+      return;
+    }
+
+    const btn = $("submitBtn");
+    setBusy(btn, true, "予約送信中...");
+
+    try {
+      const body = {
+        shop_code: CONFIG.shopCode || "dpro_seitai_demo",
+        customer_name: $("customerName").value.trim(),
+        customer_kana: $("customerKana").value.trim(),
+        phone: $("phone").value.trim(),
+        memo: $("customerMemo").value.trim(),
+        menu_code: state.selectedMenu.menu_code,
+        staff_preference: state.staffPreference,
+        staff_code: state.staffPreference === "specific" ? state.selectedStaffCode : "",
+        reservation_date: state.selectedDate,
+        start_time: state.selectedSlot.time,
+        concern_tags: state.selectedConcerns,
+        request_note: $("requestNote").value.trim(),
+        source: "line"
+      };
+
+      const data = await apiPost(endpoint("reservationCreate"), body);
+      state.lastReservationResult = data;
+      saveProfile();
+
+      $("messageText").textContent = data.message_text || buildFallbackMessage(data);
+      $("completeBox").classList.add("show");
+      $("completeBox").scrollIntoView({ behavior: "smooth", block: "start" });
+
+      showToast("予約を受け付けました");
+    } catch (error) {
+      showToast(error.message);
+      $("confirmBox").innerHTML = `<div class="alert danger">${escapeHtml(error.message)}</div>`;
+      scrollToSection("sectionConfirm");
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  function buildFallbackMessage(data) {
+    const name = $("customerName").value.trim() || "お客様";
+    const staff = data.staff?.display_name || state.selectedSlot?.staff_name || "おまかせ";
+    return `${name}様\n\nご予約内容の確認です。\n日時：${state.selectedDate} ${state.selectedSlot?.time || ""}\nメニュー：${state.selectedMenu?.menu_name || ""}\n担当：${staff}\n\n変更やキャンセルがある場合は、お早めにLINEでお知らせください。\n当日はお気をつけてお越しください。`;
+  }
+
+  function resetForNewReservation() {
+    state.selectedSlot = null;
+    state.slots = [];
+    $("completeBox").classList.remove("show");
+    renderSlots();
+    updateSummary();
+    scrollToSection("sectionDate");
+  }
+
+  function initEvents() {
+    setupStaffPreference();
+
+    $("dateInput").addEventListener("change", () => {
+      state.selectedDate = $("dateInput").value;
+      state.selectedSlot = null;
+      state.slots = [];
+      renderSlots();
+      updateSummary();
+    });
+
+    $("loadSlotsBtn").addEventListener("click", async () => {
+      const btn = $("loadSlotsBtn");
+      setBusy(btn, true, "確認中...");
+      try { await loadSlots(); }
+      catch (error) {
+        setStatus("slotStatus", "エラー", "ng");
+        $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(error.message)}</div>`;
+      } finally { setBusy(btn, false); }
+    });
+
+    $("findOpenDayBtn").addEventListener("click", async () => {
+      const btn = $("findOpenDayBtn");
+      setBusy(btn, true, "検索中...");
+      try { await findOpenDay(); }
+      catch (error) { showToast(error.message); }
+      finally { setBusy(btn, false); }
+    });
+
+    $("confirmBtn").addEventListener("click", renderConfirm);
+    $("submitBtn").addEventListener("click", submitReservation);
+
+    $("saveProfileBtn").addEventListener("click", () => {
+      saveProfile();
+      showToast("お客様情報を保存しました");
+    });
+
+    $("scrollTopBtn").addEventListener("click", () => scrollToSection("sectionMenu"));
+
+    $("copyMessageBtn").addEventListener("click", async () => {
+      const text = $("messageText").textContent || "";
+      await navigator.clipboard.writeText(text).catch(() => {});
+      showToast("文面をコピーしました");
+    });
+
+    $("newReservationBtn").addEventListener("click", resetForNewReservation);
+
+    ["customerName","customerKana","phone","customerMemo","requestNote"].forEach((id) => {
+      $(id).addEventListener("input", updateSummary);
+    });
+  }
+
+  async function init() {
+    renderConcerns();
+    initEvents();
+    loadProfile();
+
+    try {
+      await loadSettings();
+      await loadSlots($("dateInput").value).catch(() => {});
+    } catch (error) {
+      setStatus("apiStatus", "設定エラー", "ng");
+      $("settingsNote").textContent = error.message;
+      showToast(error.message);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
