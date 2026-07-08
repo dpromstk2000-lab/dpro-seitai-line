@@ -1,9 +1,10 @@
 <!doctype html>
+<!-- STEP SEITAI-6A: customer form layout fix / span6 CSS added / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-6</title>
+  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-6A</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -130,6 +131,7 @@
     }
     .span4{grid-column:span 4}
     .span5{grid-column:span 5}
+    .span6{grid-column:span 6}
     .span7{grid-column:span 7}
     .span8{grid-column:span 8}
     .span12{grid-column:span 12}
@@ -480,7 +482,7 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     @media(max-width:920px){
       .hero{grid-template-columns:1fr}
-      .span4,.span5,.span7,.span8{grid-column:span 12}
+      .span4,.span5,.span6,.span7,.span8{grid-column:span 12}
       .choiceGrid,.staffList{grid-template-columns:1fr}
       .slots{grid-template-columns:repeat(3,minmax(0,1fr))}
       .summary{position:static}
@@ -501,7 +503,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-6 / index.html</span>
+        <span class="badge">STEP SEITAI-6A / index.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>かんたん予約</h1>
         <p class="lead">
           メニュー、担当者、気になる内容、日時を選んで予約できます。
