@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-10G-R1: owner customer search button event fix / 20260709 -->
+<!-- STEP SEITAI-10G-R3: customer result select delegated event fix / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R1</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R3</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -706,7 +706,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10G-R1 / owner.html</span>
+        <span class="badge">STEP SEITAI-10G-R3 / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -1934,13 +1934,12 @@
           <div class="customerResultMeta">${escapeHtml(customerDisplayMeta(c) || "顧客情報")}</div>
           ${c.memo ? `<div class="customerResultMeta">メモ：${escapeHtml(c.memo)}</div>` : ""}
         </div>
-        <button class="btn primary" data-customer-id="${escapeHtml(c.id)}" type="button">この顧客を選択</button>
+        <button class="btn primary customerSelectBtn" data-action="select-customer" data-customer-id="${escapeHtml(c.id)}" type="button">この顧客を選択</button>
       </div>
     `).join("");
 
-    box.querySelectorAll("[data-customer-id]").forEach((btn) => {
-      btn.addEventListener("click", () => selectManualCustomer(btn.dataset.customerId));
-    });
+    // 選択ボタンは initEvents のイベント委任で拾います。
+    // 検索結果は動的に差し替わるため、個別ボタンへ毎回イベントを付ける方式にしません。
   }
 
   async function selectManualCustomer(customerId) {
@@ -1956,16 +1955,22 @@
     $("manualPhone").value = customer.phone || "";
     $("manualCustomerSearchInput").value = customer.phone || customer.customer_name || "";
 
+    setStatus("manualCustomerSearchStatus", "選択中", "warn");
+    renderSelectedManualCustomer({ customer, tickets: [], reservations: [] });
+    showToast(`${customer.customer_name || "顧客"} 様を選択しました`);
+
     try {
       const detail = await apiGet("/api/owner/customers/detail", { customer_id: customer.id }, true);
       state.selectedManualCustomerDetail = detail;
       renderSelectedManualCustomer(detail);
       applyLastReservationToManualForm(detail);
+      setStatus("manualCustomerSearchStatus", "選択済み", "ok");
       showToast("既存顧客を選択しました");
       showJson(detail);
     } catch (error) {
       state.selectedManualCustomerDetail = null;
       renderSelectedManualCustomer({ customer, tickets: [], reservations: [] });
+      setStatus("manualCustomerSearchStatus", "選択済み", "ok");
       showToast("顧客を選択しました");
     }
   }
@@ -2839,6 +2844,14 @@
     $("manualRecentCustomersBtn").addEventListener("click", () => searchManualCustomers(""));
 
     $("manualCustomerClearBtn").addEventListener("click", clearSelectedManualCustomer);
+
+    $("manualCustomerResults").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-action='select-customer']");
+      if (!btn) return;
+      event.preventDefault();
+      event.stopPropagation();
+      selectManualCustomer(btn.dataset.customerId);
+    });
 
     $("manualCustomerSearchInput").addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
