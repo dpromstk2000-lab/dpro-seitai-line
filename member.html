@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-9B: stable open-day search without jumping dates / 20260709 -->
+<!-- STEP SEITAI-9C: auto date-time selection and closed-day message / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜会員証・予約確認｜STEP SEITAI-9B</title>
+  <title>DPRO 整骨院・整体 LINE｜会員証・予約確認｜STEP SEITAI-9C</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -419,7 +419,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-9B / member.html</span>
+        <span class="badge">STEP SEITAI-9C / member.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>会員証・予約確認</h1>
         <p class="lead">
           お客様がLINEから、会員証・現在の予約・回数券残数を確認できます。
@@ -547,7 +547,7 @@
       <div>
         <span class="badge">予約変更</span>
         <h2 style="margin-top:10px;">予約日時を変更</h2>
-        <p class="note">メニュー・日付・時間を選び直して変更します。定休日や満席の日は理由を表示します。</p>
+        <p class="note">メニューと日付を選ぶと、その日の空き時間を自動で表示します。定休日や満席の日は理由を表示します。</p>
       </div>
       <button class="btn ghost" id="closeChangeBtn" type="button">閉じる</button>
     </div>
@@ -560,7 +560,7 @@
     <div class="note" id="changeDateLabel">日付を選んでください。</div>
 
     <div class="row" style="margin-top:12px;">
-      <button class="btn primary" id="loadSlotsBtn" type="button">この日の空き時間を表示</button>
+      <button class="btn primary" id="loadSlotsBtn" type="button">この日の時間を再確認</button>
       <button class="btn ghost" id="findOpenDayBtn" type="button">次の空き日を探す</button>
       <span class="status" id="slotStatus">未確認</span>
     </div>
@@ -633,6 +633,7 @@
     menus: [],
     staff: [],
     resources: [],
+    hours: [],
     menuMap: {},
     staffMap: {},
     resourceMap: {},
@@ -741,12 +742,56 @@
       : (Array.isArray(data.slots) ? data.slots.map((time) => ({ time })) : []);
   }
 
+  function getClosedReasonFromSettings(dateText) {
+    if (!dateText) return "";
+    const [y, m, d] = dateText.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    const day = date.getDay();
+
+    const hours = state.hours || [];
+    const row = hours.find((h) => Number(h.day_of_week) === day);
+
+    if (row && row.is_closed === true) {
+      return `${weekdayLabel(dateText)}曜日は定休日です。別の日を選ぶか「次の空き日を探す」を押してください。`;
+    }
+
+    return "";
+  }
+
   async function fetchSlotsForDate(dateText) {
     return apiGet(endpoint("appointmentOptions"), {
       date: dateText,
       menu_code: $("changeMenu").value,
       staff_preference: "any"
     });
+  }
+
+  async function autoCheckSelectedDate(reasonText = "") {
+    const date = $("changeDate").value;
+    updateChangeDateLabel();
+    state.selectedSlot = null;
+    state.slots = [];
+    $("slotList").innerHTML = "";
+
+    if (!date) {
+      setStatus("slotStatus", "未確認", "");
+      $("slotMessage").innerHTML = `<div class="alert">変更希望日を選んでください。</div>`;
+      return;
+    }
+
+    const closedReason = getClosedReasonFromSettings(date);
+    if (closedReason) {
+      setStatus("slotStatus", "定休日", "ng");
+      $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(dateWithWeekday(date))} は予約できません。<br>${escapeHtml(closedReason)}</div>`;
+      renderSlots();
+      return;
+    }
+
+    if (reasonText) {
+      $("slotMessage").innerHTML = `<div class="alert">${escapeHtml(reasonText)}</div>`;
+    }
+
+    await loadSlots({ silentButton: true });
   }
 
   function showToast(text) {
@@ -859,6 +904,7 @@
     state.menus = data.menus || [];
     state.staff = data.staff || [];
     state.resources = data.resources || [];
+    state.hours = data.hours || data.business_hours || [];
 
     state.menuMap = {};
     state.staffMap = {};
@@ -1070,16 +1116,17 @@
     updateChangeDateLabel();
 
     $("slotList").innerHTML = "";
-    $("slotMessage").innerHTML = `<div class="alert">変更したい日付を選んで「この日の空き時間を表示」を押してください。日曜・定休日・満席の日は理由を表示します。</div>`;
-    setStatus("slotStatus", "未確認", "");
+    $("slotMessage").innerHTML = `<div class="alert">日付を選ぶと、営業日なら空き時間を自動表示します。休みの日は理由を表示します。</div>`;
+    setStatus("slotStatus", "確認中...", "warn");
     $("changeDrawer").classList.add("open");
+    autoCheckSelectedDate("現在の予約日付の空き時間を確認しています。");
   }
 
   function closeChangeDrawer() {
     $("changeDrawer").classList.remove("open");
   }
 
-  async function loadSlots() {
+  async function loadSlots(options = {}) {
     const reservation = state.selectedReservation;
     if (!reservation) {
       showToast("変更する予約が選択されていません。");
@@ -1087,10 +1134,21 @@
     }
 
     const btn = $("loadSlotsBtn");
-    setBusy(btn, true, "確認中...");
+    if (!options.silentButton) setBusy(btn, true, "確認中...");
+
     try {
       const targetDate = $("changeDate").value;
       updateChangeDateLabel();
+
+      const closedReason = getClosedReasonFromSettings(targetDate);
+      if (closedReason) {
+        state.slots = [];
+        state.selectedSlot = null;
+        setStatus("slotStatus", "定休日", "ng");
+        $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(dateWithWeekday(targetDate))} は予約できません。<br>${escapeHtml(closedReason)}</div>`;
+        renderSlots();
+        return { ok:true, is_available:false, reason: closedReason, closed_by_front_settings:true };
+      }
 
       const data = await fetchSlotsForDate(targetDate);
       state.slots = normalizeSlots(data);
@@ -1098,11 +1156,11 @@
 
       if (data.is_available && state.slots.length) {
         setStatus("slotStatus", "空きあり", "ok");
-        $("slotMessage").innerHTML = `<div class="alert ok">${escapeHtml(dateWithWeekday(targetDate))} の空き時間を表示しています。変更したい時間を選んでください。</div>`;
+        $("slotMessage").innerHTML = `<div class="alert ok">${escapeHtml(dateWithWeekday(targetDate))} の空き時間を表示しています。下から時間を選んでください。</div>`;
       } else {
-        const reason = data.reason || data.message || "この日は定休日・満席・受付対象外の可能性があります。別の日を選ぶか「次の空き日を探す」を押してください。";
+        const reason = data.reason || data.message || "この日は満席、または受付対象外の可能性があります。別の日を選ぶか「次の空き日を探す」を押してください。";
         setStatus("slotStatus", "空きなし", "ng");
-        $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(dateWithWeekday(targetDate))} は予約できる時間がありません。<br>${escapeHtml(reason)}<br><br>この日付のまま確認しています。自動では日付を変更しません。</div>`;
+        $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(dateWithWeekday(targetDate))} は予約できる時間がありません。<br>${escapeHtml(reason)}</div>`;
       }
 
       renderSlots();
@@ -1113,14 +1171,14 @@
       showToast(error.message);
       return null;
     } finally {
-      setBusy(btn, false);
+      if (!options.silentButton) setBusy(btn, false);
     }
   }
 
   function renderSlots() {
     const box = $("slotList");
     if (!state.slots.length) {
-      box.innerHTML = `<div class="empty" style="grid-column:1/-1;">この日に表示できる時間はありません。<br>別の日を選ぶか「空き日を探す」を押してください。</div>`;
+      box.innerHTML = `<div class="empty" style="grid-column:1/-1;">この日に表示できる時間はありません。<br>別の日を選ぶか「次の空き日を探す」を押してください。</div>`;
       return;
     }
 
@@ -1155,6 +1213,11 @@
     try {
       for (let i = 0; i < 35; i++) {
         const date = addDaysText(originalDate, i);
+        const closedReason = getClosedReasonFromSettings(date);
+        if (closedReason) {
+          continue;
+        }
+
         const data = await fetchSlotsForDate(date);
         const slots = normalizeSlots(data);
 
@@ -1299,20 +1362,11 @@
     $("submitChangeBtn").addEventListener("click", submitChange);
 
     $("changeDate").addEventListener("change", () => {
-      state.selectedSlot = null;
-      state.slots = [];
-      $("slotList").innerHTML = "";
-      updateChangeDateLabel();
-      setStatus("slotStatus", "再確認が必要", "warn");
-      $("slotMessage").innerHTML = `<div class="alert">${escapeHtml(dateWithWeekday($("changeDate").value))} を選びました。<br>この日のまま確認するには「この日の空き時間を表示」を押してください。空いている営業日に移動したい場合だけ「次の空き日を探す」を押してください。</div>`;
+      autoCheckSelectedDate(`${dateWithWeekday($("changeDate").value)} を選びました。営業日なら空き時間を自動表示します。`);
     });
 
     $("changeMenu").addEventListener("change", () => {
-      state.selectedSlot = null;
-      state.slots = [];
-      $("slotList").innerHTML = "";
-      setStatus("slotStatus", "再確認が必要", "warn");
-      $("slotMessage").innerHTML = `<div class="alert">メニューが変わったため、${escapeHtml(dateWithWeekday($("changeDate").value))} の空き時間を再確認してください。</div>`;
+      autoCheckSelectedDate(`メニューが変わったため、${dateWithWeekday($("changeDate").value)} の空き時間を確認しています。`);
     });
 
     $("closeCancelBtn").addEventListener("click", closeCancelDrawer);
