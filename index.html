@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-6B: auto reload slots on date/menu/staff change / stale slot message fix / 20260709 -->
+<!-- STEP SEITAI-10I: customer reservation UX polish / auto slots / closed day reason / member link / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-6B</title>
+  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-10I</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -404,6 +404,26 @@
       color:var(--muted);
       font-weight:900;
     }
+
+    .dateHint{
+      margin-top:8px;
+      font-size:13px;
+      color:#475569;
+      font-weight:800;
+      line-height:1.55;
+    }
+    .nextActionBox{
+      border:1px solid #bbf7d0;
+      background:#f0fdf4;
+      color:#166534;
+      border-radius:16px;
+      padding:12px;
+      line-height:1.65;
+      font-size:13px;
+      font-weight:850;
+      margin-top:12px;
+    }
+
     .complete{
       border:1px solid #bbf7d0;
       background:linear-gradient(180deg,#ecfdf5,#ffffff);
@@ -503,7 +523,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-6B / index.html</span>
+        <span class="badge">STEP SEITAI-10I / index.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>かんたん予約</h1>
         <p class="lead">
           メニュー、担当者、気になる内容、日時を選んで予約できます。
@@ -619,12 +639,13 @@
               <div class="span5">
                 <label for="dateInput">予約日</label>
                 <input id="dateInput" type="date">
+                <div class="dateHint" id="dateLabel">日付を選んでください。</div>
               </div>
               <div class="span7">
                 <label>予約枠</label>
                 <div class="row">
-                  <button type="button" class="btn primary" id="loadSlotsBtn">この日の空きを見る</button>
-                  <button type="button" class="btn ghost" id="findOpenDayBtn">空き日を探す</button>
+                  <button type="button" class="btn primary" id="loadSlotsBtn">この日の時間を再確認</button>
+                  <button type="button" class="btn ghost" id="findOpenDayBtn">次の空き日を探す</button>
                   <span class="status" id="slotStatus">未確認</span>
                 </div>
               </div>
@@ -695,8 +716,12 @@
               デモ確認用にコピーできます。
             </p>
             <div class="messageBox" id="messageText"></div>
+            <div class="nextActionBox" id="nextActionBox">
+              予約後は、会員証・予約確認画面から現在の予約や回数券を確認できます。
+            </div>
             <div class="row" style="margin-top:12px;">
               <button type="button" class="btn primary" id="copyMessageBtn">確認文面をコピー</button>
+              <a class="btn dark" id="memberLinkBtn" href="./member.html" target="_blank" rel="noopener">会員証・予約確認を見る</a>
               <button type="button" class="btn ghost" id="newReservationBtn">続けて予約する</button>
             </div>
           </section>
@@ -774,6 +799,7 @@
     settings: null,
     menus: [],
     staff: [],
+    hours: [],
     selectedMenu: null,
     staffPreference: "any",
     selectedStaffCode: "",
@@ -866,6 +892,69 @@
 
   function formatTime(value) {
     return String(value || "").slice(0, 5);
+  }
+
+  function weekdayLabel(dateText) {
+    if (!dateText) return "";
+    const [y, m, d] = String(dateText).split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    return ["日","月","火","水","木","金","土"][date.getDay()] || "";
+  }
+
+  function dateWithWeekday(dateText) {
+    const w = weekdayLabel(dateText);
+    return w ? `${dateText}（${w}）` : dateText;
+  }
+
+  function updateDateLabel() {
+    const date = $("dateInput").value;
+    if ($("dateLabel")) {
+      $("dateLabel").textContent = date ? `選択中：${dateWithWeekday(date)}` : "日付を選んでください。";
+    }
+  }
+
+  function normalizeSlots(data) {
+    return Array.isArray(data.available_slots)
+      ? data.available_slots
+      : (Array.isArray(data.slots) ? data.slots.map((time) => ({ time })) : []);
+  }
+
+  function getClosedReasonFromSettings(dateText) {
+    if (!dateText) return "";
+    const [y, m, d] = String(dateText).split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    const day = date.getDay();
+    const row = (state.hours || []).find((h) => Number(h.day_of_week) === day);
+    if (row && row.is_closed === true) {
+      return `${weekdayLabel(dateText)}曜日は定休日です。別の日を選ぶか「次の空き日を探す」を押してください。`;
+    }
+    return "";
+  }
+
+  function normalizeLineText(value) {
+    return String(value ?? "")
+      .replace(/\\r\\n/g, "\n")
+      .replace(/\\n/g, "\n")
+      .replace(/\\r/g, "\n")
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n");
+  }
+
+  function pageUrl(path, params = {}) {
+    const base = location.origin + location.pathname.replace(/[^/]*$/, "");
+    const url = new URL(path, base);
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value) !== "") {
+        url.searchParams.set(key, String(value));
+      }
+    });
+    return url.toString();
+  }
+
+  function buildMemberUrl(data = {}) {
+    const customerNo = data.customer?.customer_no || data.customer_no || data.reservation?.customer_no || "";
+    const phone = data.customer?.phone || $("phone").value.trim();
+    return pageUrl("member.html", { phone, customer_no: customerNo });
   }
 
   function escapeHtml(value) {
@@ -1052,6 +1141,9 @@
         state.selectedSlot = state.slots.find((slot) => slot.time === btn.dataset.slotTime) || null;
         renderSlots();
         updateSummary();
+        if (state.selectedSlot) {
+          $("slotMessage").innerHTML = `<div class="alert ok">${escapeHtml(dateWithWeekday(state.selectedDate))} ${escapeHtml(state.selectedSlot.time)} を選択中です。お客様情報を入力してください。</div>`;
+        }
         scrollToSection("sectionCustomer");
       });
     });
@@ -1060,6 +1152,7 @@
   function clearSlots(message = "日付・メニュー・担当者が変わったため、予約時間を再確認してください。") {
     state.selectedSlot = null;
     state.slots = [];
+    updateDateLabel();
     renderSlots();
     setStatus("slotStatus", "再確認が必要", "warn");
     $("slotMessage").innerHTML = `<div class="alert">${escapeHtml(message)}</div>`;
@@ -1132,6 +1225,7 @@
     state.settings = data.settings || {};
     state.menus = Array.isArray(data.menus) ? data.menus : [];
     state.staff = Array.isArray(data.staff) ? data.staff : [];
+    state.hours = data.hours || data.business_hours || [];
 
     $("heroShopName").textContent = data.shop?.shop_name || CONFIG.shopName || "DPRO整体院";
     $("heroShopNote").textContent = data.shop?.public_note || "LINEから予約・回数券・次回来院フォローまで確認できるデモ整体院です。";
@@ -1145,6 +1239,7 @@
     $("dateInput").min = minDate;
     $("dateInput").value = addDaysText(minDate, 1);
     state.selectedDate = $("dateInput").value;
+    updateDateLabel();
 
     $("settingsNote").textContent = `予約は${Number(state.settings.reservation_max_months_ahead || 2)}か月先まで、${Number(state.settings.reservation_slot_minutes || 30)}分単位で受付します。`;
     setStatus("apiStatus", "店舗設定OK", "ok");
@@ -1164,14 +1259,23 @@
       return null;
     }
 
+    $("dateInput").value = date;
+    updateDateLabel();
     state.selectedDate = date;
     state.selectedSlot = null;
     state.slots = [];
     renderSlots();
     updateSummary();
 
+    const closedReason = getClosedReasonFromSettings(date);
+    if (closedReason) {
+      setStatus("slotStatus", "定休日", "ng");
+      $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(dateWithWeekday(date))} は予約できません。<br>${escapeHtml(closedReason)}</div>`;
+      return { ok:true, is_available:false, reason: closedReason, closed_by_front_settings:true };
+    }
+
     setStatus("slotStatus", "確認中...", "warn");
-    $("slotMessage").innerHTML = "";
+    $("slotMessage").innerHTML = `<div class="alert">${escapeHtml(dateWithWeekday(date))} の空き時間を確認しています。</div>`;
 
     const data = await apiGet(endpoint("appointmentOptions"), {
       date,
@@ -1180,16 +1284,16 @@
       staff_code: state.staffPreference === "specific" ? state.selectedStaffCode : ""
     });
 
-    state.slots = Array.isArray(data.available_slots)
-      ? data.available_slots
-      : (Array.isArray(data.slots) ? data.slots.map((time) => ({ time })) : []);
+    state.slots = normalizeSlots(data);
 
     if (data.is_available && state.slots.length) {
       setStatus("slotStatus", "空きあり", "ok");
-      $("slotMessage").innerHTML = `<div class="alert ok">${escapeHtml(date)} の予約可能時間を表示しています。</div>`;
+      $("slotMessage").innerHTML = `<div class="alert ok">${escapeHtml(dateWithWeekday(date))} の予約可能時間を表示しています。下から時間を選んでください。</div>`;
     } else {
-      setStatus("slotStatus", "空きなし", "ng");
-      $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(data.reason || "この日は空き枠がありません。")}</div>`;
+      const reason = data.reason || data.message || "この日は定休日・満席・受付対象外の可能性があります。別の日を選んでください。";
+      const label = /定休|休業|closed/i.test(reason) ? "定休日" : "空きなし";
+      setStatus("slotStatus", label, "ng");
+      $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(dateWithWeekday(date))} は予約できる時間がありません。<br>${escapeHtml(reason)}<br><br>別の日を選ぶか「次の空き日を探す」を押してください。</div>`;
     }
 
     renderSlots();
@@ -1203,22 +1307,42 @@
       return;
     }
 
-    const start = todayText();
-    for (let i = 0; i < 28; i++) {
-      const date = addDaysText(start, i);
+    const originalDate = $("dateInput").value || todayText();
+    setStatus("slotStatus", "検索中", "warn");
+    $("slotMessage").innerHTML = `<div class="alert">${escapeHtml(dateWithWeekday(originalDate))} 以降で、次に空いている日を探しています。</div>`;
+
+    for (let i = 0; i < 42; i++) {
+      const date = addDaysText(originalDate, i);
+      if (getClosedReasonFromSettings(date)) continue;
+
       try {
-        const data = await loadSlots(date);
-        if (data && data.is_available && state.slots.length) {
+        const data = await apiGet(endpoint("appointmentOptions"), {
+          date,
+          menu_code: state.selectedMenu.menu_code,
+          staff_preference: state.staffPreference,
+          staff_code: state.staffPreference === "specific" ? state.selectedStaffCode : ""
+        });
+        const slots = normalizeSlots(data);
+
+        if (data.is_available && slots.length) {
           $("dateInput").value = date;
+          updateDateLabel();
           state.selectedDate = date;
+          state.slots = slots;
+          state.selectedSlot = null;
+          setStatus("slotStatus", "空きあり", "ok");
+          $("slotMessage").innerHTML = `<div class="alert ok">次に空いている日を見つけました：${escapeHtml(dateWithWeekday(date))}<br>下から時間を選んでください。</div>`;
+          renderSlots();
           updateSummary();
-          showToast(`空き日：${date}`);
+          showToast(`空き日：${dateWithWeekday(date)}`);
           return;
         }
       } catch {}
     }
 
-    showToast("28日以内に空き枠が見つかりませんでした");
+    setStatus("slotStatus", "見つかりません", "ng");
+    $("slotMessage").innerHTML = `<div class="alert danger">42日以内に空き時間が見つかりませんでした。店舗へLINEでご相談ください。</div>`;
+    showToast("42日以内に空き枠が見つかりませんでした");
   }
 
   function validateBeforeConfirm() {
@@ -1290,7 +1414,9 @@
       state.lastReservationResult = data;
       saveProfile();
 
-      $("messageText").textContent = data.message_text || buildFallbackMessage(data);
+      $("messageText").textContent = normalizeLineText(data.message_text || buildFallbackMessage(data));
+      $("memberLinkBtn").href = buildMemberUrl(data);
+      $("nextActionBox").innerHTML = `予約を受け付けました。<br>会員証・予約確認画面から、現在の予約や回数券を確認できます。`;
       $("completeBox").classList.add("show");
       $("completeBox").scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -1314,6 +1440,7 @@
     state.selectedSlot = null;
     state.slots = [];
     $("completeBox").classList.remove("show");
+    $("memberLinkBtn").href = pageUrl("member.html");
     renderSlots();
     updateSummary();
     scrollToSection("sectionDate");
@@ -1324,8 +1451,9 @@
 
     $("dateInput").addEventListener("change", async () => {
       state.selectedDate = $("dateInput").value;
-      clearSlots("日付が変わったため、この日の空き時間を確認しています。");
-      await autoReloadSlots("日付が変わったため、この日の空き時間を確認しています。");
+      updateDateLabel();
+      clearSlots(`${dateWithWeekday($("dateInput").value)} の空き時間を確認しています。`);
+      await autoReloadSlots(`${dateWithWeekday($("dateInput").value)} の空き時間を確認しています。`);
     });
 
     $("loadSlotsBtn").addEventListener("click", async () => {
@@ -1357,7 +1485,8 @@
     $("scrollTopBtn").addEventListener("click", () => scrollToSection("sectionMenu"));
 
     $("copyMessageBtn").addEventListener("click", async () => {
-      const text = $("messageText").textContent || "";
+      const text = normalizeLineText($("messageText").textContent || "");
+      $("messageText").textContent = text;
       await navigator.clipboard.writeText(text).catch(() => {});
       showToast("文面をコピーしました");
     });
