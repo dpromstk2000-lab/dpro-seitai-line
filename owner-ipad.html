@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-10C: owner-ipad quick phone and walk-in reservation form / 20260709 -->
+<!-- STEP SEITAI-10H: owner-ipad quick customer search for reservation / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-10C</title>
+  <title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-10H</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -294,6 +294,91 @@
       font-size:14px;
     }
 
+
+    .customerSearchPanel{
+      border:1px solid #bfdbfe;
+      background:linear-gradient(180deg,#eff6ff,#ffffff);
+      border-radius:18px;
+      padding:14px;
+      margin:10px 0 14px;
+    }
+    .customerSearchTitle{
+      font-size:16px;
+      font-weight:950;
+      color:#1e3a8a;
+      letter-spacing:-.02em;
+      margin-bottom:4px;
+    }
+    .customerSearchTop{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .customerResultList{
+      display:grid;
+      gap:8px;
+      margin-top:10px;
+    }
+    .customerResultItem{
+      border:1px solid #dbeafe;
+      background:#fff;
+      border-radius:14px;
+      padding:12px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+    }
+    .customerResultName{
+      font-size:15px;
+      font-weight:950;
+      color:#0f172a;
+      line-height:1.35;
+    }
+    .customerResultMeta{
+      font-size:12px;
+      color:#64748b;
+      line-height:1.55;
+      margin-top:3px;
+      word-break:break-word;
+    }
+    .selectedCustomerBox{
+      display:none;
+      border:1px solid #bbf7d0;
+      background:#f0fdf4;
+      color:#166534;
+      border-radius:16px;
+      padding:12px;
+      line-height:1.65;
+      font-size:13px;
+      font-weight:850;
+      margin-top:10px;
+    }
+    .selectedCustomerBox.show{display:block}
+    .customerMiniMetrics{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-top:10px;
+    }
+    .customerMiniMetric{
+      border:1px solid #dbeafe;
+      background:#fff;
+      border-radius:12px;
+      padding:9px;
+      font-size:12px;
+      line-height:1.45;
+      color:#334155;
+    }
+    .customerMiniMetric b{
+      display:block;
+      font-size:15px;
+      color:#0f172a;
+      margin-bottom:3px;
+    }
+
     .quickReserveCard{
       border-color:#fde68a;
       background:linear-gradient(180deg,#fff7ed,#ffffff);
@@ -314,6 +399,7 @@
     }
     .field4{grid-column:span 4}
     .field6{grid-column:span 6}
+    .field8{grid-column:span 8}
     .field12{grid-column:span 12}
     .manualInner textarea{
       min-height:110px;
@@ -463,7 +549,9 @@
     @media(max-width:980px){
       .hero{grid-template-columns:1fr}
       .span3,.span4,.span5,.span6,.span7,.span8{grid-column:span 12}
-      .field4,.field6{grid-column:span 12}
+      .field4,.field6,.field8{grid-column:span 12}
+      .customerResultItem{grid-template-columns:1fr}
+      .customerMiniMetrics{grid-template-columns:1fr}
       .slotGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .quickReserveButtons{grid-template-columns:1fr}
       .statGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -487,7 +575,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10C / owner-ipad.html</span>
+        <span class="badge">STEP SEITAI-10H / owner-ipad.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>iPad受付・施術画面</h1>
         <p class="lead">
           受付・施術中に使う画面です。店舗設定は出さず、予約確認・来院・施術・回数券・文面コピーに絞っています。
@@ -642,6 +730,40 @@
       <button class="sourceTab" data-source="admin" type="button">手入力</button>
     </div>
 
+    <div class="customerSearchPanel">
+      <div class="customerSearchTop">
+        <div>
+          <div class="customerSearchTitle">既存顧客を検索</div>
+          <p class="note">
+            電話番号・名前・会員番号で検索できます。選択すると名前・電話番号・前回メニューを反映します。
+          </p>
+        </div>
+        <span class="status" id="manualCustomerSearchStatus">未検索</span>
+      </div>
+
+      <div class="manualGrid">
+        <div class="field8">
+          <label for="manualCustomerSearchInput">電話番号・名前・会員番号</label>
+          <input id="manualCustomerSearchInput" type="text" placeholder="例：09011112222 / 佐藤 / SEITAI-0001">
+        </div>
+        <div class="field4">
+          <label>検索</label>
+          <div class="row">
+            <button class="btn primary" id="manualCustomerSearchBtn" type="button">顧客検索</button>
+            <button class="btn ghost" id="manualCustomerClearBtn" type="button">解除</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="btn ghost" id="manualSearchByPhoneBtn" type="button">入力中の電話番号で検索</button>
+        <button class="btn ghost" id="manualRecentCustomersBtn" type="button">最近の顧客</button>
+      </div>
+
+      <div id="manualCustomerResults" class="customerResultList"></div>
+      <div id="selectedCustomerBox" class="selectedCustomerBox">顧客未選択</div>
+    </div>
+
     <div class="manualGrid">
       <div class="field4">
         <label for="manualCustomerName">お名前</label>
@@ -753,7 +875,10 @@
     staff: [],
     manualSource: "phone",
     manualSlots: [],
-    manualSelectedSlot: null
+    manualSelectedSlot: null,
+    selectedManualCustomer: null,
+    selectedManualCustomerDetail: null,
+    manualCustomerResults: []
   };
 
   function endpoint(key) {
@@ -982,6 +1107,184 @@
     }).join("");
   }
 
+  function customerRowId(c) {
+    return String(c?.id || c?.customer_id || c?.customer_uuid || "");
+  }
+
+  function customerDisplayMeta(c) {
+    const parts = [];
+    if (c.customer_no) parts.push(`会員番号：${c.customer_no}`);
+    if (c.phone) parts.push(`電話：${c.phone}`);
+    if (c.last_visit_date) parts.push(`最終来院：${c.last_visit_date}`);
+    if (c.total_visit_count !== undefined && c.total_visit_count !== null) parts.push(`来院回数：${c.total_visit_count}回`);
+    return parts.join(" / ");
+  }
+
+  function findSettingRow(type, idOrCode) {
+    const rows = type === "menu" ? (state.menus || []) : (state.staff || []);
+    const key = String(idOrCode || "");
+    if (!key) return null;
+    return rows.find((row) => String(row.id) === key || String(row.menu_code || row.staff_code || "") === key) || null;
+  }
+
+  async function searchManualCustomers(query = "") {
+    if (!getAdminCode()) {
+      showToast("管理コードを保存してください。");
+      return;
+    }
+
+    const q = String(query || "").trim();
+    const btn = $("manualCustomerSearchBtn");
+    $("manualCustomerResults").innerHTML = `<div class="alert">検索中です...</div>`;
+    setBusy(btn, true, "検索中...");
+    setStatus("manualCustomerSearchStatus", "検索中", "warn");
+
+    try {
+      const data = await apiGet("/api/owner/customers/search", { q, limit: 8 }, true);
+      state.manualCustomerResults = data.customers || [];
+      renderManualCustomerResults();
+      setStatus("manualCustomerSearchStatus", `${state.manualCustomerResults.length}件`, state.manualCustomerResults.length ? "ok" : "warn");
+    } catch (error) {
+      setStatus("manualCustomerSearchStatus", "検索エラー", "ng");
+      $("manualCustomerResults").innerHTML = `<div class="alert danger">${escapeHtml(error.message)}</div>`;
+      showToast(error.message);
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  function renderManualCustomerResults() {
+    const box = $("manualCustomerResults");
+    const rows = state.manualCustomerResults || [];
+
+    if (!rows.length) {
+      box.innerHTML = `<div class="alert">該当する顧客はありません。新規顧客としてこのまま登録できます。</div>`;
+      return;
+    }
+
+    box.innerHTML = rows.map((c) => `
+      <div class="customerResultItem">
+        <div>
+          <div class="customerResultName">${escapeHtml(c.customer_name || "お客様")} 様</div>
+          <div class="customerResultMeta">${escapeHtml(customerDisplayMeta(c) || "顧客情報")}</div>
+          ${c.memo ? `<div class="customerResultMeta">メモ：${escapeHtml(c.memo)}</div>` : ""}
+        </div>
+        <button class="btn primary" data-action="select-customer" data-customer-id="${escapeHtml(customerRowId(c))}" onclick="window.DPRO_IPAD_SELECT_CUSTOMER && window.DPRO_IPAD_SELECT_CUSTOMER(this.dataset.customerId)" type="button">選択</button>
+      </div>
+    `).join("");
+
+    box.querySelectorAll("[data-action='select-customer']").forEach((btn) => {
+      btn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        selectManualCustomer(btn.dataset.customerId);
+      });
+    });
+  }
+
+  async function selectManualCustomer(customerId) {
+    const targetId = String(customerId || "");
+    const customer = (state.manualCustomerResults || []).find((c) => customerRowId(c) === targetId);
+
+    if (!customer) {
+      setStatus("manualCustomerSearchStatus", "選択失敗", "ng");
+      showToast("顧客が見つかりません。もう一度検索してください。");
+      return;
+    }
+
+    state.selectedManualCustomer = customer;
+    $("manualCustomerName").value = customer.customer_name || "";
+    $("manualPhone").value = customer.phone || "";
+    $("manualCustomerSearchInput").value = customer.phone || customer.customer_name || "";
+
+    setStatus("manualCustomerSearchStatus", "選択中", "warn");
+    renderSelectedCustomer({ customer, tickets: [], reservations: [] });
+    showToast(`${customer.customer_name || "顧客"} 様を選択しました`);
+
+    try {
+      const detail = await apiGet("/api/owner/customers/detail", { customer_id: customerRowId(customer) }, true);
+      state.selectedManualCustomerDetail = detail;
+      renderSelectedCustomer(detail);
+      applyLastReservation(detail);
+      setStatus("manualCustomerSearchStatus", "選択済み", "ok");
+    } catch (error) {
+      state.selectedManualCustomerDetail = null;
+      setStatus("manualCustomerSearchStatus", "選択済み", "ok");
+    }
+  }
+
+  function activeTicketsFromDetail(detail) {
+    return (detail?.tickets || []).filter((t) => t.status === "active" || t.status === "usable" || !t.status);
+  }
+
+  function latestReservationFromDetail(detail) {
+    const rows = detail?.reservations || [];
+    return rows[0] || null;
+  }
+
+  function renderSelectedCustomer(detail) {
+    const customer = detail?.customer || state.selectedManualCustomer;
+    const box = $("selectedCustomerBox");
+
+    if (!customer) {
+      box.classList.remove("show");
+      box.innerHTML = "顧客未選択";
+      return;
+    }
+
+    const tickets = activeTicketsFromDetail(detail);
+    const latest = latestReservationFromDetail(detail);
+    const ticketText = tickets.length
+      ? tickets.map((t) => `${t.ticket_name || "回数券"}：残り${Number(t.remaining_count || 0)}回`).join(" / ")
+      : "回数券なし";
+
+    box.classList.add("show");
+    box.innerHTML = `
+      <b>${escapeHtml(customer.customer_name || "お客様")} 様を選択中</b><br>
+      ${escapeHtml(customerDisplayMeta(customer) || "")}
+      <div class="customerMiniMetrics">
+        <div class="customerMiniMetric"><b>${escapeHtml(tickets.length)}</b>回数券</div>
+        <div class="customerMiniMetric"><b>${escapeHtml(latest?.reservation_date || "-")}</b>直近予約</div>
+        <div class="customerMiniMetric"><b>${escapeHtml(latest?.source || "-")}</b>予約経路</div>
+      </div>
+      <div style="margin-top:8px;">${escapeHtml(ticketText)}</div>
+      ${latest ? `<div style="margin-top:6px;">前回メモ：${escapeHtml(latest.request_note || "-")}</div>` : ""}
+    `;
+  }
+
+  function applyLastReservation(detail) {
+    const latest = latestReservationFromDetail(detail);
+    if (!latest) return;
+
+    const menu = findSettingRow("menu", latest.menu_id || latest.menu_code);
+    const staff = findSettingRow("staff", latest.staff_id || latest.staff_code);
+
+    if (menu) $("manualMenu").value = menu.menu_code || menu.id;
+    if (staff) $("manualStaff").value = staff.staff_code || staff.id;
+
+    if (latest.request_note && !$("manualRequestNote").value.trim()) {
+      $("manualRequestNote").value = `前回メモ：${latest.request_note}`;
+    }
+
+    state.manualSelectedSlot = null;
+    state.manualSlots = [];
+    $("manualSlotList").innerHTML = "";
+    setStatus("manualSlotStatus", "再確認", "warn");
+    $("manualSlotMessage").className = "alert";
+    $("manualSlotMessage").innerHTML = "既存顧客の前回内容を反映しました。日付と空き時間を確認してください。";
+  }
+
+  function clearSelectedManualCustomer() {
+    state.selectedManualCustomer = null;
+    state.selectedManualCustomerDetail = null;
+    state.manualCustomerResults = [];
+    $("manualCustomerSearchInput").value = "";
+    $("manualCustomerResults").innerHTML = "";
+    renderSelectedCustomer(null);
+    setStatus("manualCustomerSearchStatus", "未検索", "");
+    showToast("顧客選択を解除しました。");
+  }
+
   function setManualSource(source) {
     state.manualSource = source || "phone";
     $("manualSourceTabs").querySelectorAll("[data-source]").forEach((btn) => {
@@ -1021,6 +1324,7 @@
     $("manualDate").value = state.date || todayText();
     state.manualSelectedSlot = null;
     state.manualSlots = [];
+    clearSelectedManualCustomer();
     clearManualSlots("入力をリセットしました。空き時間を確認してください。");
   }
 
@@ -1168,6 +1472,8 @@
       const body = {
         source: state.manualSource,
         actor_name: "ipad",
+        customer_id: customerRowId(state.selectedManualCustomer) || "",
+        customer_no: state.selectedManualCustomer?.customer_no || "",
         customer_name: $("manualCustomerName").value.trim(),
         phone: $("manualPhone").value.trim(),
         menu_code: $("manualMenu").value,
@@ -1496,6 +1802,8 @@
     });
   }
 
+  window.DPRO_IPAD_SELECT_CUSTOMER = selectManualCustomer;
+
   function initEvents() {
     $("saveAdminBtn").addEventListener("click", () => {
       const code = $("adminCodeInput").value.trim();
@@ -1571,6 +1879,45 @@
     $("manualLoadSlotsBtn").addEventListener("click", () => loadManualSlots());
     $("manualFindOpenDayBtn").addEventListener("click", findManualOpenDay);
     $("manualSubmitBtn").addEventListener("click", submitManualReservation);
+
+    $("manualCustomerSearchBtn").addEventListener("click", () => {
+      const q = $("manualCustomerSearchInput").value.trim() || $("manualPhone").value.trim() || $("manualCustomerName").value.trim();
+      searchManualCustomers(q);
+    });
+
+    $("manualSearchByPhoneBtn").addEventListener("click", () => {
+      const phone = $("manualPhone").value.trim();
+      if (!phone) return showToast("電話番号を入力してください。");
+      $("manualCustomerSearchInput").value = phone;
+      searchManualCustomers(phone);
+    });
+
+    $("manualRecentCustomersBtn").addEventListener("click", () => searchManualCustomers(""));
+
+    $("manualCustomerClearBtn").addEventListener("click", clearSelectedManualCustomer);
+
+    $("manualCustomerResults").addEventListener("click", (event) => {
+      const btn = event.target.closest("[data-action='select-customer']");
+      if (!btn) return;
+      event.preventDefault();
+      event.stopPropagation();
+      selectManualCustomer(btn.dataset.customerId);
+    });
+
+    $("manualCustomerSearchInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const q = $("manualCustomerSearchInput").value.trim() || $("manualPhone").value.trim() || $("manualCustomerName").value.trim();
+        searchManualCustomers(q);
+      }
+    });
+
+    $("manualPhone").addEventListener("blur", () => {
+      const phone = $("manualPhone").value.trim();
+      if (phone && !state.selectedManualCustomer) {
+        $("manualCustomerSearchInput").value = phone;
+      }
+    });
 
     $("manualSourceTabs").querySelectorAll("[data-source]").forEach((btn) => {
       btn.addEventListener("click", () => setManualSource(btn.dataset.source));
