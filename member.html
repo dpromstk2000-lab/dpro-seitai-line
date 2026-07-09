@@ -1,0 +1,1231 @@
+<!doctype html>
+<!-- STEP SEITAI-9: member.html / customer member card, reservations and tickets / 20260709 -->
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>DPRO 整骨院・整体 LINE｜会員証・予約確認｜STEP SEITAI-9</title>
+  <script src="./config.js?v=step-seitai-4"></script>
+  <style>
+    :root{
+      --bg:#f4f8fb;
+      --card:#ffffff;
+      --ink:#102033;
+      --muted:#64748b;
+      --line:#dbe4ef;
+      --brand:#14a085;
+      --brand2:#0f766e;
+      --soft:#e9fbf6;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --danger:#dc2626;
+      --dark:#0f172a;
+      --shadow:0 18px 45px rgba(15,23,42,.08);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+      background:
+        radial-gradient(circle at top left,rgba(20,160,133,.15),transparent 360px),
+        linear-gradient(180deg,#ecfdf7 0%,#f4f8fb 330px,#f4f8fb 100%);
+      color:var(--ink);
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(1120px,100%);margin:0 auto;padding:0 16px}
+    header{padding:18px 0 12px}
+    .hero{
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(219,228,239,.95);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      display:grid;
+      grid-template-columns:1.25fr .85fr;
+      gap:18px;
+      align-items:center;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 11px;
+      border-radius:999px;
+      background:var(--soft);
+      color:var(--brand2);
+      font-size:12px;
+      font-weight:950;
+      letter-spacing:.03em;
+    }
+    h1{
+      margin:12px 0 10px;
+      font-size:clamp(30px,5vw,48px);
+      line-height:1.1;
+      letter-spacing:-.04em;
+    }
+    h2{margin:0 0 10px;font-size:22px;letter-spacing:-.02em}
+    h3{margin:14px 0 8px;font-size:16px}
+    .lead{margin:0;color:var(--muted);line-height:1.8;font-size:15px}
+    .heroPanel{
+      background:linear-gradient(135deg,#0f766e,#14a085);
+      color:#fff;
+      border-radius:24px;
+      padding:18px;
+      min-height:160px;
+      display:grid;
+      align-content:center;
+      gap:10px;
+    }
+    .shop{font-size:24px;font-weight:950;letter-spacing:-.03em}
+    .mini{font-size:12px;opacity:.86;line-height:1.6}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{
+      display:inline-flex;
+      padding:7px 9px;
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.24);
+      color:#fff;
+      font-size:12px;
+      font-weight:900;
+    }
+    main{padding:10px 0 44px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 10px 28px rgba(15,23,42,.05);
+      padding:18px;
+    }
+    .span4{grid-column:span 4}
+    .span5{grid-column:span 5}
+    .span6{grid-column:span 6}
+    .span7{grid-column:span 7}
+    .span8{grid-column:span 8}
+    .span12{grid-column:span 12}
+    .note{margin:7px 0 0;color:var(--muted);line-height:1.75;font-size:13px}
+    label{
+      display:block;
+      margin:12px 0 6px;
+      font-size:13px;
+      font-weight:900;
+      color:#334155;
+    }
+    input,select,textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:15px;
+      padding:13px 14px;
+      background:#fff;
+      color:var(--ink);
+      outline:none;
+      font-size:15px;
+    }
+    textarea{min-height:90px;line-height:1.65;resize:vertical}
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--brand);
+      box-shadow:0 0 0 4px rgba(20,160,133,.12);
+    }
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{
+      border:0;
+      border-radius:14px;
+      padding:12px 15px;
+      font-size:14px;
+      font-weight:950;
+      background:#e2e8f0;
+      color:#0f172a;
+      transition:.15s transform,.15s opacity,.15s background;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.dark{background:var(--dark);color:#fff}
+    .btn.warn{background:var(--warn);color:#fff}
+    .btn.danger{background:var(--danger);color:#fff}
+    .btn.ghost{background:#fff;border:1px solid var(--line)}
+    .btn.large{font-size:16px;min-height:54px;padding:14px 17px}
+    .status{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background:#e2e8f0;
+      color:#334155;
+      font-size:12px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+    .status.ok{background:#dcfce7;color:#166534}
+    .status.warn{background:#fef3c7;color:#92400e}
+    .status.ng{background:#fee2e2;color:#991b1b}
+    .memberCard{
+      background:linear-gradient(135deg,#0f766e,#14a085);
+      color:#fff;
+      border-radius:26px;
+      padding:20px;
+      box-shadow:0 16px 40px rgba(20,160,133,.22);
+      min-height:260px;
+      display:grid;
+      gap:12px;
+    }
+    .memberNo{
+      display:inline-flex;
+      align-items:center;
+      width:max-content;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.24);
+      font-weight:950;
+      font-size:12px;
+    }
+    .memberName{
+      font-size:34px;
+      font-weight:950;
+      letter-spacing:-.05em;
+      line-height:1.12;
+    }
+    .memberMeta{
+      font-size:13px;
+      opacity:.9;
+      line-height:1.65;
+    }
+    .qrLike{
+      width:94px;
+      height:94px;
+      border-radius:18px;
+      background:
+        linear-gradient(90deg,#fff 8px,transparent 8px) 0 0/16px 16px,
+        linear-gradient(#fff 8px,transparent 8px) 0 0/16px 16px,
+        rgba(255,255,255,.18);
+      border:8px solid rgba(255,255,255,.92);
+      opacity:.92;
+    }
+    .memberBottom{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:end;
+    }
+    .list{display:grid;gap:12px;margin-top:12px}
+    .item{
+      border:1px solid #e5edf6;
+      border-radius:20px;
+      background:#fbfdff;
+      padding:15px;
+      display:grid;
+      gap:10px;
+    }
+    .item.active{border-color:#bbf7d0;background:#f0fdf4}
+    .itemTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+    }
+    .itemTitle{
+      font-size:18px;
+      font-weight:950;
+      line-height:1.45;
+      letter-spacing:-.03em;
+    }
+    .itemMeta{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.65;
+      margin-top:4px;
+    }
+    .pill{
+      display:inline-flex;
+      padding:5px 8px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#3730a3;
+      font-size:11px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+    .pill.green{background:#dcfce7;color:#166534}
+    .pill.orange{background:#ffedd5;color:#9a3412}
+    .pill.red{background:#fee2e2;color:#991b1b}
+    .pill.gray{background:#e2e8f0;color:#334155}
+    .ticketGauge{
+      height:12px;
+      background:#e2e8f0;
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:8px;
+    }
+    .ticketGauge > span{
+      display:block;
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#14a085,#0f766e);
+      border-radius:999px;
+    }
+    .empty{
+      border:1px dashed var(--line);
+      background:#f8fafc;
+      border-radius:20px;
+      padding:20px;
+      text-align:center;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+    .sectionHead{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .drawer{
+      position:fixed;
+      inset:0;
+      z-index:220;
+      display:none;
+      background:rgba(15,23,42,.42);
+      backdrop-filter:blur(5px);
+      padding:18px;
+      overflow:auto;
+    }
+    .drawer.open{display:block}
+    .drawerInner{
+      width:min(760px,100%);
+      margin:0 auto;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:26px;
+      box-shadow:0 26px 90px rgba(15,23,42,.28);
+      padding:18px;
+    }
+    .drawerHead{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      border-bottom:1px solid var(--line);
+      padding-bottom:12px;
+      margin-bottom:12px;
+    }
+    .slots{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:8px;
+      margin-top:12px;
+    }
+    .slot{
+      border:1px solid #bbf7d0;
+      background:#ecfdf5;
+      color:#047857;
+      border-radius:13px;
+      padding:10px 8px;
+      font-size:13px;
+      font-weight:950;
+      text-align:center;
+    }
+    .slot.selected{
+      background:var(--brand);
+      color:#fff;
+      border-color:var(--brand2);
+      box-shadow:0 8px 18px rgba(20,160,133,.22);
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:#0f172a;
+      color:#fff;
+      border-radius:999px;
+      padding:13px 17px;
+      box-shadow:var(--shadow);
+      font-size:15px;
+      font-weight:950;
+      opacity:0;
+      pointer-events:none;
+      transition:.2s;
+      z-index:300;
+      max-width:calc(100% - 28px);
+      text-align:center;
+    }
+    .toast.show{opacity:1;bottom:30px}
+    .loading{
+      display:inline-block;
+      width:14px;height:14px;
+      border:2px solid rgba(255,255,255,.55);
+      border-top-color:#fff;
+      border-radius:999px;
+      animation:spin .7s linear infinite;
+      vertical-align:-2px;
+      margin-right:6px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:920px){
+      .hero{grid-template-columns:1fr}
+      .span4,.span5,.span6,.span7,.span8{grid-column:span 12}
+      .slots{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media(max-width:560px){
+      .wrap{padding:0 12px}
+      header{padding-top:12px}
+      .hero,.card{border-radius:20px;padding:16px}
+      .grid{gap:12px}
+      .memberName{font-size:30px}
+      .itemTop{display:block}
+      .itemTop .pill{margin-top:8px}
+      .btn{width:100%}
+      .row .btn{width:auto}
+      .slots{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <span class="badge">STEP SEITAI-9 / member.html</span>
+        <h1>DPRO 整骨院・整体 LINE<br>会員証・予約確認</h1>
+        <p class="lead">
+          お客様がLINEから、会員証・現在の予約・回数券残数を確認できます。
+          予約変更・キャンセルもここから操作できます。
+        </p>
+      </div>
+      <div class="heroPanel">
+        <div class="mini">店舗</div>
+        <div class="shop" id="shopNameView">DPRO整体院</div>
+        <div class="mini" id="shopNoteView">予約・回数券・次回来院フォローまで確認できます。</div>
+        <div class="chips">
+          <span class="chip">会員証</span>
+          <span class="chip">予約確認</span>
+          <span class="chip">回数券</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="grid">
+      <div class="card span4">
+        <h2>本人確認</h2>
+        <p class="note">
+          予約時の電話番号、または会員番号で確認します。
+          LINE内で開いた場合は、将来的にLINEユーザーIDで自動確認する想定です。
+        </p>
+
+        <label for="lookupPhone">電話番号</label>
+        <input id="lookupPhone" type="tel" placeholder="例：090-1111-2222" autocomplete="tel">
+
+        <label for="lookupCustomerNo">会員番号</label>
+        <input id="lookupCustomerNo" type="text" placeholder="例：C000001">
+
+        <div class="row" style="margin-top:14px;">
+          <button class="btn primary" id="lookupBtn" type="button">会員情報を確認</button>
+          <button class="btn ghost" id="useSavedBtn" type="button">予約時の情報を使う</button>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn ghost" id="demoPhoneBtn" type="button">テスト太郎で確認</button>
+          <button class="btn ghost" id="clearLookupBtn" type="button">クリア</button>
+        </div>
+
+        <div style="margin-top:14px;">
+          <span class="status" id="lookupStatus">未確認</span>
+        </div>
+      </div>
+
+      <div class="span8">
+        <div class="memberCard" id="memberCard">
+          <div>
+            <span class="memberNo" id="memberNoView">会員番号：未確認</span>
+            <div class="memberName" id="memberNameView">お客様</div>
+            <div class="memberMeta" id="memberMetaView">
+              電話番号・会員番号を入力して確認してください。
+            </div>
+          </div>
+
+          <div class="memberBottom">
+            <div>
+              <div class="mini">DPRO 整骨院・整体 LINE</div>
+              <div class="mini">予約・回数券・次回来院フォロー</div>
+            </div>
+            <div class="qrLike" aria-label="会員証QR風表示"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card span8">
+        <div class="sectionHead">
+          <div>
+            <h2>現在の予約</h2>
+            <p class="note">予約変更・キャンセルはこちらから操作できます。</p>
+          </div>
+          <a class="btn primary" href="./index.html">新しく予約する</a>
+        </div>
+        <div id="reservationList" class="list"></div>
+      </div>
+
+      <div class="card span4">
+        <h2>店舗へ連絡</h2>
+        <p class="note">変更・キャンセル・相談がある場合は、LINEで店舗へ連絡できます。</p>
+        <div class="list">
+          <a class="btn dark large" id="lineContactBtn" href="#" target="_blank" rel="noopener">LINEで店舗へ連絡</a>
+          <button class="btn ghost large" id="copyContactTextBtn" type="button">連絡文面をコピー</button>
+        </div>
+        <div class="empty" style="margin-top:12px;text-align:left;">
+          例：予約時間の変更を相談したいです。<br>
+          例：少し遅れそうです。<br>
+          例：回数券について確認したいです。
+        </div>
+      </div>
+
+      <div class="card span6">
+        <div class="sectionHead">
+          <div>
+            <h2>回数券</h2>
+            <p class="note">残数・有効期限を確認できます。</p>
+          </div>
+          <span class="status" id="ticketStatus">未確認</span>
+        </div>
+        <div id="ticketList" class="list"></div>
+      </div>
+
+      <div class="card span6">
+        <h2>来院メモ</h2>
+        <p class="note">
+          来院履歴の詳細表示は次STEPで専用APIを追加して強化予定です。
+          現時点では、現在予約と回数券の確認を優先しています。
+        </p>
+        <div id="recommendBox" class="empty" style="text-align:left;">
+          会員情報を確認すると、次回来院のおすすめや回数券案内をここに表示します。
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="drawer" id="changeDrawer">
+  <div class="drawerInner">
+    <div class="drawerHead">
+      <div>
+        <span class="badge">予約変更</span>
+        <h2 style="margin-top:10px;">予約日時を変更</h2>
+        <p class="note">メニュー・日付・時間を選び直して変更します。</p>
+      </div>
+      <button class="btn ghost" id="closeChangeBtn" type="button">閉じる</button>
+    </div>
+
+    <label for="changeMenu">メニュー</label>
+    <select id="changeMenu"></select>
+
+    <label for="changeDate">変更希望日</label>
+    <input id="changeDate" type="date">
+
+    <div class="row" style="margin-top:12px;">
+      <button class="btn primary" id="loadSlotsBtn" type="button">空き時間を表示</button>
+      <span class="status" id="slotStatus">未確認</span>
+    </div>
+
+    <div id="slotList" class="slots"></div>
+
+    <label for="changeNote">変更メモ</label>
+    <textarea id="changeNote" placeholder="例：できれば午前中が希望です。"></textarea>
+
+    <div class="row" style="margin-top:14px;">
+      <button class="btn primary large" id="submitChangeBtn" type="button">この内容で変更する</button>
+    </div>
+  </div>
+</div>
+
+<div class="drawer" id="cancelDrawer">
+  <div class="drawerInner">
+    <div class="drawerHead">
+      <div>
+        <span class="badge">予約キャンセル</span>
+        <h2 style="margin-top:10px;">予約をキャンセル</h2>
+        <p class="note">キャンセル理由を入力して送信します。</p>
+      </div>
+      <button class="btn ghost" id="closeCancelBtn" type="button">閉じる</button>
+    </div>
+
+    <div id="cancelTargetBox" class="empty" style="text-align:left;">キャンセル対象の予約を選択してください。</div>
+
+    <label for="cancelReason">キャンセル理由</label>
+    <textarea id="cancelReason" placeholder="例：都合が悪くなったため"></textarea>
+
+    <div class="row" style="margin-top:14px;">
+      <button class="btn danger large" id="submitCancelBtn" type="button">予約をキャンセルする</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">OK</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const FALLBACK_CONFIG = {
+    serviceName: "DPRO 整骨院・整体 LINE",
+    shopCode: "dpro_seitai_demo",
+    shopName: "DPRO整体院",
+    apiBaseUrl: "https://dpro-seitai-line-api.dpromstk2000.workers.dev",
+    endpoints: {
+      publicSettings: "/api/public/settings",
+      memberProfile: "/api/member/profile",
+      memberTicket: "/api/member/ticket",
+      memberReservations: "/api/member/reservations",
+      appointmentOptions: "/api/public/appointment-options",
+      reservationUpdate: "/api/reservations/update",
+      reservationCancel: "/api/reservations/cancel"
+    }
+  };
+
+  const CONFIG = window.DPRO_SEITAI_CONFIG || FALLBACK_CONFIG;
+  const $ = (id) => document.getElementById(id);
+
+  const state = {
+    settings: null,
+    shop: null,
+    customer: null,
+    reservations: [],
+    tickets: [],
+    menus: [],
+    staff: [],
+    resources: [],
+    menuMap: {},
+    staffMap: {},
+    resourceMap: {},
+    selectedReservation: null,
+    selectedSlot: null,
+    slots: []
+  };
+
+  function endpoint(key) {
+    const map = CONFIG.endpoints || {};
+    return map[key] || FALLBACK_CONFIG.endpoints[key] || key;
+  }
+
+  function trimSlash(value) {
+    return String(value || "").replace(/\/+$/, "");
+  }
+
+  function apiUrl(path, params = {}) {
+    const url = new URL(`${trimSlash(CONFIG.apiBaseUrl)}${path.startsWith("/") ? path : `/${path}`}`);
+    if (!url.searchParams.get("shop_code")) {
+      url.searchParams.set("shop_code", CONFIG.shopCode || "dpro_seitai_demo");
+    }
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value) !== "") {
+        url.searchParams.set(key, String(value));
+      }
+    });
+    return url.toString();
+  }
+
+  async function apiGet(path, params = {}) {
+    const res = await fetch(apiUrl(path, params), { method: "GET" });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.message || data.error || `API error ${res.status}`);
+    }
+    return data;
+  }
+
+  async function apiPost(path, body = {}, query = {}) {
+    const res = await fetch(apiUrl(path, query), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {})
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.message || data.error || `API error ${res.status}`);
+    }
+    return data;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function formatTime(value) {
+    return String(value || "").slice(0, 5);
+  }
+
+  function todayText() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function addDaysText(dateText, days) {
+    const [y, m, d] = dateText.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + Number(days || 0));
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  function showToast(text) {
+    const t = $("toast");
+    t.textContent = text;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1900);
+  }
+
+  function setStatus(id, text, kind = "") {
+    const el = $(id);
+    el.textContent = text;
+    el.className = `status ${kind}`.trim();
+  }
+
+  function setBusy(button, busy, label) {
+    if (!button) return;
+    if (busy) {
+      button.dataset.oldText = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = `<span class="loading"></span>${label || "処理中..."}`;
+    } else {
+      button.disabled = false;
+      if (button.dataset.oldText) button.innerHTML = button.dataset.oldText;
+      delete button.dataset.oldText;
+    }
+  }
+
+  function statusLabel(status) {
+    const map = {
+      reserved: "予約済み",
+      arrived: "来院済み",
+      in_treatment: "施術中",
+      treatment_done: "施術完了",
+      completed: "完了",
+      cancelled: "キャンセル",
+      no_show: "無断キャンセル"
+    };
+    return map[status] || status || "-";
+  }
+
+  function statusClass(status) {
+    if (status === "reserved") return "green";
+    if (status === "arrived" || status === "in_treatment") return "orange";
+    if (status === "completed" || status === "treatment_done") return "gray";
+    if (status === "cancelled" || status === "no_show") return "red";
+    return "gray";
+  }
+
+  function menuName(idOrCode) {
+    const row = state.menuMap[idOrCode] || {};
+    return row.menu_name || row.name || idOrCode || "-";
+  }
+
+  function staffName(idOrCode) {
+    const row = state.staffMap[idOrCode] || {};
+    return row.display_name || row.staff_name || row.name || "おまかせ";
+  }
+
+  function resourceName(idOrCode) {
+    const row = state.resourceMap[idOrCode] || {};
+    return row.resource_name || row.name || "";
+  }
+
+  function buildLookupParams() {
+    const params = {};
+    const phone = $("lookupPhone").value.trim();
+    const customerNo = $("lookupCustomerNo").value.trim();
+
+    if (phone) params.phone = phone;
+    if (customerNo) params.customer_no = customerNo;
+
+    const url = new URL(location.href);
+    ["customer_id","customer_no","phone","line_user_id"].forEach((key) => {
+      const v = url.searchParams.get(key);
+      if (v && !params[key]) params[key] = v;
+    });
+
+    return params;
+  }
+
+  function saveLookup() {
+    const data = {
+      phone: $("lookupPhone").value.trim(),
+      customer_no: $("lookupCustomerNo").value.trim()
+    };
+    localStorage.setItem("DPRO_SEITAI_MEMBER_LOOKUP", JSON.stringify(data));
+  }
+
+  function loadSavedLookup() {
+    try {
+      const profileRaw = localStorage.getItem("DPRO_SEITAI_CUSTOMER_PROFILE");
+      if (profileRaw) {
+        const profile = JSON.parse(profileRaw);
+        if (profile.phone) $("lookupPhone").value = profile.phone;
+      }
+
+      const raw = localStorage.getItem("DPRO_SEITAI_MEMBER_LOOKUP");
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data.phone) $("lookupPhone").value = data.phone;
+      if (data.customer_no) $("lookupCustomerNo").value = data.customer_no;
+    } catch {}
+  }
+
+  async function loadSettings() {
+    const data = await apiGet(endpoint("publicSettings"));
+    state.settings = data.settings || {};
+    state.shop = data.shop || {};
+    state.menus = data.menus || [];
+    state.staff = data.staff || [];
+    state.resources = data.resources || [];
+
+    state.menuMap = {};
+    state.staffMap = {};
+    state.resourceMap = {};
+
+    state.menus.forEach((m) => {
+      state.menuMap[m.id] = m;
+      state.menuMap[m.menu_code] = m;
+    });
+    state.staff.forEach((s) => {
+      state.staffMap[s.id] = s;
+      state.staffMap[s.staff_code] = s;
+    });
+    state.resources.forEach((r) => {
+      state.resourceMap[r.id] = r;
+      state.resourceMap[r.resource_code] = r;
+    });
+
+    $("shopNameView").textContent = state.shop.shop_name || CONFIG.shopName || "DPRO整体院";
+    $("shopNoteView").textContent = state.shop.public_note || "予約・回数券・次回来院フォローまで確認できます。";
+
+    if (state.shop.line_official_url) {
+      $("lineContactBtn").href = state.shop.line_official_url;
+    } else {
+      $("lineContactBtn").removeAttribute("href");
+    }
+
+    renderChangeMenuOptions();
+  }
+
+  async function loadMember() {
+    const params = buildLookupParams();
+    if (!params.phone && !params.customer_no && !params.customer_id && !params.line_user_id) {
+      showToast("電話番号または会員番号を入力してください。");
+      return;
+    }
+
+    setStatus("lookupStatus", "確認中...", "warn");
+    const [profile, tickets, reservations] = await Promise.all([
+      apiGet(endpoint("memberProfile"), params),
+      apiGet(endpoint("memberTicket"), params).catch((error) => ({ ok:false, tickets:[], error: error.message })),
+      apiGet(endpoint("memberReservations"), params).catch((error) => ({ ok:false, reservations:[], error: error.message }))
+    ]);
+
+    state.customer = profile.customer;
+    state.tickets = tickets.tickets || [];
+    state.reservations = reservations.reservations || [];
+
+    saveLookup();
+    renderMember();
+    renderReservations();
+    renderTickets();
+    renderRecommend();
+    setStatus("lookupStatus", "確認OK", "ok");
+  }
+
+  function renderMember() {
+    const c = state.customer;
+    if (!c) return;
+
+    $("memberNoView").textContent = `会員番号：${c.customer_no || "未設定"}`;
+    $("memberNameView").textContent = `${c.customer_name || "お客様"} 様`;
+    $("memberMetaView").innerHTML = `
+      フリガナ：${escapeHtml(c.customer_kana || "-")}<br>
+      電話：${escapeHtml(c.phone || "-")}<br>
+      最終来院：${escapeHtml(c.last_visit_date || "-")} / 来院回数：${Number(c.total_visit_count || 0)}回
+    `;
+
+    if (c.phone) $("lookupPhone").value = c.phone;
+    if (c.customer_no) $("lookupCustomerNo").value = c.customer_no;
+  }
+
+  function renderReservations() {
+    const box = $("reservationList");
+    const rows = state.reservations || [];
+
+    if (!state.customer) {
+      box.innerHTML = `<div class="empty">会員情報を確認すると、現在の予約が表示されます。</div>`;
+      return;
+    }
+
+    if (!rows.length) {
+      box.innerHTML = `
+        <div class="empty">
+          現在の予約はありません。<br>
+          新しく予約する場合は「新しく予約する」から進んでください。
+        </div>
+      `;
+      return;
+    }
+
+    box.innerHTML = rows.map((r) => {
+      const menu = menuName(r.menu_id || r.menu_code);
+      const staff = staffName(r.staff_id || r.staff_code);
+      const resource = resourceName(r.resource_id || r.resource_code);
+      return `
+        <div class="item active">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${escapeHtml(r.reservation_date || "-")} ${formatTime(r.start_time)}　${escapeHtml(menu)}</div>
+              <div class="itemMeta">
+                担当：${escapeHtml(staff)}${resource ? ` / ${escapeHtml(resource)}` : ""}<br>
+                予約番号：${escapeHtml(r.id || r.reservation_id || "-")}
+              </div>
+            </div>
+            <span class="pill ${statusClass(r.status)}">${escapeHtml(statusLabel(r.status))}</span>
+          </div>
+          ${r.request_note ? `<div class="itemMeta">ご要望：${escapeHtml(r.request_note)}</div>` : ""}
+          <div class="row">
+            <button class="btn primary" data-action="change" data-id="${escapeHtml(r.id || r.reservation_id)}" type="button">予約を変更</button>
+            <button class="btn danger" data-action="cancel" data-id="${escapeHtml(r.id || r.reservation_id)}" type="button">キャンセル</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    box.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const reservation = state.reservations.find((r) => String(r.id || r.reservation_id) === String(btn.dataset.id));
+        if (!reservation) return showToast("予約が見つかりません。");
+        if (btn.dataset.action === "change") openChangeDrawer(reservation);
+        if (btn.dataset.action === "cancel") openCancelDrawer(reservation);
+      });
+    });
+  }
+
+  function renderTickets() {
+    const box = $("ticketList");
+    const rows = state.tickets || [];
+    setStatus("ticketStatus", state.customer ? `${rows.length}件` : "未確認", state.customer ? "ok" : "");
+
+    if (!state.customer) {
+      box.innerHTML = `<div class="empty">会員情報を確認すると、回数券が表示されます。</div>`;
+      return;
+    }
+
+    if (!rows.length) {
+      box.innerHTML = `<div class="empty">現在表示できる回数券はありません。</div>`;
+      return;
+    }
+
+    box.innerHTML = rows.map((t) => {
+      const total = Number(t.total_count || 0);
+      const remaining = Number(t.remaining_count || 0);
+      const pct = total > 0 ? Math.max(0, Math.min(100, Math.round((remaining / total) * 100))) : 0;
+      const low = remaining <= Number(state.settings.ticket_low_threshold || 2);
+      return `
+        <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${escapeHtml(t.ticket_name || "回数券")}</div>
+              <div class="itemMeta">
+                残り ${remaining}回 / 合計 ${total}回<br>
+                有効期限：${escapeHtml(t.expires_at || "-")} / 状態：${escapeHtml(t.status || "-")}
+              </div>
+            </div>
+            <span class="pill ${low ? "red" : "green"}">${low ? "残り少" : "利用中"}</span>
+          </div>
+          <div class="ticketGauge"><span style="width:${pct}%"></span></div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderRecommend() {
+    if (!state.customer) return;
+
+    const activeTicket = (state.tickets || []).find((t) => t.status === "active");
+    const reservationCount = (state.reservations || []).length;
+
+    if (reservationCount > 0) {
+      $("recommendBox").innerHTML = `
+        <b>次回予約があります。</b><br>
+        予約日時と回数券残数を確認して、当日はお気をつけてお越しください。
+      `;
+      return;
+    }
+
+    if (activeTicket) {
+      $("recommendBox").innerHTML = `
+        <b>回数券をご利用中です。</b><br>
+        残り ${Number(activeTicket.remaining_count || 0)}回です。次回予約を入れておくと安心です。
+      `;
+      return;
+    }
+
+    $("recommendBox").innerHTML = `
+      <b>次回予約がおすすめです。</b><br>
+      肩こり・腰痛・姿勢改善は、間隔を空けすぎない来院がおすすめです。
+    `;
+  }
+
+  function renderChangeMenuOptions() {
+    $("changeMenu").innerHTML = (state.menus || []).map((m) =>
+      `<option value="${escapeHtml(m.menu_code || m.id)}">${escapeHtml(m.menu_name || m.menu_code)}（${Number(m.duration_minutes || 0)}分）</option>`
+    ).join("");
+  }
+
+  function openChangeDrawer(reservation) {
+    state.selectedReservation = reservation;
+    state.selectedSlot = null;
+    state.slots = [];
+
+    const menuRow = state.menuMap[reservation.menu_id] || state.menuMap[reservation.menu_code] || state.menus[0];
+    $("changeMenu").value = menuRow?.menu_code || menuRow?.id || "";
+    $("changeDate").value = reservation.reservation_date || addDaysText(todayText(), 1);
+    $("changeDate").min = todayText();
+    $("changeNote").value = reservation.request_note || "";
+
+    $("slotList").innerHTML = "";
+    setStatus("slotStatus", "未確認", "");
+    $("changeDrawer").classList.add("open");
+  }
+
+  function closeChangeDrawer() {
+    $("changeDrawer").classList.remove("open");
+  }
+
+  async function loadSlots() {
+    const reservation = state.selectedReservation;
+    if (!reservation) return showToast("変更する予約が選択されていません。");
+
+    const btn = $("loadSlotsBtn");
+    setBusy(btn, true, "確認中...");
+    try {
+      const data = await apiGet(endpoint("appointmentOptions"), {
+        date: $("changeDate").value,
+        menu_code: $("changeMenu").value,
+        staff_preference: "any"
+      });
+
+      state.slots = Array.isArray(data.available_slots)
+        ? data.available_slots
+        : (Array.isArray(data.slots) ? data.slots.map((time) => ({ time })) : []);
+
+      state.selectedSlot = null;
+
+      if (data.is_available && state.slots.length) {
+        setStatus("slotStatus", "空きあり", "ok");
+      } else {
+        setStatus("slotStatus", "空きなし", "ng");
+      }
+
+      renderSlots();
+    } catch (error) {
+      setStatus("slotStatus", "エラー", "ng");
+      showToast(error.message);
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  function renderSlots() {
+    const box = $("slotList");
+    if (!state.slots.length) {
+      box.innerHTML = `<div class="empty" style="grid-column:1/-1;">表示できる空き時間はありません。</div>`;
+      return;
+    }
+
+    box.innerHTML = state.slots.map((slot) => {
+      const time = slot.time || slot;
+      const selected = state.selectedSlot && state.selectedSlot.time === time;
+      return `<button class="slot ${selected ? "selected" : ""}" data-time="${escapeHtml(time)}" type="button">${escapeHtml(time)}</button>`;
+    }).join("");
+
+    box.querySelectorAll("[data-time]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.selectedSlot = state.slots.find((slot) => String(slot.time || slot) === String(btn.dataset.time)) || { time: btn.dataset.time };
+        renderSlots();
+      });
+    });
+  }
+
+  async function submitChange() {
+    const reservation = state.selectedReservation;
+    if (!reservation) return showToast("変更する予約が選択されていません。");
+    if (!state.selectedSlot) return showToast("変更後の時間を選んでください。");
+
+    const btn = $("submitChangeBtn");
+    setBusy(btn, true, "変更中...");
+
+    try {
+      const data = await apiPost(endpoint("reservationUpdate"), {
+        reservation_id: reservation.id || reservation.reservation_id,
+        reservation_date: $("changeDate").value,
+        start_time: state.selectedSlot.time || state.selectedSlot,
+        menu_code: $("changeMenu").value,
+        staff_preference: "any",
+        request_note: $("changeNote").value.trim(),
+        source: "member"
+      });
+
+      showToast(data.message || "予約を変更しました。");
+      closeChangeDrawer();
+      await loadMember();
+    } catch (error) {
+      showToast(error.message);
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  function openCancelDrawer(reservation) {
+    state.selectedReservation = reservation;
+    const menu = menuName(reservation.menu_id || reservation.menu_code);
+    $("cancelTargetBox").innerHTML = `
+      <b>${escapeHtml(reservation.reservation_date || "-")} ${formatTime(reservation.start_time)}</b><br>
+      ${escapeHtml(menu)}
+    `;
+    $("cancelReason").value = "";
+    $("cancelDrawer").classList.add("open");
+  }
+
+  function closeCancelDrawer() {
+    $("cancelDrawer").classList.remove("open");
+  }
+
+  async function submitCancel() {
+    const reservation = state.selectedReservation;
+    if (!reservation) return showToast("キャンセルする予約が選択されていません。");
+
+    const btn = $("submitCancelBtn");
+    setBusy(btn, true, "キャンセル中...");
+
+    try {
+      const data = await apiPost(endpoint("reservationCancel"), {
+        reservation_id: reservation.id || reservation.reservation_id,
+        cancel_reason: $("cancelReason").value.trim() || "お客様操作によるキャンセル",
+        source: "member"
+      });
+
+      showToast(data.message || "予約をキャンセルしました。");
+      closeCancelDrawer();
+      await loadMember();
+    } catch (error) {
+      showToast(error.message);
+    } finally {
+      setBusy(btn, false);
+    }
+  }
+
+  async function copyContactText() {
+    const name = state.customer?.customer_name || "お客様";
+    const text = `${name}です。\n予約・回数券について確認したいです。\nよろしくお願いします。`;
+    await navigator.clipboard.writeText(text).catch(() => {});
+    showToast("連絡文面をコピーしました。");
+  }
+
+  function initEvents() {
+    $("lookupBtn").addEventListener("click", async () => {
+      const btn = $("lookupBtn");
+      setBusy(btn, true, "確認中...");
+      try { await loadMember(); }
+      catch (error) { setStatus("lookupStatus", "見つかりません", "ng"); showToast(error.message); }
+      finally { setBusy(btn, false); }
+    });
+
+    $("useSavedBtn").addEventListener("click", () => {
+      loadSavedLookup();
+      showToast("保存済み情報を入れました。");
+    });
+
+    $("demoPhoneBtn").addEventListener("click", () => {
+      $("lookupPhone").value = "090-1111-2222";
+      $("lookupCustomerNo").value = "";
+      $("lookupBtn").click();
+    });
+
+    $("clearLookupBtn").addEventListener("click", () => {
+      $("lookupPhone").value = "";
+      $("lookupCustomerNo").value = "";
+      localStorage.removeItem("DPRO_SEITAI_MEMBER_LOOKUP");
+      setStatus("lookupStatus", "未確認", "");
+      showToast("入力をクリアしました。");
+    });
+
+    $("copyContactTextBtn").addEventListener("click", copyContactText);
+
+    $("closeChangeBtn").addEventListener("click", closeChangeDrawer);
+    $("loadSlotsBtn").addEventListener("click", loadSlots);
+    $("submitChangeBtn").addEventListener("click", submitChange);
+
+    $("closeCancelBtn").addEventListener("click", closeCancelDrawer);
+    $("submitCancelBtn").addEventListener("click", submitCancel);
+
+    ["changeDrawer","cancelDrawer"].forEach((id) => {
+      $(id).addEventListener("click", (event) => {
+        if (event.target.id === id) {
+          if (id === "changeDrawer") closeChangeDrawer();
+          if (id === "cancelDrawer") closeCancelDrawer();
+        }
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeChangeDrawer();
+        closeCancelDrawer();
+      }
+    });
+  }
+
+  async function init() {
+    initEvents();
+    loadSavedLookup();
+
+    const url = new URL(location.href);
+    if (url.searchParams.get("phone")) $("lookupPhone").value = url.searchParams.get("phone");
+    if (url.searchParams.get("customer_no")) $("lookupCustomerNo").value = url.searchParams.get("customer_no");
+
+    renderReservations();
+    renderTickets();
+
+    try {
+      await loadSettings();
+    } catch (error) {
+      showToast(error.message);
+    }
+
+    if ($("lookupPhone").value || $("lookupCustomerNo").value || url.searchParams.get("customer_id") || url.searchParams.get("line_user_id")) {
+      $("lookupBtn").click();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
