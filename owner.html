@@ -1,10 +1,10 @@
-<!doctype html>　
-<!-- STEP SEITAI-10G: owner customer search for phone/walk-in reservation / 20260709 -->
+<!doctype html>
+<!-- STEP SEITAI-10G-R1: owner customer search button event fix / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R1</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -706,7 +706,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10G / owner.html</span>
+        <span class="badge">STEP SEITAI-10G-R1 / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -1899,6 +1899,7 @@
 
     const q = String(query || "").trim();
     const btn = $("manualCustomerSearchBtn");
+    $("manualCustomerResults").innerHTML = `<div class="empty" style="padding:12px;">検索中です...</div>`;
     setBusy(btn, true, "検索中...");
     setStatus("manualCustomerSearchStatus", "検索中", "warn");
 
@@ -2822,6 +2823,37 @@
     $("manualLoadSlotsBtn").addEventListener("click", () => loadManualSlots());
     $("manualFindOpenDayBtn").addEventListener("click", findManualOpenDay);
     $("manualSubmitBtn").addEventListener("click", submitManualReservation);
+
+    $("manualCustomerSearchBtn").addEventListener("click", () => {
+      const q = $("manualCustomerSearchInput").value.trim() || $("manualPhone").value.trim() || $("manualCustomerName").value.trim();
+      searchManualCustomers(q);
+    });
+
+    $("manualSearchByPhoneBtn").addEventListener("click", () => {
+      const phone = $("manualPhone").value.trim();
+      if (!phone) return showToast("電話番号を入力してください");
+      $("manualCustomerSearchInput").value = phone;
+      searchManualCustomers(phone);
+    });
+
+    $("manualRecentCustomersBtn").addEventListener("click", () => searchManualCustomers(""));
+
+    $("manualCustomerClearBtn").addEventListener("click", clearSelectedManualCustomer);
+
+    $("manualCustomerSearchInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const q = $("manualCustomerSearchInput").value.trim() || $("manualPhone").value.trim() || $("manualCustomerName").value.trim();
+        searchManualCustomers(q);
+      }
+    });
+
+    $("manualPhone").addEventListener("blur", () => {
+      const phone = $("manualPhone").value.trim();
+      if (phone && !state.selectedManualCustomer) {
+        $("manualCustomerSearchInput").value = phone;
+      }
+    });
 
     $("manualSourceTabs").querySelectorAll("[data-source]").forEach((btn) => {
       btn.addEventListener("click", () => setManualSource(btn.dataset.source));
