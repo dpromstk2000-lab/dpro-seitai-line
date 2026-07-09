@@ -1,9 +1,9 @@
-<!doctype html>　
+<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-10E</title>
+  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-10F</title>
   <script src="./config.js"></script>
   <style>
     :root{
@@ -388,8 +388,9 @@
     }
     .copyArea{
       width:100%;
-      min-height:120px;
+      min-height:150px;
       resize:vertical;
+      white-space:pre-wrap;
       border:1px solid var(--line);
       border-radius:14px;
       padding:12px;
@@ -415,7 +416,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10E / system-check.html</span>
+        <span class="badge">STEP SEITAI-10F / system-check.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>システム確認画面</h1>
         <p class="lead">
           API接続、管理コード保存、店舗設定、予約枠、営業前デモ準備、各デモ画面の入口を確認します。
@@ -882,7 +883,7 @@
       "5. お客様予約で新規予約を確認"
     ];
 
-    $("demoUrlText").value = lines.join("\\n");
+    $("demoUrlText").value = lines.join("\n");
 
     if (data?.created) {
       const c = data.created;
