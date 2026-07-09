@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-10G-R3: customer result select delegated event fix / 20260709 -->
+<!-- STEP SEITAI-10G-R4: customer select triple event fix / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R3</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R4</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -706,7 +706,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10G-R3 / owner.html</span>
+        <span class="badge">STEP SEITAI-10G-R4 / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -1934,18 +1934,25 @@
           <div class="customerResultMeta">${escapeHtml(customerDisplayMeta(c) || "顧客情報")}</div>
           ${c.memo ? `<div class="customerResultMeta">メモ：${escapeHtml(c.memo)}</div>` : ""}
         </div>
-        <button class="btn primary customerSelectBtn" data-action="select-customer" data-customer-id="${escapeHtml(c.id)}" type="button">この顧客を選択</button>
+        <button class="btn primary customerSelectBtn" data-action="select-customer" data-customer-id="${escapeHtml(c.id)}" onclick="window.DPRO_OWNER_SELECT_CUSTOMER && window.DPRO_OWNER_SELECT_CUSTOMER(this.dataset.customerId)" type="button">この顧客を選択</button>
       </div>
     `).join("");
 
-    // 選択ボタンは initEvents のイベント委任で拾います。
-    // 検索結果は動的に差し替わるため、個別ボタンへ毎回イベントを付ける方式にしません。
+    box.querySelectorAll("[data-action='select-customer']").forEach((btn) => {
+      btn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        selectManualCustomer(btn.dataset.customerId);
+      });
+    });
   }
 
   async function selectManualCustomer(customerId) {
+    setStatus("manualCustomerSearchStatus", "選択処理中", "warn");
     const customer = (state.manualCustomerResults || []).find((c) => String(c.id) === String(customerId));
     if (!customer) {
       showToast("顧客が見つかりません");
+      setStatus("manualCustomerSearchStatus", "選択失敗", "ng");
       return;
     }
 
@@ -2743,6 +2750,8 @@
       });
     });
   }
+
+  window.DPRO_OWNER_SELECT_CUSTOMER = selectManualCustomer;
 
   function initEvents() {
     $("saveAdminBtn").addEventListener("click", () => {
