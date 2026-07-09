@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-7</title>
+  <script src="./config.js?v=step-seitai-4"></script>
+  <style>
+    :root{
+      --bg:#f4f8fb;
+      --card:#ffffff;
+      --ink:#102033;
+      --muted:#64748b;
+      --line:#dbe4ef;
+      --brand:#14a085;
+      --brand2:#0f766e;
+      --soft:#e9fbf6;
+      --soft2:#f8fafc;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --danger:#dc2626;
+      --dark:#0f172a;
+      --shadow:0 18px 45px rgba(15,23,42,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left,rgba(20,160,133,.15),transparent 360px),
+        linear-gradient(180deg,#ecfdf7 0%,#f4f8fb 330px,#f4f8fb 100%);
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(1240px,100%);margin:0 auto;padding:0 16px}
+    header{padding:20px 0 12px}
+    .hero{
+      display:grid;
+      grid-template-columns:1.25fr .9fr;
+      gap:18px;
+      align-items:center;
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(219,228,239,.95);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:22px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 11px;
+      border-radius:999px;
+      background:var(--soft);
+      color:var(--brand2);
+      font-weight:950;
+      font-size:12px;
+      letter-spacing:.03em;
+    }
+    h1{
+      margin:12px 0 10px;
+      font-size:clamp(28px,4.8vw,44px);
+      line-height:1.14;
+      letter-spacing:-.04em;
+    }
+    h2{margin:0 0 10px;font-size:20px;letter-spacing:-.02em}
+    h3{margin:16px 0 8px;font-size:15px}
+    .lead{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:15px;
+    }
+    .heroPanel{
+      background:linear-gradient(135deg,#0f766e,#14a085);
+      color:#fff;
+      border-radius:22px;
+      padding:18px;
+      min-height:150px;
+      display:grid;
+      gap:10px;
+      align-content:center;
+    }
+    .heroPanel .shop{font-size:23px;font-weight:950;letter-spacing:-.03em}
+    .heroPanel .mini{opacity:.86;font-size:12px;line-height:1.6}
+    .heroChips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .heroChip{
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.24);
+      color:#fff;
+      padding:7px 9px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+    }
+    main{padding:10px 0 42px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:0 10px 28px rgba(15,23,42,.05);
+      padding:18px;
+    }
+    .span3{grid-column:span 3}
+    .span4{grid-column:span 4}
+    .span5{grid-column:span 5}
+    .span6{grid-column:span 6}
+    .span7{grid-column:span 7}
+    .span8{grid-column:span 8}
+    .span12{grid-column:span 12}
+    .note{margin:7px 0 0;color:var(--muted);line-height:1.75;font-size:13px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    label{
+      display:block;
+      font-size:13px;
+      font-weight:900;
+      margin:12px 0 6px;
+      color:#334155;
+    }
+    input,select,textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 13px;
+      background:#fff;
+      color:var(--ink);
+      outline:none;
+      font-size:15px;
+    }
+    textarea{min-height:120px;line-height:1.65;resize:vertical}
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--brand);
+      box-shadow:0 0 0 4px rgba(20,160,133,.12);
+    }
+    .btn{
+      border:0;
+      border-radius:13px;
+      padding:11px 14px;
+      font-weight:950;
+      background:#e2e8f0;
+      color:#0f172a;
+      transition:.15s transform,.15s opacity,.15s background;
+      font-size:14px;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.dark{background:var(--dark);color:#fff}
+    .btn.warn{background:var(--warn);color:#fff}
+    .btn.danger{background:var(--danger);color:#fff}
+    .btn.ghost{background:#fff;border:1px solid var(--line)}
+    .btn.small{padding:8px 10px;border-radius:11px;font-size:12px}
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:#e2e8f0;
+      color:#334155;
+      font-size:12px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+    .status.ok{background:#dcfce7;color:#166534}
+    .status.warn{background:#fef3c7;color:#92400e}
+    .status.ng{background:#fee2e2;color:#991b1b}
+    .statGrid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-top:14px;
+    }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:13px;
+    }
+    .statLabel{font-size:12px;color:var(--muted);font-weight:900}
+    .statValue{font-size:26px;font-weight:950;letter-spacing:-.04em;margin-top:2px}
+    .statHint{font-size:11px;color:var(--muted);font-weight:800;margin-top:2px}
+    .list{display:grid;gap:10px;margin-top:12px}
+    .item{
+      border:1px solid #e5edf6;
+      border-radius:18px;
+      background:#fbfdff;
+      padding:13px;
+    }
+    .item.active{border-color:#bbf7d0;background:#f0fdf4}
+    .itemTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .itemTitle{font-weight:950;line-height:1.5;font-size:15px}
+    .itemMeta{color:var(--muted);font-size:12px;line-height:1.65;margin-top:3px}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      padding:5px 8px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#3730a3;
+      font-size:11px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+    .pill.green{background:#dcfce7;color:#166534}
+    .pill.orange{background:#ffedd5;color:#9a3412}
+    .pill.red{background:#fee2e2;color:#991b1b}
+    .pill.gray{background:#e2e8f0;color:#334155}
+    .pill.dark{background:#0f172a;color:#fff}
+    .tagRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .tag{
+      display:inline-flex;
+      padding:5px 8px;
+      border-radius:999px;
+      background:#f1f5f9;
+      color:#334155;
+      font-size:11px;
+      font-weight:900;
+    }
+    .actionRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .messageBox{
+      background:#0f172a;
+      color:#d1fae5;
+      border-radius:16px;
+      padding:13px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:12px;
+      line-height:1.65;
+      white-space:pre-wrap;
+      min-height:120px;
+      max-height:340px;
+      overflow:auto;
+    }
+    .kv{
+      display:grid;
+      grid-template-columns:140px 1fr;
+      gap:8px 10px;
+      font-size:13px;
+      background:#f8fafc;
+      border:1px solid #edf2f7;
+      border-radius:16px;
+      padding:12px;
+    }
+    .kv div:nth-child(odd){color:var(--muted);font-weight:900}
+    .adminBar{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:end;
+    }
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .tab{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:999px;
+      padding:8px 11px;
+      font-size:12px;
+      font-weight:950;
+      color:#334155;
+    }
+    .tab.selected{background:var(--brand);border-color:var(--brand);color:#fff}
+    .sectionHead{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:8px;
+    }
+    .split{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .empty{
+      border:1px dashed var(--line);
+      background:#f8fafc;
+      border-radius:17px;
+      padding:18px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+      text-align:center;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:#0f172a;
+      color:#fff;
+      border-radius:999px;
+      padding:12px 16px;
+      box-shadow:var(--shadow);
+      font-size:14px;
+      font-weight:900;
+      opacity:0;
+      pointer-events:none;
+      transition:.2s;
+      z-index:99;
+      max-width:calc(100% - 28px);
+      text-align:center;
+    }
+    .toast.show{opacity:1;bottom:30px}
+    .loading{
+      display:inline-block;
+      width:14px;height:14px;
+      border:2px solid rgba(255,255,255,.55);
+      border-top-color:#fff;
+      border-radius:999px;
+      animation:spin .7s linear infinite;
+      vertical-align:-2px;
+      margin-right:6px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:980px){
+      .hero{grid-template-columns:1fr}
+      .span3,.span4,.span5,.span6,.span7,.span8{grid-column:span 12}
+      .statGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .adminBar{grid-template-columns:1fr}
+      .split{grid-template-columns:1fr}
+    }
+    @media(max-width:560px){
+      .wrap{padding:0 12px}
+      header{padding-top:12px}
+      .hero,.card{border-radius:20px;padding:16px}
+      .grid{gap:12px}
+      .statGrid{grid-template-columns:1fr 1fr}
+      h1{font-size:30px}
+      .itemTop{display:block}
+      .itemTop .pill{margin-top:8px}
+      .kv{grid-template-columns:1fr}
+      .kv div:nth-child(odd){margin-top:4px}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <span class="badge">STEP SEITAI-7 / owner.html</span>
+        <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
+        <p class="lead">
+          今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
+        </p>
+      </div>
+      <div class="heroPanel">
+        <div class="mini">店舗</div>
+        <div class="shop" id="heroShopName">DPRO整体院</div>
+        <div class="mini" id="heroShopNote">営業前デモ準備済みの予約・フォロー・回数券残数を確認できます。</div>
+        <div class="heroChips">
+          <span class="heroChip">本日の予約</span>
+          <span class="heroChip">来院管理</span>
+          <span class="heroChip">LINE文面コピー</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="grid">
+      <div class="card span4">
+        <h2>管理コード</h2>
+        <p class="note">Cloudflare Worker の ADMIN_TOKEN に設定したコードを、このブラウザに保存します。今回は <b>1234</b> です。</p>
+        <div class="adminBar">
+          <div>
+            <label for="adminCodeInput">管理コード</label>
+            <input id="adminCodeInput" type="password" placeholder="例：1234" autocomplete="off">
+          </div>
+          <button class="btn primary" id="saveAdminBtn" type="button">保存</button>
+        </div>
+        <div class="row" style="margin-top:12px;">
+          <button class="btn ghost small" id="toggleAdminBtn" type="button">表示/非表示</button>
+          <button class="btn danger small" id="clearAdminBtn" type="button">削除</button>
+          <span class="status" id="adminStatus">未確認</span>
+        </div>
+      </div>
+
+      <div class="card span8">
+        <div class="sectionHead">
+          <div>
+            <h2>表示日</h2>
+            <p class="note">営業前デモ準備後は「予約がある日を探す」で次営業日の予約を確認できます。</p>
+          </div>
+          <span class="status" id="apiStatus">待機中</span>
+        </div>
+        <div class="row">
+          <input id="dateInput" type="date" style="max-width:230px;">
+          <button class="btn primary" id="loadBtn" type="button">この日の予約を表示</button>
+          <button class="btn ghost" id="todayBtn" type="button">今日</button>
+          <button class="btn ghost" id="tomorrowBtn" type="button">明日</button>
+          <button class="btn dark" id="findReservationDayBtn" type="button">予約がある日を探す</button>
+          <a class="btn ghost" href="./system-check.html" style="text-decoration:none;">system-check</a>
+        </div>
+
+        <div class="statGrid">
+          <div class="stat">
+            <div class="statLabel">予約件数</div>
+            <div class="statValue" id="statReservation">-</div>
+            <div class="statHint">指定日の有効予約</div>
+          </div>
+          <div class="stat">
+            <div class="statLabel">来院済み</div>
+            <div class="statValue" id="statArrived">-</div>
+            <div class="statHint">来院済み・施術中</div>
+          </div>
+          <div class="stat">
+            <div class="statLabel">フォロー</div>
+            <div class="statValue" id="statFollowup">-</div>
+            <div class="statHint">LINE対応対象</div>
+          </div>
+          <div class="stat">
+            <div class="statLabel">回数券注意</div>
+            <div class="statValue" id="statTicket">-</div>
+            <div class="statHint">残数少ない回数券</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card span12">
+        <div class="sectionHead">
+          <div>
+            <h2>今日やること</h2>
+            <p class="note">予約、フォロー、回数券注意をまとめて表示します。</p>
+          </div>
+          <button class="btn ghost small" id="refreshTodoBtn" type="button">更新</button>
+        </div>
+        <div id="todoList" class="list"></div>
+      </div>
+
+      <div class="card span8">
+        <div class="sectionHead">
+          <div>
+            <h2>予約一覧</h2>
+            <p class="note">来院済み・施術中・施術完了・回数券使用・LINE文面コピーを操作できます。</p>
+          </div>
+          <div class="tabs" id="reservationTabs">
+            <button class="tab selected" data-filter="active" type="button">有効予約</button>
+            <button class="tab" data-filter="all" type="button">すべて</button>
+            <button class="tab" data-filter="reserved" type="button">予約済み</button>
+            <button class="tab" data-filter="arrived" type="button">来院済み</button>
+            <button class="tab" data-filter="completed" type="button">完了</button>
+          </div>
+        </div>
+        <div id="reservationList" class="list"></div>
+      </div>
+
+      <div class="card span4">
+        <h2>LINE確認文面</h2>
+        <p class="note">選択した予約の文面をコピーできます。コピー後は予約側に「コピー済み」を記録します。</p>
+        <div class="messageBox" id="messageBox">予約を選択すると、ここにLINE文面が表示されます。</div>
+        <div class="row" style="margin-top:12px;">
+          <button class="btn primary" id="copyMessageBtn" type="button">文面をコピー</button>
+          <button class="btn ghost" id="clearMessageBtn" type="button">クリア</button>
+        </div>
+      </div>
+
+      <div class="card span6">
+        <div class="sectionHead">
+          <div>
+            <h2>フォロー対象</h2>
+            <p class="note">来院後フォロー、久しぶりフォロー、回数券残数案内など。</p>
+          </div>
+          <button class="btn ghost small" id="reloadFollowupsBtn" type="button">再読込</button>
+        </div>
+        <div id="followupList" class="list"></div>
+      </div>
+
+      <div class="card span6">
+        <div class="sectionHead">
+          <div>
+            <h2>回数券残数注意</h2>
+            <p class="note">残り回数が少ない回数券を表示します。</p>
+          </div>
+          <span class="status warn">残り少</span>
+        </div>
+        <div id="ticketList" class="list"></div>
+      </div>
+
+      <div class="card span12">
+        <h2>APIレスポンス確認</h2>
+        <p class="note">トラブル時の確認用です。</p>
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn ghost small" id="copyJsonBtn" type="button">JSONコピー</button>
+          <button class="btn ghost small" id="clearJsonBtn" type="button">クリア</button>
+        </div>
+        <div class="messageBox" id="jsonBox" style="max-height:420px;">{}</div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast">OK</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const FALLBACK_CONFIG = {
+    serviceName: "DPRO 整骨院・整体 LINE",
+    shopCode: "dpro_seitai_demo",
+    shopName: "DPRO整体院",
+    apiBaseUrl: "https://dpro-seitai-line-api.dpromstk2000.workers.dev",
+    adminCodeStorageKey: "DPRO_SEITAI_ADMIN_CODE",
+    adminCodeHeaderName: "X-DPRO-Admin-Code",
+    endpoints: {
+      publicSettings: "/api/public/settings",
+      ownerToday: "/api/owner/today",
+      ownerFollowups: "/api/owner/followups"
+    }
+  };
+
+  const CONFIG = window.DPRO_SEITAI_CONFIG || FALLBACK_CONFIG;
+  const $ = (id) => document.getElementById(id);
+
+  const state = {
+    shop: null,
+    settings: null,
+    date: "",
+    data: null,
+    reservations: [],
+    followups: [],
+    lowTickets: [],
+    filter: "active",
+    selectedReservation: null,
+    currentMessage: "",
+    lastJson: {}
+  };
+
+  function endpoint(key) {
+    const map = CONFIG.endpoints || {};
+    return map[key] || FALLBACK_CONFIG.endpoints[key] || key;
+  }
+
+  function trimSlash(value) {
+    return String(value || "").replace(/\/+$/, "");
+  }
+
+  function apiUrl(path, params = {}) {
+    const url = new URL(`${trimSlash(CONFIG.apiBaseUrl)}${path.startsWith("/") ? path : `/${path}`}`);
+    if (!url.searchParams.get("shop_code")) {
+      url.searchParams.set("shop_code", CONFIG.shopCode || "dpro_seitai_demo");
+    }
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value) !== "") {
+        url.searchParams.set(key, String(value));
+      }
+    });
+    return url.toString();
+  }
+
+  function getAdminCode() {
+    try {
+      return localStorage.getItem(CONFIG.adminCodeStorageKey || "DPRO_SEITAI_ADMIN_CODE") || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function saveAdminCode(code) {
+    try {
+      localStorage.setItem(CONFIG.adminCodeStorageKey || "DPRO_SEITAI_ADMIN_CODE", String(code || "").trim());
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function clearAdminCode() {
+    try {
+      localStorage.removeItem(CONFIG.adminCodeStorageKey || "DPRO_SEITAI_ADMIN_CODE");
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function adminHeaders() {
+    const code = getAdminCode();
+    return {
+      "Content-Type": "application/json",
+      ...(code ? { [CONFIG.adminCodeHeaderName || "X-DPRO-Admin-Code"]: code } : {})
+    };
+  }
+
+  async function apiGet(path, params = {}, admin = true) {
+    const res = await fetch(apiUrl(path, params), {
+      method: "GET",
+      headers: admin ? adminHeaders() : {}
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.message || data.error || `API error ${res.status}`);
+    }
+    return data;
+  }
+
+  async function apiPost(path, body = {}, admin = true, query = {}) {
+    const res = await fetch(apiUrl(path, query), {
+      method: "POST",
+      headers: admin ? adminHeaders() : { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {})
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.ok === false) {
+      throw new Error(data.message || data.error || `API error ${res.status}`);
+    }
+    return data;
+  }
+
+  function todayText() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function addDaysText(dateText, days) {
+    const [y, m, d] = dateText.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + Number(days || 0));
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  function formatTime(value) {
+    return String(value || "").slice(0, 5);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function showToast(text) {
+    const t = $("toast");
+    t.textContent = text;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1900);
+  }
+
+  function setStatus(id, text, kind = "") {
+    const el = $(id);
+    el.textContent = text;
+    el.className = `status ${kind}`.trim();
+  }
+
+  function setBusy(button, busy, label) {
+    if (!button) return;
+    if (busy) {
+      button.dataset.oldText = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = `<span class="loading"></span>${label || "処理中..."}`;
+    } else {
+      button.disabled = false;
+      if (button.dataset.oldText) button.innerHTML = button.dataset.oldText;
+      delete button.dataset.oldText;
+    }
+  }
+
+  function showJson(data) {
+    state.lastJson = data || {};
+    $("jsonBox").textContent = JSON.stringify(state.lastJson, null, 2);
+  }
+
+  function statusLabel(status) {
+    const map = {
+      reserved: "予約済み",
+      arrived: "来院済み",
+      in_treatment: "施術中",
+      treatment_done: "施術完了",
+      completed: "完了",
+      cancelled: "キャンセル",
+      no_show: "無断キャンセル"
+    };
+    return map[status] || status || "-";
+  }
+
+  function statusClass(status) {
+    if (status === "reserved") return "";
+    if (status === "arrived" || status === "in_treatment") return "orange";
+    if (status === "completed" || status === "treatment_done") return "green";
+    if (status === "cancelled" || status === "no_show") return "red";
+    return "gray";
+  }
+
+  function isActiveReservation(r) {
+    return ["reserved","arrived","in_treatment","treatment_done"].includes(r.status);
+  }
+
+  function buildLineMessage(r) {
+    const name = r.customer_name || "お客様";
+    const date = r.reservation_date || state.date;
+    const time = formatTime(r.start_time);
+    const menu = r.menu_name || "メニュー";
+    const staff = r.staff_name || "おまかせ";
+    const request = r.request_note ? `\nご要望：${r.request_note}` : "";
+    return `${name}様\n\nご予約内容の確認です。\n日時：${date} ${time}\nメニュー：${menu}\n担当：${staff}${request}\n\n変更やキャンセルがある場合は、お早めにLINEでお知らせください。\n当日はお気をつけてお越しください。`;
+  }
+
+  function updateAdminStatus() {
+    const code = getAdminCode();
+    $("adminCodeInput").value = code;
+    setStatus("adminStatus", code ? "管理コード保存済み" : "管理コード未保存", code ? "ok" : "warn");
+  }
+
+  async function loadSettings() {
+    const data = await apiGet(endpoint("publicSettings"), {}, false);
+    state.shop = data.shop || null;
+    state.settings = data.settings || null;
+    $("heroShopName").textContent = data.shop?.shop_name || CONFIG.shopName || "DPRO整体院";
+    $("heroShopNote").textContent = data.shop?.public_note || "営業前デモ準備済みの予約・フォロー・回数券残数を確認できます。";
+  }
+
+  async function loadOwnerToday(date = $("dateInput").value) {
+    if (!getAdminCode()) throw new Error("管理コードを保存してください。");
+    state.date = date || todayText();
+    $("dateInput").value = state.date;
+    setStatus("apiStatus", "読込中...", "warn");
+
+    const data = await apiGet(endpoint("ownerToday"), { date: state.date }, true);
+    state.data = data;
+    state.shop = data.shop || state.shop;
+    state.reservations = data.reservations || [];
+    state.followups = data.followups || [];
+    state.lowTickets = data.low_tickets || [];
+    showJson(data);
+    renderAll();
+    setStatus("apiStatus", "読込OK", "ok");
+    return data;
+  }
+
+  async function findReservationDay() {
+    if (!getAdminCode()) throw new Error("管理コードを保存してください。");
+    const start = todayText();
+    for (let i = 0; i < 28; i++) {
+      const date = addDaysText(start, i);
+      const data = await apiGet(endpoint("ownerToday"), { date }, true);
+      if ((data.reservations || []).some(isActiveReservation)) {
+        state.date = date;
+        $("dateInput").value = date;
+        state.data = data;
+        state.shop = data.shop || state.shop;
+        state.reservations = data.reservations || [];
+        state.followups = data.followups || [];
+        state.lowTickets = data.low_tickets || [];
+        showJson(data);
+        renderAll();
+        showToast(`予約あり：${date}`);
+        return data;
+      }
+    }
+    throw new Error("28日以内に予約データが見つかりませんでした。system-checkで営業前デモ準備を実行してください。");
+  }
+
+  function renderAll() {
+    renderStats();
+    renderTodos();
+    renderReservations();
+    renderFollowups();
+    renderTickets();
+  }
+
+  function renderStats() {
+    const stats = state.data?.stats || {};
+    const arrived = Number(stats.arrived || 0) + Number(stats.in_treatment || 0);
+    $("statReservation").textContent = Number(stats.reservation_count ?? state.reservations.filter(isActiveReservation).length);
+    $("statArrived").textContent = arrived;
+    $("statFollowup").textContent = Number(stats.active_followup_count ?? state.followups.length);
+    $("statTicket").textContent = Number(stats.low_ticket_count ?? state.lowTickets.length);
+  }
+
+  function renderTodos() {
+    const box = $("todoList");
+    const active = state.reservations.filter(isActiveReservation);
+    const followups = state.followups || [];
+    const tickets = state.lowTickets || [];
+
+    const items = [];
+
+    if (active.length) {
+      items.push(`
+        <div class="item active">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">本日の予約 ${active.length}件</div>
+              <div class="itemMeta">${active.map((r) => `${formatTime(r.start_time)} ${r.customer_name || ""}様`).join(" / ")}</div>
+            </div>
+            <span class="pill green">予約</span>
+          </div>
+        </div>
+      `);
+    }
+
+    if (followups.length) {
+      items.push(`
+        <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">LINEフォロー ${followups.length}件</div>
+              <div class="itemMeta">${followups.slice(0,3).map((f) => `${f.customer_name || ""}様：${f.title || f.followup_type || ""}`).join(" / ")}</div>
+            </div>
+            <span class="pill orange">フォロー</span>
+          </div>
+        </div>
+      `);
+    }
+
+    if (tickets.length) {
+      items.push(`
+        <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">回数券残数注意 ${tickets.length}件</div>
+              <div class="itemMeta">${tickets.slice(0,3).map((t) => `${t.ticket_name || "回数券"} 残り${t.remaining_count}回`).join(" / ")}</div>
+            </div>
+            <span class="pill red">残り少</span>
+          </div>
+        </div>
+      `);
+    }
+
+    if (!items.length) {
+      box.innerHTML = `<div class="empty">この日に表示する「今日やること」はありません。</div>`;
+      return;
+    }
+
+    box.innerHTML = items.join("");
+  }
+
+  function reservationMatchesFilter(r) {
+    if (state.filter === "all") return true;
+    if (state.filter === "active") return isActiveReservation(r);
+    if (state.filter === "reserved") return r.status === "reserved";
+    if (state.filter === "arrived") return r.status === "arrived" || r.status === "in_treatment";
+    if (state.filter === "completed") return r.status === "completed" || r.status === "treatment_done";
+    return true;
+  }
+
+  function renderReservations() {
+    const box = $("reservationList");
+    const rows = state.reservations.filter(reservationMatchesFilter);
+
+    if (!rows.length) {
+      box.innerHTML = `<div class="empty">この条件の予約はありません。</div>`;
+      return;
+    }
+
+    box.innerHTML = rows.map((r) => {
+      const copied = r.line_message_copied ? `<span class="pill green">文面コピー済み</span>` : "";
+      const tags = Array.isArray(r.concern_tags) ? r.concern_tags : [];
+      return `
+        <div class="item" data-reservation-id="${escapeHtml(r.reservation_id || r.id)}">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${formatTime(r.start_time)} ${escapeHtml(r.customer_name || "-")} 様</div>
+              <div class="itemMeta">
+                ${escapeHtml(r.menu_name || "-")} / 担当：${escapeHtml(r.staff_name || "未定")} / ${escapeHtml(r.resource_name || "")}<br>
+                電話：${escapeHtml(r.phone || "-")} / 予約日：${escapeHtml(r.reservation_date || state.date)}
+              </div>
+            </div>
+            <div class="row">
+              <span class="pill ${statusClass(r.status)}">${escapeHtml(statusLabel(r.status))}</span>
+              ${copied}
+            </div>
+          </div>
+
+          ${tags.length ? `<div class="tagRow">${tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
+          ${r.request_note ? `<div class="itemMeta" style="margin-top:8px;">ご要望：${escapeHtml(r.request_note)}</div>` : ""}
+
+          <div class="actionRow">
+            ${r.status === "reserved" ? `<button class="btn primary small" data-action="arrived" data-id="${escapeHtml(r.reservation_id || r.id)}">来院済みにする</button>` : ""}
+            ${r.status === "arrived" ? `<button class="btn warn small" data-action="start" data-id="${escapeHtml(r.reservation_id || r.id)}">施術中にする</button>` : ""}
+            ${(r.status === "arrived" || r.status === "in_treatment" || r.status === "treatment_done") ? `<button class="btn dark small" data-action="complete" data-id="${escapeHtml(r.reservation_id || r.id)}">施術完了</button>` : ""}
+            <button class="btn ghost small" data-action="message" data-id="${escapeHtml(r.reservation_id || r.id)}">文面表示</button>
+            <button class="btn ghost small" data-action="copy" data-id="${escapeHtml(r.reservation_id || r.id)}">文面コピー</button>
+            <button class="btn ghost small" data-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}">回数券1回使用</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    box.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", () => handleReservationAction(btn.dataset.action, btn.dataset.id, btn));
+    });
+  }
+
+  async function handleReservationAction(action, reservationId, button) {
+    const r = state.reservations.find((item) => String(item.reservation_id || item.id) === String(reservationId));
+    if (!r) return showToast("予約が見つかりません。");
+
+    if (action === "message") {
+      selectReservationMessage(r);
+      return;
+    }
+
+    if (action === "copy") {
+      selectReservationMessage(r);
+      await copyCurrentMessage();
+      await markReservationLineCopied(r).catch(() => {});
+      await loadOwnerToday(state.date);
+      return;
+    }
+
+    setBusy(button, true, "処理中...");
+    try {
+      if (action === "arrived") {
+        await apiPost("/api/owner/visits/check-in", { reservation_id: reservationId, actor_name: "owner" });
+        showToast("来院済みにしました");
+      } else if (action === "start") {
+        await apiPost("/api/owner/visits/start", { reservation_id: reservationId, actor_name: "owner" });
+        showToast("施術中にしました");
+      } else if (action === "complete") {
+        await apiPost("/api/owner/visits/complete", { reservation_id: reservationId, actor_name: "owner", source: "admin" });
+        showToast("施術完了にしました");
+      } else if (action === "ticket") {
+        await apiPost("/api/owner/tickets/use", { reservation_id: reservationId, customer_id: r.customer_id, memo: "予約画面から回数券を1回使用", source: "admin" });
+        showToast("回数券を1回使用しました");
+      }
+      await loadOwnerToday(state.date);
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message, action });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  function selectReservationMessage(r) {
+    state.selectedReservation = r;
+    state.currentMessage = buildLineMessage(r);
+    $("messageBox").textContent = state.currentMessage;
+    showToast("文面を表示しました");
+  }
+
+  async function copyCurrentMessage() {
+    const text = state.currentMessage || $("messageBox").textContent || "";
+    if (!text || text.includes("予約を選択すると")) {
+      showToast("コピーする文面がありません");
+      return;
+    }
+    await navigator.clipboard.writeText(text).catch(() => {});
+    showToast("LINE文面をコピーしました");
+  }
+
+  async function markReservationLineCopied(r) {
+    await apiPost("/api/owner/reservations/line-copied", { reservation_id: r.reservation_id || r.id });
+  }
+
+  function renderFollowups() {
+    const box = $("followupList");
+    const rows = state.followups || [];
+
+    if (!rows.length) {
+      box.innerHTML = `<div class="empty">フォロー対象はありません。</div>`;
+      return;
+    }
+
+    box.innerHTML = rows.map((f) => `
+      <div class="item" data-followup-id="${escapeHtml(f.followup_id || f.id)}">
+        <div class="itemTop">
+          <div>
+            <div class="itemTitle">${escapeHtml(f.customer_name || "-")} 様</div>
+            <div class="itemMeta">${escapeHtml(f.title || f.followup_type || "フォロー")} / 期限：${escapeHtml(f.due_date || "-")}</div>
+          </div>
+          <span class="pill ${f.priority === "high" ? "orange" : "gray"}">${escapeHtml(f.priority || "normal")}</span>
+        </div>
+        <div class="actionRow">
+          <button class="btn ghost small" data-followup-action="show" data-id="${escapeHtml(f.followup_id || f.id)}">文面表示</button>
+          <button class="btn primary small" data-followup-action="copy" data-id="${escapeHtml(f.followup_id || f.id)}">文面コピー</button>
+          <button class="btn dark small" data-followup-action="done" data-id="${escapeHtml(f.followup_id || f.id)}">対応済み</button>
+        </div>
+      </div>
+    `).join("");
+
+    box.querySelectorAll("[data-followup-action]").forEach((btn) => {
+      btn.addEventListener("click", () => handleFollowupAction(btn.dataset.followupAction, btn.dataset.id, btn));
+    });
+  }
+
+  async function handleFollowupAction(action, id, button) {
+    const f = state.followups.find((item) => String(item.followup_id || item.id) === String(id));
+    if (!f) return showToast("フォローが見つかりません。");
+
+    const text = f.message_text || `${f.customer_name || "お客様"}様\n\n${f.title || "ご連絡です。"}\nご都合のよい時に、このLINEにそのままご返信ください。`;
+
+    if (action === "show") {
+      state.currentMessage = text;
+      $("messageBox").textContent = text;
+      showToast("フォロー文面を表示しました");
+      return;
+    }
+
+    setBusy(button, true, "処理中...");
+    try {
+      if (action === "copy") {
+        state.currentMessage = text;
+        $("messageBox").textContent = text;
+        await navigator.clipboard.writeText(text).catch(() => {});
+        await apiPost("/api/owner/followups/update", { followup_id: id, status: "copied" });
+        showToast("フォロー文面をコピーしました");
+      } else if (action === "done") {
+        await apiPost("/api/owner/followups/update", { followup_id: id, status: "done" });
+        showToast("フォローを対応済みにしました");
+      }
+      await loadOwnerToday(state.date);
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message, action });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  function renderTickets() {
+    const box = $("ticketList");
+    const rows = state.lowTickets || [];
+
+    if (!rows.length) {
+      box.innerHTML = `<div class="empty">残数注意の回数券はありません。</div>`;
+      return;
+    }
+
+    box.innerHTML = rows.map((t) => `
+      <div class="item">
+        <div class="itemTop">
+          <div>
+            <div class="itemTitle">${escapeHtml(t.ticket_name || "回数券")}</div>
+            <div class="itemMeta">
+              残り ${Number(t.remaining_count || 0)}回 / 合計 ${Number(t.total_count || 0)}回<br>
+              有効期限：${escapeHtml(t.expires_at || "-")}
+            </div>
+          </div>
+          <span class="pill red">残り${Number(t.remaining_count || 0)}回</span>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  async function loadFollowupsOnly() {
+    if (!getAdminCode()) throw new Error("管理コードを保存してください。");
+    const dueTo = addDaysText(todayText(), 14);
+    const data = await apiGet(endpoint("ownerFollowups"), { due_to: dueTo }, true);
+    state.followups = data.followups || [];
+    showJson(data);
+    renderFollowups();
+    showToast("フォローを再読込しました");
+  }
+
+  function initTabs() {
+    $("reservationTabs").querySelectorAll("[data-filter]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        $("reservationTabs").querySelectorAll("[data-filter]").forEach((b) => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        state.filter = btn.dataset.filter;
+        renderReservations();
+      });
+    });
+  }
+
+  function initEvents() {
+    $("saveAdminBtn").addEventListener("click", () => {
+      const code = $("adminCodeInput").value.trim();
+      if (!code) return showToast("管理コードを入力してください");
+      saveAdminCode(code);
+      updateAdminStatus();
+      showToast("管理コードを保存しました");
+    });
+
+    $("toggleAdminBtn").addEventListener("click", () => {
+      $("adminCodeInput").type = $("adminCodeInput").type === "password" ? "text" : "password";
+    });
+
+    $("clearAdminBtn").addEventListener("click", () => {
+      clearAdminCode();
+      updateAdminStatus();
+      showToast("管理コードを削除しました");
+    });
+
+    $("loadBtn").addEventListener("click", async () => {
+      const btn = $("loadBtn");
+      setBusy(btn, true, "読込中...");
+      try { await loadOwnerToday($("dateInput").value); }
+      catch (error) { setStatus("apiStatus", "エラー", "ng"); showToast(error.message); showJson({ ok:false, message:error.message }); }
+      finally { setBusy(btn, false); }
+    });
+
+    $("refreshTodoBtn").addEventListener("click", () => $("loadBtn").click());
+
+    $("todayBtn").addEventListener("click", () => {
+      $("dateInput").value = todayText();
+      $("loadBtn").click();
+    });
+
+    $("tomorrowBtn").addEventListener("click", () => {
+      $("dateInput").value = addDaysText(todayText(), 1);
+      $("loadBtn").click();
+    });
+
+    $("findReservationDayBtn").addEventListener("click", async () => {
+      const btn = $("findReservationDayBtn");
+      setBusy(btn, true, "検索中...");
+      try { await findReservationDay(); }
+      catch (error) { setStatus("apiStatus", "検索エラー", "ng"); showToast(error.message); showJson({ ok:false, message:error.message }); }
+      finally { setBusy(btn, false); }
+    });
+
+    $("copyMessageBtn").addEventListener("click", copyCurrentMessage);
+
+    $("clearMessageBtn").addEventListener("click", () => {
+      state.currentMessage = "";
+      state.selectedReservation = null;
+      $("messageBox").textContent = "予約を選択すると、ここにLINE文面が表示されます。";
+    });
+
+    $("reloadFollowupsBtn").addEventListener("click", async () => {
+      const btn = $("reloadFollowupsBtn");
+      setBusy(btn, true, "読込中...");
+      try { await loadFollowupsOnly(); }
+      catch (error) { showToast(error.message); showJson({ ok:false, message:error.message }); }
+      finally { setBusy(btn, false); }
+    });
+
+    $("copyJsonBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText(JSON.stringify(state.lastJson, null, 2)).catch(() => {});
+      showToast("JSONをコピーしました");
+    });
+
+    $("clearJsonBtn").addEventListener("click", () => {
+      state.lastJson = {};
+      $("jsonBox").textContent = "{}";
+    });
+
+    initTabs();
+  }
+
+  async function init() {
+    $("dateInput").value = todayText();
+    updateAdminStatus();
+    initEvents();
+
+    try {
+      await loadSettings();
+    } catch (error) {
+      showToast(error.message);
+    }
+
+    if (getAdminCode()) {
+      try {
+        await findReservationDay();
+      } catch {
+        try { await loadOwnerToday(todayText()); } catch (error) { showToast(error.message); }
+      }
+    } else {
+      setStatus("apiStatus", "管理コードを保存してください", "warn");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
+</script>
+</body>
+</html>
