@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-7A: owner settings panel added / 20260709 -->
+<!-- STEP SEITAI-7B: compact settings drawer UI / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-7A</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-7B</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -328,8 +328,48 @@
     }
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    .settingsPanel{display:none;margin-top:14px}
+    .settingsPanel{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      display:none;
+      margin:0;
+    }
     .settingsPanel.open{display:block}
+    .settingsBackdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(15,23,42,.42);
+      backdrop-filter:blur(5px);
+    }
+    .settingsDrawer{
+      position:absolute;
+      top:18px;
+      right:18px;
+      width:min(980px,calc(100vw - 36px));
+      max-height:calc(100vh - 36px);
+      overflow:auto;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:26px;
+      box-shadow:0 26px 90px rgba(15,23,42,.28);
+      padding:18px;
+    }
+    .settingsDrawerHead{
+      position:sticky;
+      top:-18px;
+      z-index:5;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      padding:18px;
+      margin:-18px -18px 14px;
+      background:rgba(255,255,255,.95);
+      border-bottom:1px solid var(--line);
+      border-radius:26px 26px 0 0;
+      backdrop-filter:blur(10px);
+    }
     .settingsNav{
       display:flex;
       gap:8px;
@@ -418,6 +458,8 @@
       .split{grid-template-columns:1fr}
       .field3,.field4,.field6,.field8{grid-column:span 12}
       .checkGrid{grid-template-columns:1fr}
+      .settingsDrawer{left:12px;right:12px;top:12px;width:auto;max-height:calc(100vh - 24px);padding:14px}
+      .settingsDrawerHead{margin:-14px -14px 14px;padding:14px;border-radius:22px 22px 0 0}
     }
     @media(max-width:560px){
       .wrap{padding:0 12px}
@@ -439,7 +481,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-7A / owner.html</span>
+        <span class="badge">STEP SEITAI-7B / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -453,6 +495,7 @@
           <span class="heroChip">本日の予約</span>
           <span class="heroChip">来院管理</span>
           <span class="heroChip">LINE文面コピー</span>
+          <span class="heroChip">⚙設定は右上</span>
         </div>
       </div>
     </section>
@@ -494,6 +537,7 @@
           <button class="btn ghost" id="tomorrowBtn" type="button">明日</button>
           <button class="btn dark" id="findReservationDayBtn" type="button">予約がある日を探す</button>
           <a class="btn ghost" href="./system-check.html" style="text-decoration:none;">system-check</a>
+          <button class="btn ghost" id="toggleSettingsBtn" type="button">⚙ 店舗設定</button>
         </div>
 
         <div class="statGrid">
@@ -581,22 +625,24 @@
       </div>
 
 
-      <div class="card span12">
-        <div class="sectionHead">
-          <div>
-            <h2>店舗設定</h2>
-            <p class="note">
-              店舗名・予約ルール・営業時間・スタッフ・メニュー・ベッド・LINE文面をここで変更します。
-              保存すると、お客様予約画面にも反映されます。
-            </p>
+      <div class="settingsPanel" id="settingsPanel" aria-hidden="true">
+        <div class="settingsBackdrop" id="settingsBackdrop"></div>
+        <div class="settingsDrawer">
+          <div class="settingsDrawerHead">
+            <div>
+              <span class="badge">⚙ 店舗設定</span>
+              <h2 style="margin-top:10px;">店舗設定</h2>
+              <p class="note">
+                店舗名・予約ルール・営業時間・スタッフ・メニュー・ベッド・LINE文面を必要な時だけ開いて変更します。
+                普段の運用画面はスッキリ残します。
+              </p>
+            </div>
+            <div class="row">
+              <span class="status" id="settingsSaveStatus">未読込</span>
+              <button class="btn ghost" id="closeSettingsBtn" type="button">閉じる</button>
+            </div>
           </div>
-          <div class="row">
-            <span class="status" id="settingsSaveStatus">未読込</span>
-            <button class="btn primary" id="toggleSettingsBtn" type="button">店舗設定を開く</button>
-          </div>
-        </div>
 
-        <div class="settingsPanel" id="settingsPanel">
           <div class="settingsNav" id="settingsNav">
             <button class="settingsTab selected" data-settings-tab="basic" type="button">基本・予約ルール</button>
             <button class="settingsTab" data-settings-tab="hours" type="button">営業時間</button>
@@ -730,6 +776,7 @@
               <button class="btn primary" id="saveTemplateSettingsBtn" type="button">LINE文面を保存</button>
             </div>
           </section>
+        </div>
         </div>
       </div>
 
@@ -1743,13 +1790,29 @@
   }
 
   function initSettingsPanel() {
+    function closeSettingsPanel() {
+      const panel = $("settingsPanel");
+      panel.classList.remove("open");
+      panel.setAttribute("aria-hidden", "true");
+      $("toggleSettingsBtn").textContent = "⚙ 店舗設定";
+    }
+
     $("toggleSettingsBtn").addEventListener("click", async () => {
       const panel = $("settingsPanel");
       const willOpen = !panel.classList.contains("open");
       panel.classList.toggle("open", willOpen);
-      $("toggleSettingsBtn").textContent = willOpen ? "店舗設定を閉じる" : "店舗設定を開く";
+      panel.setAttribute("aria-hidden", willOpen ? "false" : "true");
+      $("toggleSettingsBtn").textContent = willOpen ? "⚙ 設定を閉じる" : "⚙ 店舗設定";
       if (willOpen && !state.ownerSettings && getAdminCode()) {
         try { await loadOwnerSettings(); } catch (error) { showToast(error.message); }
+      }
+    });
+
+    $("closeSettingsBtn").addEventListener("click", closeSettingsPanel);
+    $("settingsBackdrop").addEventListener("click", closeSettingsPanel);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && $("settingsPanel").classList.contains("open")) {
+        closeSettingsPanel();
       }
     });
 
