@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-6A: customer form layout fix / span6 CSS added / 20260709 -->
+<!-- STEP SEITAI-6B: auto reload slots on date/menu/staff change / stale slot message fix / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-6A</title>
+  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-6B</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -503,7 +503,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-6A / index.html</span>
+        <span class="badge">STEP SEITAI-6B / index.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>かんたん予約</h1>
         <p class="lead">
           メニュー、担当者、気になる内容、日時を選んで予約できます。
@@ -951,11 +951,9 @@
       btn.addEventListener("click", () => {
         const code = btn.dataset.menuCode;
         state.selectedMenu = state.menus.find((m) => m.menu_code === code) || null;
-        state.selectedSlot = null;
-        state.slots = [];
         renderMenus();
-        renderSlots();
-        updateSummary();
+        clearSlots("メニューが変わったため、予約可能時間を再確認しています。");
+        autoReloadSlots("メニューが変わったため、予約可能時間を再確認しています。");
         scrollToSection("sectionStaff");
       });
     });
@@ -983,11 +981,9 @@
     box.querySelectorAll("[data-staff-code]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.selectedStaffCode = btn.dataset.staffCode;
-        state.selectedSlot = null;
-        state.slots = [];
         renderStaff();
-        renderSlots();
-        updateSummary();
+        clearSlots("指名スタッフが変わったため、予約可能時間を再確認しています。");
+        autoReloadSlots("指名スタッフが変わったため、予約可能時間を再確認しています。");
       });
     });
   }
@@ -1027,12 +1023,9 @@
         }
 
         $("staffSelectArea").style.display = state.staffPreference === "specific" ? "block" : "none";
-        state.selectedSlot = null;
-        state.slots = [];
-
         renderStaff();
-        renderSlots();
-        updateSummary();
+        clearSlots("担当者希望が変わったため、予約可能時間を再確認しています。");
+        autoReloadSlots("担当者希望が変わったため、予約可能時間を再確認しています。");
       });
     });
   }
@@ -1062,6 +1055,34 @@
         scrollToSection("sectionCustomer");
       });
     });
+  }
+
+  function clearSlots(message = "日付・メニュー・担当者が変わったため、予約時間を再確認してください。") {
+    state.selectedSlot = null;
+    state.slots = [];
+    renderSlots();
+    setStatus("slotStatus", "再確認が必要", "warn");
+    $("slotMessage").innerHTML = `<div class="alert">${escapeHtml(message)}</div>`;
+    updateSummary();
+  }
+
+  async function autoReloadSlots(reason = "") {
+    if (!state.selectedMenu || !$("dateInput").value) {
+      clearSlots(reason || "メニューと日付を選んでください。");
+      return;
+    }
+
+    const btn = $("loadSlotsBtn");
+    setBusy(btn, true, "自動確認中...");
+    try {
+      await loadSlots($("dateInput").value);
+    } catch (error) {
+      setStatus("slotStatus", "確認エラー", "ng");
+      $("slotMessage").innerHTML = `<div class="alert danger">${escapeHtml(error.message)}</div>`;
+      showToast(error.message);
+    } finally {
+      setBusy(btn, false);
+    }
   }
 
   function staffLabel() {
@@ -1204,7 +1225,7 @@
     if (!state.selectedMenu) return "メニューを選んでください。";
     if (state.staffPreference === "specific" && !state.selectedStaffCode) return "指名スタッフを選んでください。";
     if (!state.selectedDate) return "予約日を選んでください。";
-    if (!state.selectedSlot) return "予約時間を選んでください。";
+    if (!state.selectedSlot) return "予約時間を選んでください。日付を変更した場合は、表示された時間ボタンをもう一度選んでください。";
     if (!$("customerName").value.trim()) return "お名前を入力してください。";
     if (!$("phone").value.trim()) return "電話番号を入力してください。";
     return "";
@@ -1301,12 +1322,10 @@
   function initEvents() {
     setupStaffPreference();
 
-    $("dateInput").addEventListener("change", () => {
+    $("dateInput").addEventListener("change", async () => {
       state.selectedDate = $("dateInput").value;
-      state.selectedSlot = null;
-      state.slots = [];
-      renderSlots();
-      updateSummary();
+      clearSlots("日付が変わったため、この日の空き時間を確認しています。");
+      await autoReloadSlots("日付が変わったため、この日の空き時間を確認しています。");
     });
 
     $("loadSlotsBtn").addEventListener("click", async () => {
