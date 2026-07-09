@@ -1,9 +1,10 @@
 <!doctype html>
+<!-- STEP SEITAI-7A: owner settings panel added / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-7</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-7A</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -326,12 +327,97 @@
       margin-right:6px;
     }
     @keyframes spin{to{transform:rotate(360deg)}}
+
+    .settingsPanel{display:none;margin-top:14px}
+    .settingsPanel.open{display:block}
+    .settingsNav{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin:14px 0;
+      padding:8px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#f8fafc;
+    }
+    .settingsTab{
+      border:1px solid var(--line);
+      background:#fff;
+      color:#334155;
+      border-radius:999px;
+      padding:9px 12px;
+      font-size:12px;
+      font-weight:950;
+    }
+    .settingsTab.selected{
+      background:var(--brand);
+      border-color:var(--brand);
+      color:#fff;
+    }
+    .settingsSection{display:none}
+    .settingsSection.open{display:block}
+    .formGrid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:12px;
+    }
+    .field3{grid-column:span 3}
+    .field4{grid-column:span 4}
+    .field6{grid-column:span 6}
+    .field8{grid-column:span 8}
+    .field12{grid-column:span 12}
+    .checkGrid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .checkCard{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:14px;
+      padding:11px;
+      font-size:13px;
+      font-weight:900;
+    }
+    .checkCard input{width:auto}
+    .editTable{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+    .editRow{
+      border:1px solid var(--line);
+      background:#fbfdff;
+      border-radius:18px;
+      padding:12px;
+    }
+    .editRowTitle{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+      font-weight:950;
+    }
+    .templateArea{
+      min-height:180px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:13px;
+      white-space:pre-wrap;
+    }
+
     @media(max-width:980px){
       .hero{grid-template-columns:1fr}
       .span3,.span4,.span5,.span6,.span7,.span8{grid-column:span 12}
       .statGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .adminBar{grid-template-columns:1fr}
       .split{grid-template-columns:1fr}
+      .field3,.field4,.field6,.field8{grid-column:span 12}
+      .checkGrid{grid-template-columns:1fr}
     }
     @media(max-width:560px){
       .wrap{padding:0 12px}
@@ -343,6 +429,7 @@
       .itemTop{display:block}
       .itemTop .pill{margin-top:8px}
       .kv{grid-template-columns:1fr}
+      .field3,.field4,.field6,.field8{grid-column:span 12}
       .kv div:nth-child(odd){margin-top:4px}
     }
   </style>
@@ -352,7 +439,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-7 / owner.html</span>
+        <span class="badge">STEP SEITAI-7A / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -493,6 +580,159 @@
         <div id="ticketList" class="list"></div>
       </div>
 
+
+      <div class="card span12">
+        <div class="sectionHead">
+          <div>
+            <h2>店舗設定</h2>
+            <p class="note">
+              店舗名・予約ルール・営業時間・スタッフ・メニュー・ベッド・LINE文面をここで変更します。
+              保存すると、お客様予約画面にも反映されます。
+            </p>
+          </div>
+          <div class="row">
+            <span class="status" id="settingsSaveStatus">未読込</span>
+            <button class="btn primary" id="toggleSettingsBtn" type="button">店舗設定を開く</button>
+          </div>
+        </div>
+
+        <div class="settingsPanel" id="settingsPanel">
+          <div class="settingsNav" id="settingsNav">
+            <button class="settingsTab selected" data-settings-tab="basic" type="button">基本・予約ルール</button>
+            <button class="settingsTab" data-settings-tab="hours" type="button">営業時間</button>
+            <button class="settingsTab" data-settings-tab="staff" type="button">スタッフ</button>
+            <button class="settingsTab" data-settings-tab="menus" type="button">メニュー</button>
+            <button class="settingsTab" data-settings-tab="resources" type="button">ベッド・設備</button>
+            <button class="settingsTab" data-settings-tab="templates" type="button">LINE文面</button>
+          </div>
+
+          <section class="settingsSection open" id="settings_basic">
+            <h3>基本設定・予約ルール</h3>
+            <div class="formGrid">
+              <div class="field4">
+                <label for="setShopName">店舗名</label>
+                <input id="setShopName" type="text" placeholder="DPRO整体院">
+              </div>
+              <div class="field4">
+                <label for="setPhone">電話番号</label>
+                <input id="setPhone" type="text" placeholder="0978-00-0000">
+              </div>
+              <div class="field4">
+                <label for="setLineUrl">LINE公式URL</label>
+                <input id="setLineUrl" type="text" placeholder="https://lin.ee/...">
+              </div>
+              <div class="field6">
+                <label for="setAddress">住所</label>
+                <input id="setAddress" type="text" placeholder="店舗住所">
+              </div>
+              <div class="field6">
+                <label for="setPublicNote">予約画面に出す説明文</label>
+                <input id="setPublicNote" type="text" placeholder="LINEから予約できます。">
+              </div>
+
+              <div class="field3">
+                <label for="setMaxMonths">予約可能期間（月）</label>
+                <input id="setMaxMonths" type="number" min="1" max="6">
+              </div>
+              <div class="field3">
+                <label for="setSlotMinutes">予約単位（分）</label>
+                <select id="setSlotMinutes">
+                  <option value="15">15分</option>
+                  <option value="30">30分</option>
+                  <option value="60">60分</option>
+                </select>
+              </div>
+              <div class="field3">
+                <label for="setDailyLimit">店舗全体1日上限</label>
+                <input id="setDailyLimit" type="number" min="1" max="99">
+              </div>
+              <div class="field3">
+                <label for="setSameTimeLimit">同時間帯上限</label>
+                <input id="setSameTimeLimit" type="number" min="1" max="20">
+              </div>
+              <div class="field3">
+                <label for="setBedCount">簡易ベッド数</label>
+                <input id="setBedCount" type="number" min="1" max="20">
+              </div>
+              <div class="field3">
+                <label for="setTicketLow">回数券注意ライン</label>
+                <input id="setTicketLow" type="number" min="0" max="20">
+              </div>
+              <div class="field3">
+                <label for="setAfterVisitDays">来院後フォロー（日後）</label>
+                <input id="setAfterVisitDays" type="number" min="1" max="60">
+              </div>
+              <div class="field3">
+                <label for="setAbsentDays">久しぶり判定（日）</label>
+                <input id="setAbsentDays" type="number" min="7" max="365">
+              </div>
+            </div>
+
+            <div class="checkGrid">
+              <label class="checkCard"><input id="setAllowAny" type="checkbox"> おまかせ予約を受け付ける</label>
+              <label class="checkCard"><input id="setAllowNomination" type="checkbox"> スタッフ指名を受け付ける</label>
+              <label class="checkCard"><input id="setAllowSameStaff" type="checkbox"> 前回と同じ担当を表示</label>
+              <label class="checkCard"><input id="setAllowFemale" type="checkbox"> 女性スタッフ希望を表示</label>
+              <label class="checkCard"><input id="setAllowUnassigned" type="checkbox"> 担当者未定予約を許可</label>
+              <label class="checkCard"><input id="setUseSpecialDays" type="checkbox"> 臨時休業を予約に反映</label>
+            </div>
+
+            <div class="row" style="margin-top:14px;">
+              <button class="btn primary" id="saveBasicSettingsBtn" type="button">基本設定を保存</button>
+              <button class="btn ghost" id="reloadSettingsBtn" type="button">設定を再読込</button>
+            </div>
+          </section>
+
+          <section class="settingsSection" id="settings_hours">
+            <h3>営業時間・定休日</h3>
+            <p class="note">曜日ごとに営業時間を設定します。休みにする場合は「休み」をONにします。</p>
+            <div class="editTable" id="hoursEditor"></div>
+            <div class="row" style="margin-top:14px;">
+              <button class="btn primary" id="saveHoursSettingsBtn" type="button">営業時間を保存</button>
+            </div>
+          </section>
+
+          <section class="settingsSection" id="settings_staff">
+            <h3>スタッフ設定</h3>
+            <p class="note">スタッフ名・指名受付・1日上限を変更できます。対応メニューの細かい設定は次STEPでさらに強化します。</p>
+            <div class="editTable" id="staffEditor"></div>
+            <div class="row" style="margin-top:14px;">
+              <button class="btn ghost" id="addStaffRowBtn" type="button">スタッフ行を追加</button>
+              <button class="btn primary" id="saveStaffSettingsBtn" type="button">スタッフ設定を保存</button>
+            </div>
+          </section>
+
+          <section class="settingsSection" id="settings_menus">
+            <h3>メニュー設定</h3>
+            <p class="note">メニュー名・所要時間・価格・回数券対象・表示/非表示を変更できます。</p>
+            <div class="editTable" id="menuEditor"></div>
+            <div class="row" style="margin-top:14px;">
+              <button class="btn ghost" id="addMenuRowBtn" type="button">メニュー行を追加</button>
+              <button class="btn primary" id="saveMenuSettingsBtn" type="button">メニュー設定を保存</button>
+            </div>
+          </section>
+
+          <section class="settingsSection" id="settings_resources">
+            <h3>ベッド・設備設定</h3>
+            <p class="note">ベッド・個室・設備を変更できます。予約枠判定の設備空きに使います。</p>
+            <div class="editTable" id="resourceEditor"></div>
+            <div class="row" style="margin-top:14px;">
+              <button class="btn ghost" id="addResourceRowBtn" type="button">設備行を追加</button>
+              <button class="btn primary" id="saveResourceSettingsBtn" type="button">ベッド・設備を保存</button>
+            </div>
+          </section>
+
+          <section class="settingsSection" id="settings_templates">
+            <h3>LINE文面テンプレート</h3>
+            <p class="note">予約確認・来院後フォロー・回数券案内などの基本文面を変更できます。</p>
+            <div class="editTable" id="templateEditor"></div>
+            <div class="row" style="margin-top:14px;">
+              <button class="btn primary" id="saveTemplateSettingsBtn" type="button">LINE文面を保存</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
       <div class="card span12">
         <h2>APIレスポンス確認</h2>
         <p class="note">トラブル時の確認用です。</p>
@@ -540,7 +780,9 @@
     filter: "active",
     selectedReservation: null,
     currentMessage: "",
-    lastJson: {}
+    lastJson: {},
+    ownerSettings: null,
+    settingsTab: "basic"
   };
 
   function endpoint(key) {
@@ -1070,6 +1312,476 @@
     showToast("フォローを再読込しました");
   }
 
+
+  function value(id) {
+    return ($(id)?.value || "").trim();
+  }
+
+  function numValue(id, fallback = 0) {
+    const n = Number(value(id));
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function checked(id) {
+    return $(id)?.checked === true;
+  }
+
+  function setInput(id, v) {
+    const el = $(id);
+    if (el) el.value = v ?? "";
+  }
+
+  function setChecked(id, v) {
+    const el = $(id);
+    if (el) el.checked = v === true;
+  }
+
+  function dayName(n) {
+    return ["日","月","火","水","木","金","土"][Number(n)] || "-";
+  }
+
+  async function loadOwnerSettings() {
+    if (!getAdminCode()) throw new Error("管理コードを保存してください。");
+    setStatus("settingsSaveStatus", "設定読込中...", "warn");
+    const data = await apiGet("/api/owner/settings", {}, true);
+    state.ownerSettings = data;
+    renderSettingsForm(data);
+    setStatus("settingsSaveStatus", "設定読込OK", "ok");
+    showJson(data);
+    return data;
+  }
+
+  function renderSettingsForm(data) {
+    const shop = data.shop || {};
+    const s = data.settings || {};
+    setInput("setShopName", shop.shop_name || "");
+    setInput("setPhone", shop.phone || "");
+    setInput("setAddress", shop.address || "");
+    setInput("setLineUrl", shop.line_official_url || "");
+    setInput("setPublicNote", shop.public_note || "");
+
+    setInput("setMaxMonths", s.reservation_max_months_ahead ?? 2);
+    setInput("setSlotMinutes", s.reservation_slot_minutes ?? 30);
+    setInput("setDailyLimit", s.total_daily_reservation_limit ?? 12);
+    setInput("setSameTimeLimit", s.same_time_reservation_limit ?? 2);
+    setInput("setBedCount", s.simple_bed_count ?? 2);
+    setInput("setTicketLow", s.ticket_low_threshold ?? 2);
+    setInput("setAfterVisitDays", s.followup_after_visit_days ?? 3);
+    setInput("setAbsentDays", s.followup_absent_days ?? 30);
+
+    setChecked("setAllowAny", s.allow_any_staff !== false);
+    setChecked("setAllowNomination", s.allow_staff_nomination !== false);
+    setChecked("setAllowSameStaff", s.allow_same_as_last_staff !== false);
+    setChecked("setAllowFemale", s.allow_female_staff_preferred === true);
+    setChecked("setAllowUnassigned", s.allow_unassigned_reservation !== false);
+    setChecked("setUseSpecialDays", s.use_special_days !== false);
+
+    renderHoursEditor(data.hours || []);
+    renderStaffEditor(data.staff || []);
+    renderMenuEditor(data.menus || []);
+    renderResourceEditor(data.resources || []);
+    renderTemplateEditor(data.templates || []);
+  }
+
+  function renderHoursEditor(hours) {
+    const byDay = Object.fromEntries((hours || []).map((h) => [Number(h.day_of_week), h]));
+    const rows = [];
+    for (let i = 0; i < 7; i++) {
+      const h = byDay[i] || { day_of_week:i, is_closed:false, open_time_1:"09:00", close_time_1:"13:00", open_time_2:"15:00", close_time_2:"19:00" };
+      rows.push(`
+        <div class="editRow" data-hour-day="${i}">
+          <div class="editRowTitle">
+            <span>${dayName(i)}曜日</span>
+            <label class="checkCard" style="padding:7px 10px;margin:0;"><input class="hourClosed" type="checkbox" ${h.is_closed ? "checked" : ""}> 休み</label>
+          </div>
+          <div class="formGrid">
+            <div class="field3"><label>午前 開始</label><input class="hourOpen1" type="time" value="${escapeHtml(formatTime(h.open_time_1) || "")}"></div>
+            <div class="field3"><label>午前 終了</label><input class="hourClose1" type="time" value="${escapeHtml(formatTime(h.close_time_1) || "")}"></div>
+            <div class="field3"><label>午後 開始</label><input class="hourOpen2" type="time" value="${escapeHtml(formatTime(h.open_time_2) || "")}"></div>
+            <div class="field3"><label>午後 終了</label><input class="hourClose2" type="time" value="${escapeHtml(formatTime(h.close_time_2) || "")}"></div>
+            <div class="field12"><label>メモ</label><input class="hourNote" type="text" value="${escapeHtml(h.note || "")}" placeholder="定休日など"></div>
+          </div>
+        </div>
+      `);
+    }
+    $("hoursEditor").innerHTML = rows.join("");
+  }
+
+  function renderStaffEditor(staff) {
+    $("staffEditor").innerHTML = (staff || []).map((st, index) => `
+      <div class="editRow" data-staff-row>
+        <div class="editRowTitle"><span>${escapeHtml(st.display_name || st.staff_name || st.staff_code || `スタッフ${index + 1}`)}</span><span class="pill ${st.is_active === false ? "red" : "green"}">${st.is_active === false ? "非表示" : "表示中"}</span></div>
+        <div class="formGrid">
+          <div class="field3"><label>スタッフコード</label><input class="staffCode" type="text" value="${escapeHtml(st.staff_code || "")}"></div>
+          <div class="field3"><label>スタッフ名</label><input class="staffName" type="text" value="${escapeHtml(st.staff_name || "")}"></div>
+          <div class="field3"><label>表示名</label><input class="staffDisplayName" type="text" value="${escapeHtml(st.display_name || "")}"></div>
+          <div class="field3"><label>1日上限</label><input class="staffDailyLimit" type="number" min="1" max="99" value="${Number(st.daily_limit || 8)}"></div>
+          <div class="field3"><label>役割</label><select class="staffRole"><option value="owner">院長/オーナー</option><option value="manager">管理者</option><option value="staff">スタッフ</option><option value="assistant">補助</option></select></div>
+          <div class="field3"><label>性別</label><select class="staffGender"><option value="unspecified">未指定</option><option value="male">男性</option><option value="female">女性</option></select></div>
+          <div class="field3"><label>表示順</label><input class="staffSort" type="number" value="${Number(st.sort_order || 100)}"></div>
+          <div class="field3"><label>有効</label><select class="staffActive"><option value="true">表示する</option><option value="false">非表示</option></select></div>
+          <div class="field12"><label>メモ</label><input class="staffNote" type="text" value="${escapeHtml(st.note || "")}"></div>
+          <div class="field12"><label class="checkCard"><input class="staffNomination" type="checkbox" ${st.is_nomination_available !== false ? "checked" : ""}> 指名受付する</label></div>
+        </div>
+      </div>
+    `).join("");
+    document.querySelectorAll("[data-staff-row]").forEach((row, index) => {
+      const st = (staff || [])[index] || {};
+      row.querySelector(".staffRole").value = st.role || "staff";
+      row.querySelector(".staffGender").value = st.gender || "unspecified";
+      row.querySelector(".staffActive").value = st.is_active === false ? "false" : "true";
+    });
+  }
+
+  function renderMenuEditor(menus) {
+    $("menuEditor").innerHTML = (menus || []).map((m, index) => `
+      <div class="editRow" data-menu-row>
+        <div class="editRowTitle"><span>${escapeHtml(m.menu_name || m.menu_code || `メニュー${index + 1}`)}</span><span class="pill ${m.is_active === false ? "red" : "green"}">${m.is_active === false ? "非表示" : "表示中"}</span></div>
+        <div class="formGrid">
+          <div class="field3"><label>メニューコード</label><input class="menuCode" type="text" value="${escapeHtml(m.menu_code || "")}"></div>
+          <div class="field3"><label>メニュー名</label><input class="menuName" type="text" value="${escapeHtml(m.menu_name || "")}"></div>
+          <div class="field3"><label>所要時間（分）</label><input class="menuDuration" type="number" min="5" max="240" value="${Number(m.duration_minutes || 30)}"></div>
+          <div class="field3"><label>価格</label><input class="menuPrice" type="number" min="0" value="${Number(m.price_yen || 0)}"></div>
+          <div class="field3"><label>カテゴリ</label><select class="menuCategory"><option value="first_visit">初回</option><option value="treatment">通常施術</option><option value="pelvis">骨盤</option><option value="acupuncture">鍼灸</option><option value="ticket">回数券</option><option value="relaxation">リラク</option><option value="other">その他</option></select></div>
+          <div class="field3"><label>設備種別</label><select class="menuResourceType"><option value="bed">ベッド</option><option value="private_room">個室</option><option value="equipment">設備</option><option value="any">指定なし</option></select></div>
+          <div class="field3"><label>表示順</label><input class="menuSort" type="number" value="${Number(m.sort_order || 100)}"></div>
+          <div class="field3"><label>有効</label><select class="menuActive"><option value="true">表示する</option><option value="false">非表示</option></select></div>
+          <div class="field12"><label>説明文</label><input class="menuDescription" type="text" value="${escapeHtml(m.description || "")}"></div>
+          <div class="field6"><label class="checkCard"><input class="menuTicket" type="checkbox" ${m.is_ticket_eligible === true ? "checked" : ""}> 回数券対象</label></div>
+          <div class="field6"><label class="checkCard"><input class="menuFirstOnly" type="checkbox" ${m.is_first_time_only === true ? "checked" : ""}> 初回限定</label></div>
+        </div>
+      </div>
+    `).join("");
+    document.querySelectorAll("[data-menu-row]").forEach((row, index) => {
+      const m = (menus || [])[index] || {};
+      row.querySelector(".menuCategory").value = m.category || "treatment";
+      row.querySelector(".menuResourceType").value = m.required_resource_type || "bed";
+      row.querySelector(".menuActive").value = m.is_active === false ? "false" : "true";
+    });
+  }
+
+  function renderResourceEditor(resources) {
+    $("resourceEditor").innerHTML = (resources || []).map((r, index) => `
+      <div class="editRow" data-resource-row>
+        <div class="editRowTitle"><span>${escapeHtml(r.resource_name || r.resource_code || `設備${index + 1}`)}</span><span class="pill ${r.is_active === false ? "red" : "green"}">${r.is_active === false ? "非表示" : "表示中"}</span></div>
+        <div class="formGrid">
+          <div class="field3"><label>設備コード</label><input class="resourceCode" type="text" value="${escapeHtml(r.resource_code || "")}"></div>
+          <div class="field3"><label>設備名</label><input class="resourceName" type="text" value="${escapeHtml(r.resource_name || "")}"></div>
+          <div class="field3"><label>種別</label><select class="resourceType"><option value="bed">ベッド</option><option value="private_room">個室</option><option value="equipment">設備</option><option value="other">その他</option></select></div>
+          <div class="field3"><label>表示順</label><input class="resourceSort" type="number" value="${Number(r.sort_order || 100)}"></div>
+          <div class="field3"><label>定員</label><input class="resourceCapacity" type="number" min="1" max="20" value="${Number(r.capacity || 1)}"></div>
+          <div class="field3"><label>有効</label><select class="resourceActive"><option value="true">表示する</option><option value="false">非表示</option></select></div>
+          <div class="field6"><label>メモ</label><input class="resourceNote" type="text" value="${escapeHtml(r.note || "")}"></div>
+        </div>
+      </div>
+    `).join("");
+    document.querySelectorAll("[data-resource-row]").forEach((row, index) => {
+      const r = (resources || [])[index] || {};
+      row.querySelector(".resourceType").value = r.resource_type || "bed";
+      row.querySelector(".resourceActive").value = r.is_active === false ? "false" : "true";
+    });
+  }
+
+  function renderTemplateEditor(templates) {
+    $("templateEditor").innerHTML = (templates || []).map((t, index) => `
+      <div class="editRow" data-template-row>
+        <div class="editRowTitle"><span>${escapeHtml(t.title || t.template_key || `文面${index + 1}`)}</span><span class="pill ${t.is_active === false ? "red" : "green"}">${t.is_active === false ? "非表示" : "表示中"}</span></div>
+        <div class="formGrid">
+          <div class="field3"><label>キー</label><input class="templateKey" type="text" value="${escapeHtml(t.template_key || "")}"></div>
+          <div class="field3"><label>タイトル</label><input class="templateTitle" type="text" value="${escapeHtml(t.title || "")}"></div>
+          <div class="field3"><label>カテゴリ</label><select class="templateCategory"><option value="reservation">予約</option><option value="after_visit">来院後</option><option value="ticket">回数券</option><option value="followup">フォロー</option><option value="cancel">キャンセル</option><option value="general">汎用</option></select></div>
+          <div class="field3"><label>表示順</label><input class="templateSort" type="number" value="${Number(t.sort_order || 100)}"></div>
+          <div class="field12"><label>本文</label><textarea class="templateBody templateArea">${escapeHtml(t.body || "")}</textarea></div>
+          <div class="field12"><label class="checkCard"><input class="templateActive" type="checkbox" ${t.is_active !== false ? "checked" : ""}> 有効にする</label></div>
+        </div>
+      </div>
+    `).join("");
+    document.querySelectorAll("[data-template-row]").forEach((row, index) => {
+      const t = (templates || [])[index] || {};
+      row.querySelector(".templateCategory").value = t.category || "general";
+    });
+  }
+
+  function collectHours() {
+    return Array.from(document.querySelectorAll("[data-hour-day]")).map((row) => ({
+      day_of_week: Number(row.dataset.hourDay),
+      is_closed: row.querySelector(".hourClosed").checked,
+      open_time_1: row.querySelector(".hourOpen1").value,
+      close_time_1: row.querySelector(".hourClose1").value,
+      open_time_2: row.querySelector(".hourOpen2").value,
+      close_time_2: row.querySelector(".hourClose2").value,
+      note: row.querySelector(".hourNote").value,
+      display_label: `${dayName(row.dataset.hourDay)}曜日`
+    }));
+  }
+
+  function collectStaff() {
+    return Array.from(document.querySelectorAll("[data-staff-row]")).map((row, index) => ({
+      staff_code: row.querySelector(".staffCode").value.trim(),
+      staff_name: row.querySelector(".staffName").value.trim(),
+      display_name: row.querySelector(".staffDisplayName").value.trim(),
+      role: row.querySelector(".staffRole").value,
+      gender: row.querySelector(".staffGender").value,
+      daily_limit: Number(row.querySelector(".staffDailyLimit").value || 8),
+      sort_order: Number(row.querySelector(".staffSort").value || (index + 1) * 10),
+      is_active: row.querySelector(".staffActive").value === "true",
+      is_nomination_available: row.querySelector(".staffNomination").checked,
+      note: row.querySelector(".staffNote").value.trim()
+    })).filter((row) => row.staff_code && row.staff_name);
+  }
+
+  function collectMenus() {
+    return Array.from(document.querySelectorAll("[data-menu-row]")).map((row, index) => ({
+      menu_code: row.querySelector(".menuCode").value.trim(),
+      menu_name: row.querySelector(".menuName").value.trim(),
+      category: row.querySelector(".menuCategory").value,
+      duration_minutes: Number(row.querySelector(".menuDuration").value || 30),
+      price_yen: Number(row.querySelector(".menuPrice").value || 0),
+      required_resource_type: row.querySelector(".menuResourceType").value,
+      required_resource_count: 1,
+      sort_order: Number(row.querySelector(".menuSort").value || (index + 1) * 10),
+      is_active: row.querySelector(".menuActive").value === "true",
+      is_ticket_eligible: row.querySelector(".menuTicket").checked,
+      is_first_time_only: row.querySelector(".menuFirstOnly").checked,
+      description: row.querySelector(".menuDescription").value.trim()
+    })).filter((row) => row.menu_code && row.menu_name);
+  }
+
+  function collectResources() {
+    return Array.from(document.querySelectorAll("[data-resource-row]")).map((row, index) => ({
+      resource_code: row.querySelector(".resourceCode").value.trim(),
+      resource_name: row.querySelector(".resourceName").value.trim(),
+      resource_type: row.querySelector(".resourceType").value,
+      capacity: Number(row.querySelector(".resourceCapacity").value || 1),
+      sort_order: Number(row.querySelector(".resourceSort").value || (index + 1) * 10),
+      is_active: row.querySelector(".resourceActive").value === "true",
+      note: row.querySelector(".resourceNote").value.trim()
+    })).filter((row) => row.resource_code && row.resource_name);
+  }
+
+  function collectTemplates() {
+    return Array.from(document.querySelectorAll("[data-template-row]")).map((row, index) => ({
+      template_key: row.querySelector(".templateKey").value.trim(),
+      title: row.querySelector(".templateTitle").value.trim(),
+      category: row.querySelector(".templateCategory").value,
+      body: row.querySelector(".templateBody").value,
+      sort_order: Number(row.querySelector(".templateSort").value || (index + 1) * 10),
+      is_active: row.querySelector(".templateActive").checked
+    })).filter((row) => row.template_key && row.title && row.body);
+  }
+
+  async function saveBasicSettings(button) {
+    setBusy(button, true, "保存中...");
+    try {
+      const body = {
+        actor_name: "owner",
+        shop: {
+          shop_name: value("setShopName"),
+          phone: value("setPhone"),
+          address: value("setAddress"),
+          line_official_url: value("setLineUrl"),
+          public_note: value("setPublicNote")
+        },
+        settings: {
+          reservation_max_months_ahead: numValue("setMaxMonths", 2),
+          reservation_slot_minutes: numValue("setSlotMinutes", 30),
+          total_daily_reservation_limit: numValue("setDailyLimit", 12),
+          same_time_reservation_limit: numValue("setSameTimeLimit", 2),
+          simple_bed_count: numValue("setBedCount", 2),
+          ticket_low_threshold: numValue("setTicketLow", 2),
+          followup_after_visit_days: numValue("setAfterVisitDays", 3),
+          followup_absent_days: numValue("setAbsentDays", 30),
+          allow_any_staff: checked("setAllowAny"),
+          allow_staff_nomination: checked("setAllowNomination"),
+          allow_same_as_last_staff: checked("setAllowSameStaff"),
+          allow_female_staff_preferred: checked("setAllowFemale"),
+          allow_unassigned_reservation: checked("setAllowUnassigned"),
+          use_special_days: checked("setUseSpecialDays"),
+          use_business_hours: true
+        }
+      };
+      const data = await apiPost("/api/owner/settings/basic", body, true);
+      showJson(data);
+      showToast("基本設定を保存しました");
+      await loadOwnerSettings();
+      await loadSettings().catch(() => {});
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  async function saveHoursSettings(button) {
+    setBusy(button, true, "保存中...");
+    try {
+      const data = await apiPost("/api/owner/settings/hours", { actor_name: "owner", hours: collectHours() }, true);
+      showJson(data);
+      showToast("営業時間を保存しました");
+      await loadOwnerSettings();
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  async function saveStaffSettings(button) {
+    setBusy(button, true, "保存中...");
+    try {
+      const data = await apiPost("/api/owner/settings/staff", { actor_name: "owner", staff: collectStaff() }, true);
+      showJson(data);
+      showToast("スタッフ設定を保存しました");
+      await loadOwnerSettings();
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  async function saveMenuSettings(button) {
+    setBusy(button, true, "保存中...");
+    try {
+      const data = await apiPost("/api/owner/settings/menus", { actor_name: "owner", menus: collectMenus() }, true);
+      showJson(data);
+      showToast("メニュー設定を保存しました");
+      await loadOwnerSettings();
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  async function saveResourceSettings(button) {
+    setBusy(button, true, "保存中...");
+    try {
+      const resources = collectResources();
+      const data = await apiPost("/api/owner/settings/resources", {
+        actor_name: "owner",
+        resources,
+        settings: { simple_bed_count: resources.filter((r) => r.is_active && r.resource_type === "bed").length || numValue("setBedCount", 2) }
+      }, true);
+      showJson(data);
+      showToast("ベッド・設備を保存しました");
+      await loadOwnerSettings();
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  async function saveTemplateSettings(button) {
+    setBusy(button, true, "保存中...");
+    try {
+      const data = await apiPost("/api/owner/templates/save", { actor_name: "owner", templates: collectTemplates() }, true);
+      showJson(data);
+      showToast("LINE文面を保存しました");
+      await loadOwnerSettings();
+    } catch (error) {
+      showToast(error.message);
+      showJson({ ok:false, message:error.message });
+    } finally {
+      setBusy(button, false);
+    }
+  }
+
+  function addStaffRow() {
+    const current = collectStaff();
+    current.push({
+      staff_code: `staff_${current.length + 1}`,
+      staff_name: "新しいスタッフ",
+      display_name: "スタッフ",
+      role: "staff",
+      gender: "unspecified",
+      daily_limit: 6,
+      sort_order: (current.length + 1) * 10,
+      is_active: true,
+      is_nomination_available: true,
+      note: ""
+    });
+    renderStaffEditor(current);
+  }
+
+  function addMenuRow() {
+    const current = collectMenus();
+    current.push({
+      menu_code: `menu_${current.length + 1}`,
+      menu_name: "新しいメニュー",
+      category: "treatment",
+      duration_minutes: 30,
+      price_yen: 0,
+      required_resource_type: "bed",
+      sort_order: (current.length + 1) * 10,
+      is_active: true,
+      is_ticket_eligible: false,
+      is_first_time_only: false,
+      description: ""
+    });
+    renderMenuEditor(current);
+  }
+
+  function addResourceRow() {
+    const current = collectResources();
+    current.push({
+      resource_code: `bed_${current.length + 1}`,
+      resource_name: "新しいベッド",
+      resource_type: "bed",
+      capacity: 1,
+      sort_order: (current.length + 1) * 10,
+      is_active: true,
+      note: ""
+    });
+    renderResourceEditor(current);
+  }
+
+  function initSettingsPanel() {
+    $("toggleSettingsBtn").addEventListener("click", async () => {
+      const panel = $("settingsPanel");
+      const willOpen = !panel.classList.contains("open");
+      panel.classList.toggle("open", willOpen);
+      $("toggleSettingsBtn").textContent = willOpen ? "店舗設定を閉じる" : "店舗設定を開く";
+      if (willOpen && !state.ownerSettings && getAdminCode()) {
+        try { await loadOwnerSettings(); } catch (error) { showToast(error.message); }
+      }
+    });
+
+    $("settingsNav").querySelectorAll("[data-settings-tab]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        $("settingsNav").querySelectorAll("[data-settings-tab]").forEach((b) => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        document.querySelectorAll(".settingsSection").forEach((section) => section.classList.remove("open"));
+        const key = btn.dataset.settingsTab;
+        state.settingsTab = key;
+        $(`settings_${key}`).classList.add("open");
+      });
+    });
+
+    $("reloadSettingsBtn").addEventListener("click", async () => {
+      try { await loadOwnerSettings(); showToast("店舗設定を再読込しました"); }
+      catch (error) { showToast(error.message); }
+    });
+
+    $("saveBasicSettingsBtn").addEventListener("click", (e) => saveBasicSettings(e.currentTarget));
+    $("saveHoursSettingsBtn").addEventListener("click", (e) => saveHoursSettings(e.currentTarget));
+    $("saveStaffSettingsBtn").addEventListener("click", (e) => saveStaffSettings(e.currentTarget));
+    $("saveMenuSettingsBtn").addEventListener("click", (e) => saveMenuSettings(e.currentTarget));
+    $("saveResourceSettingsBtn").addEventListener("click", (e) => saveResourceSettings(e.currentTarget));
+    $("saveTemplateSettingsBtn").addEventListener("click", (e) => saveTemplateSettings(e.currentTarget));
+
+    $("addStaffRowBtn").addEventListener("click", addStaffRow);
+    $("addMenuRowBtn").addEventListener("click", addMenuRow);
+    $("addResourceRowBtn").addEventListener("click", addResourceRow);
+  }
+
+
   function initTabs() {
     $("reservationTabs").querySelectorAll("[data-filter]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -1087,7 +1799,10 @@
       if (!code) return showToast("管理コードを入力してください");
       saveAdminCode(code);
       updateAdminStatus();
+      setStatus("apiStatus", "管理コードOK", "ok");
       showToast("管理コードを保存しました");
+      loadOwnerSettings().catch((error) => showToast(error.message));
+      findReservationDay().catch(() => loadOwnerToday($("dateInput").value).catch(() => {}));
     });
 
     $("toggleAdminBtn").addEventListener("click", () => {
@@ -1155,6 +1870,7 @@
     });
 
     initTabs();
+    initSettingsPanel();
   }
 
   async function init() {
@@ -1164,6 +1880,7 @@
 
     try {
       await loadSettings();
+      if (getAdminCode()) await loadOwnerSettings().catch(() => {});
     } catch (error) {
       showToast(error.message);
     }
