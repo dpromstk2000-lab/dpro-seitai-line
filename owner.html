@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-7B: compact settings drawer UI / 20260709 -->
+<!-- STEP SEITAI-7C: reliable settings open button / no emoji / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-7B</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-7C</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -450,6 +450,25 @@
       white-space:pre-wrap;
     }
 
+
+    .settingsFloatBtn{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:120;
+      border:0;
+      border-radius:999px;
+      padding:12px 16px;
+      background:var(--warn);
+      color:#fff;
+      font-weight:950;
+      box-shadow:0 18px 42px rgba(15,23,42,.22);
+      display:none;
+    }
+    @media(max-width:980px){
+      .settingsFloatBtn{display:block}
+    }
+
     @media(max-width:980px){
       .hero{grid-template-columns:1fr}
       .span3,.span4,.span5,.span6,.span7,.span8{grid-column:span 12}
@@ -481,7 +500,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-7B / owner.html</span>
+        <span class="badge">STEP SEITAI-7C / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -495,7 +514,7 @@
           <span class="heroChip">本日の予約</span>
           <span class="heroChip">来院管理</span>
           <span class="heroChip">LINE文面コピー</span>
-          <span class="heroChip">⚙設定は右上</span>
+          <span class="heroChip">設定は右上</span>
         </div>
       </div>
     </section>
@@ -537,7 +556,7 @@
           <button class="btn ghost" id="tomorrowBtn" type="button">明日</button>
           <button class="btn dark" id="findReservationDayBtn" type="button">予約がある日を探す</button>
           <a class="btn ghost" href="./system-check.html" style="text-decoration:none;">system-check</a>
-          <button class="btn ghost" id="toggleSettingsBtn" type="button">⚙ 店舗設定</button>
+          <button class="btn warn" id="toggleSettingsBtn" type="button" onclick="window.DPRO_OWNER_OPEN_SETTINGS && window.DPRO_OWNER_OPEN_SETTINGS()">店舗設定</button>
         </div>
 
         <div class="statGrid">
@@ -630,7 +649,7 @@
         <div class="settingsDrawer">
           <div class="settingsDrawerHead">
             <div>
-              <span class="badge">⚙ 店舗設定</span>
+              <span class="badge">店舗設定</span>
               <h2 style="margin-top:10px;">店舗設定</h2>
               <p class="note">
                 店舗名・予約ルール・営業時間・スタッフ・メニュー・ベッド・LINE文面を必要な時だけ開いて変更します。
@@ -792,6 +811,9 @@
     </section>
   </div>
 </main>
+
+
+<button class="settingsFloatBtn" id="settingsFloatBtn" type="button" onclick="window.DPRO_OWNER_OPEN_SETTINGS && window.DPRO_OWNER_OPEN_SETTINGS()">店舗設定</button>
 
 <div class="toast" id="toast">OK</div>
 
@@ -1790,33 +1812,68 @@
   }
 
   function initSettingsPanel() {
-    function closeSettingsPanel() {
+    async function setSettingsPanelOpen(open) {
       const panel = $("settingsPanel");
-      panel.classList.remove("open");
-      panel.setAttribute("aria-hidden", "true");
-      $("toggleSettingsBtn").textContent = "⚙ 店舗設定";
+      if (!panel) return;
+
+      panel.classList.toggle("open", open);
+      panel.setAttribute("aria-hidden", open ? "false" : "true");
+
+      const mainBtn = $("toggleSettingsBtn");
+      if (mainBtn) mainBtn.textContent = open ? "設定を閉じる" : "店舗設定";
+
+      const floatBtn = $("settingsFloatBtn");
+      if (floatBtn) floatBtn.textContent = open ? "設定を閉じる" : "店舗設定";
+
+      if (open && !state.ownerSettings && getAdminCode()) {
+        try {
+          await loadOwnerSettings();
+        } catch (error) {
+          showToast(error.message);
+        }
+      }
     }
 
-    $("toggleSettingsBtn").addEventListener("click", async () => {
+    window.DPRO_OWNER_OPEN_SETTINGS = () => setSettingsPanelOpen(true);
+    window.DPRO_OWNER_CLOSE_SETTINGS = () => setSettingsPanelOpen(false);
+    window.DPRO_OWNER_TOGGLE_SETTINGS = () => {
       const panel = $("settingsPanel");
-      const willOpen = !panel.classList.contains("open");
-      panel.classList.toggle("open", willOpen);
-      panel.setAttribute("aria-hidden", willOpen ? "false" : "true");
-      $("toggleSettingsBtn").textContent = willOpen ? "⚙ 設定を閉じる" : "⚙ 店舗設定";
-      if (willOpen && !state.ownerSettings && getAdminCode()) {
-        try { await loadOwnerSettings(); } catch (error) { showToast(error.message); }
-      }
-    });
+      setSettingsPanelOpen(!panel.classList.contains("open"));
+    };
 
-    $("closeSettingsBtn").addEventListener("click", closeSettingsPanel);
-    $("settingsBackdrop").addEventListener("click", closeSettingsPanel);
+    const mainBtn = $("toggleSettingsBtn");
+    if (mainBtn && !mainBtn.getAttribute("onclick")) {
+      mainBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.DPRO_OWNER_TOGGLE_SETTINGS();
+      });
+    }
+
+    const floatBtn = $("settingsFloatBtn");
+    if (floatBtn && !floatBtn.getAttribute("onclick")) {
+      floatBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.DPRO_OWNER_TOGGLE_SETTINGS();
+      });
+    }
+
+    const closeBtn = $("closeSettingsBtn");
+    if (closeBtn) closeBtn.addEventListener("click", () => setSettingsPanelOpen(false));
+
+    const backdrop = $("settingsBackdrop");
+    if (backdrop) backdrop.addEventListener("click", () => setSettingsPanelOpen(false));
+
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && $("settingsPanel").classList.contains("open")) {
-        closeSettingsPanel();
+      const panel = $("settingsPanel");
+      if (event.key === "Escape" && panel && panel.classList.contains("open")) {
+        setSettingsPanelOpen(false);
       }
     });
 
-    $("settingsNav").querySelectorAll("[data-settings-tab]").forEach((btn) => {
+    const nav = $("settingsNav");
+    if (!nav) return;
+
+    nav.querySelectorAll("[data-settings-tab]").forEach((btn) => {
       btn.addEventListener("click", () => {
         $("settingsNav").querySelectorAll("[data-settings-tab]").forEach((b) => b.classList.remove("selected"));
         btn.classList.add("selected");
