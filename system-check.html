@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-5</title>
+  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-10E</title>
   <script src="./config.js"></script>
   <style>
     :root{
@@ -305,9 +305,106 @@
       border:1px solid #fecaca;
       background:#fff7f7;
     }
+
+    .btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+    }
+    .demoNavGrid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+    .demoNavCard{
+      border:1px solid #e5edf6;
+      background:#fbfdff;
+      border-radius:16px;
+      padding:14px;
+      display:grid;
+      gap:10px;
+      min-height:150px;
+    }
+    .demoNavTitle{
+      font-size:16px;
+      font-weight:950;
+      letter-spacing:-.02em;
+      color:var(--ink);
+    }
+    .demoNavText{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.65;
+      min-height:38px;
+    }
+    .demoUrl{
+      font-size:11px;
+      word-break:break-all;
+      color:#334155;
+      background:#f8fafc;
+      border:1px solid #edf2f7;
+      border-radius:12px;
+      padding:9px;
+      min-height:48px;
+    }
+    .guideBox{
+      border:1px solid #bbf7d0;
+      background:#f0fdf4;
+      color:#166534;
+      border-radius:16px;
+      padding:14px;
+      line-height:1.75;
+      font-size:13px;
+      font-weight:800;
+      margin-top:12px;
+    }
+    .guideBox.warn{
+      border-color:#fde68a;
+      background:#fffbeb;
+      color:#92400e;
+    }
+    .demoSteps{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .demoStep{
+      border:1px solid #e5edf6;
+      background:#fff;
+      border-radius:14px;
+      padding:12px;
+      font-size:12px;
+      line-height:1.55;
+    }
+    .demoStep b{
+      display:block;
+      font-size:13px;
+      margin-bottom:5px;
+      color:var(--ink);
+    }
+    .copyArea{
+      width:100%;
+      min-height:120px;
+      resize:vertical;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+      font-size:12px;
+      line-height:1.6;
+      color:#0f172a;
+      background:#fff;
+    }
+
     @media(max-width:900px){
       .hero{grid-template-columns:1fr}
       .span4,.span6,.span8{grid-column:span 12}
+      .demoNavGrid{grid-template-columns:1fr}
+      .demoSteps{grid-template-columns:1fr}
       .kv{grid-template-columns:1fr}
       .kv div:nth-child(odd){margin-top:4px}
     }
@@ -318,10 +415,10 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-5 / system-check.html</span>
+        <span class="badge">STEP SEITAI-10E / system-check.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>システム確認画面</h1>
         <p class="lead">
-          API接続、管理コード保存、店舗設定、予約枠、営業前デモ準備、本日の予約データを確認します。
+          API接続、管理コード保存、店舗設定、予約枠、営業前デモ準備、各デモ画面の入口を確認します。
           営業前にまずこの画面を開けば、デモ状態を整えられます。
         </p>
       </div>
@@ -478,13 +575,86 @@
         </p>
       </div>
 
+      <div class="card span12">
+        <h2>6. 営業デモ入口・確認ナビ</h2>
+        <p class="note">
+          営業前デモ準備のあと、この順番で開けば一通りのデモができます。
+          URLは商談中にそのままコピーできます。
+        </p>
+
+        <div class="demoSteps">
+          <div class="demoStep">
+            <b>1. 営業前準備</b>
+            この画面でデモデータを作成。
+          </div>
+          <div class="demoStep">
+            <b>2. PC管理</b>
+            電話予約・店頭予約・今日やることを見せる。
+          </div>
+          <div class="demoStep">
+            <b>3. iPad受付</b>
+            来院済み・施術中・回数券使用を見せる。
+          </div>
+          <div class="demoStep">
+            <b>4. 会員証</b>
+            テスト太郎で予約と回数券を見せる。
+          </div>
+          <div class="demoStep">
+            <b>5. お客様予約</b>
+            新規予約・担当指名・空き時間を見せる。
+          </div>
+        </div>
+
+        <div class="demoNavGrid">
+          <div class="demoNavCard">
+            <div class="demoNavTitle">オーナーPC</div>
+            <div class="demoNavText">電話予約・店頭予約・店舗設定・LINE文面編集を確認。</div>
+            <a class="btn primary" id="openOwnerLink" target="_blank" rel="noopener">開く</a>
+            <div class="demoUrl" id="ownerUrlView">-</div>
+          </div>
+
+          <div class="demoNavCard">
+            <div class="demoNavTitle">受付・施術iPad</div>
+            <div class="demoNavText">現場操作、来院済み、施術中、回数券使用を確認。</div>
+            <a class="btn primary" id="openIpadLink" target="_blank" rel="noopener">開く</a>
+            <div class="demoUrl" id="ipadUrlView">-</div>
+          </div>
+
+          <div class="demoNavCard">
+            <div class="demoNavTitle">会員証・予約確認</div>
+            <div class="demoNavText">テスト太郎で、会員証・予約・回数券を確認。</div>
+            <a class="btn primary" id="openMemberLink" target="_blank" rel="noopener">開く</a>
+            <div class="demoUrl" id="memberUrlView">-</div>
+          </div>
+
+          <div class="demoNavCard">
+            <div class="demoNavTitle">お客様予約</div>
+            <div class="demoNavText">新規予約、担当指名、日付・時間選択を確認。</div>
+            <a class="btn primary" id="openIndexLink" target="_blank" rel="noopener">開く</a>
+            <div class="demoUrl" id="indexUrlView">-</div>
+          </div>
+        </div>
+
+        <div class="guideBox warn" id="demoGuideBox">
+          営業前デモ準備を実行すると、作成件数・会員証テスト情報・確認順がここに表示されます。
+        </div>
+
+        <label for="demoUrlText" style="margin-top:14px;">営業用URLまとめ</label>
+        <textarea class="copyArea" id="demoUrlText" readonly></textarea>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn dark" id="copyDemoUrlsBtn">営業用URLをまとめてコピー</button>
+          <button class="btn ghost" id="refreshDemoLinksBtn">URLを再表示</button>
+        </div>
+      </div>
+
       <div class="card span6">
-        <h2>6. 操作ログ</h2>
+        <h2>7. 操作ログ</h2>
         <div class="logBox" id="logBox">ログ待機中...</div>
       </div>
 
       <div class="card span6">
-        <h2>7. APIレスポンス</h2>
+        <h2>8. APIレスポンス</h2>
         <div class="row" style="margin-bottom:10px;">
           <button class="btn ghost" id="copyJsonBtn">JSONコピー</button>
           <button class="btn ghost" id="clearJsonBtn">クリア</button>
@@ -649,6 +819,80 @@
   function showJson(data) {
     lastJson = data || {};
     $("jsonBox").textContent = JSON.stringify(lastJson, null, 2);
+  }
+
+  function pageUrl(path) {
+    const base = location.origin + location.pathname.replace(/[^/]*$/, "");
+    return new URL(path, base).toString();
+  }
+
+  function buildDemoUrls() {
+    const memberParams = new URLSearchParams({
+      phone: "090-1111-2222",
+      customer_no: "SEITAI-20260709-9652"
+    });
+
+    return {
+      systemCheck: pageUrl("system-check.html"),
+      owner: pageUrl("owner.html"),
+      ipad: pageUrl("owner-ipad.html"),
+      member: `${pageUrl("member.html")}?${memberParams.toString()}`,
+      index: pageUrl("index.html")
+    };
+  }
+
+  function renderDemoLinks(data = null) {
+    const urls = buildDemoUrls();
+
+    $("openOwnerLink").href = urls.owner;
+    $("openIpadLink").href = urls.ipad;
+    $("openMemberLink").href = urls.member;
+    $("openIndexLink").href = urls.index;
+
+    $("ownerUrlView").textContent = urls.owner;
+    $("ipadUrlView").textContent = urls.ipad;
+    $("memberUrlView").textContent = urls.member;
+    $("indexUrlView").textContent = urls.index;
+
+    const demoLookup = data?.demo_member_lookup || {
+      phone: "090-1111-2222",
+      customer_no: "SEITAI-20260709-9652",
+      name: "テスト 太郎"
+    };
+
+    const lines = [
+      "DPRO 整骨院・整体 LINE 営業デモURL",
+      "",
+      `system-check：${urls.systemCheck}`,
+      `オーナーPC：${urls.owner}`,
+      `受付・施術iPad：${urls.ipad}`,
+      `会員証・予約確認：${urls.member}`,
+      `お客様予約：${urls.index}`,
+      "",
+      "会員証テスト",
+      `電話番号：${demoLookup.phone}`,
+      `会員番号：${demoLookup.customer_no}`,
+      `お名前：${demoLookup.name || "テスト 太郎"}`,
+      "",
+      "営業前の順番",
+      "1. system-check で営業前デモ準備",
+      "2. オーナーPCで電話予約・店頭予約・今日やることを確認",
+      "3. iPadで来院済み・施術中・回数券使用を確認",
+      "4. 会員証で予約と回数券を確認",
+      "5. お客様予約で新規予約を確認"
+    ];
+
+    $("demoUrlText").value = lines.join("\\n");
+
+    if (data?.created) {
+      const c = data.created;
+      $("demoGuideBox").className = "guideBox";
+      $("demoGuideBox").innerHTML = `
+        営業前デモ準備OK。<br>
+        予約 ${escapeHtml(c.reservations ?? "-")}件 / 電話予約 ${escapeHtml(c.phone_reservation ?? "-")}件 / 店頭予約 ${escapeHtml(c.walkin_reservation ?? "-")}件 / 回数券 ${escapeHtml(c.tickets ?? "-")}件 / フォロー ${escapeHtml(c.followups ?? "-")}件 を作成しました。<br>
+        会員証テスト：${escapeHtml(demoLookup.name || "テスト 太郎")} 様 / ${escapeHtml(demoLookup.phone)} / ${escapeHtml(demoLookup.customer_no)}
+      `;
+    }
   }
 
   function formatTime(value) {
@@ -886,6 +1130,7 @@
     }, true);
 
     showJson(data);
+    renderDemoLinks(data);
     log("営業前デモ準備 OK", data);
     showToast("営業前デモ準備が完了しました");
 
@@ -937,6 +1182,7 @@
     $("ownerDateInput").value = today;
 
     updateAdminStatus();
+    renderDemoLinks();
 
     $("saveAdminBtn").addEventListener("click", () => {
       const code = $("adminCodeInput").value.trim();
@@ -973,6 +1219,16 @@
       await navigator.clipboard.writeText("DEMO整体院だけ実行").catch(() => {});
       $("confirmTextInput").value = "DEMO整体院だけ実行";
       showToast("確認文言をコピーしました");
+    });
+
+    $("copyDemoUrlsBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText($("demoUrlText").value).catch(() => {});
+      showToast("営業用URLをコピーしました");
+    });
+
+    $("refreshDemoLinksBtn").addEventListener("click", () => {
+      renderDemoLinks();
+      showToast("URLを再表示しました");
     });
 
     $("copyJsonBtn").addEventListener("click", async () => {
