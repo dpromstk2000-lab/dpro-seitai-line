@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-10G-R4: customer select triple event fix / 20260709 -->
+<!-- STEP SEITAI-10G-R5: customer id field fallback fix / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R4</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R5</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -706,7 +706,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10G-R4 / owner.html</span>
+        <span class="badge">STEP SEITAI-10G-R5 / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -1891,6 +1891,10 @@
     return parts.join(" / ");
   }
 
+  function customerRowId(c) {
+    return String(c?.id || c?.customer_id || c?.customer_uuid || "");
+  }
+
   async function searchManualCustomers(query = "") {
     if (!getAdminCode()) {
       showToast("管理コードを保存してください");
@@ -1934,7 +1938,7 @@
           <div class="customerResultMeta">${escapeHtml(customerDisplayMeta(c) || "顧客情報")}</div>
           ${c.memo ? `<div class="customerResultMeta">メモ：${escapeHtml(c.memo)}</div>` : ""}
         </div>
-        <button class="btn primary customerSelectBtn" data-action="select-customer" data-customer-id="${escapeHtml(c.id)}" onclick="window.DPRO_OWNER_SELECT_CUSTOMER && window.DPRO_OWNER_SELECT_CUSTOMER(this.dataset.customerId)" type="button">この顧客を選択</button>
+        <button class="btn primary customerSelectBtn" data-action="select-customer" data-customer-id="${escapeHtml(customerRowId(c))}" onclick="window.DPRO_OWNER_SELECT_CUSTOMER && window.DPRO_OWNER_SELECT_CUSTOMER(this.dataset.customerId)" type="button">この顧客を選択</button>
       </div>
     `).join("");
 
@@ -1949,10 +1953,22 @@
 
   async function selectManualCustomer(customerId) {
     setStatus("manualCustomerSearchStatus", "選択処理中", "warn");
-    const customer = (state.manualCustomerResults || []).find((c) => String(c.id) === String(customerId));
+    const targetId = String(customerId || "");
+    const customer = (state.manualCustomerResults || []).find((c) => customerRowId(c) === targetId);
     if (!customer) {
-      showToast("顧客が見つかりません");
+      showToast("顧客が見つかりません。検索結果IDを再確認します。");
       setStatus("manualCustomerSearchStatus", "選択失敗", "ng");
+      showJson({
+        ok: false,
+        message: "顧客選択に失敗しました",
+        clicked_customer_id: targetId,
+        result_ids: (state.manualCustomerResults || []).map((c) => ({
+          id: c.id || null,
+          customer_id: c.customer_id || null,
+          customer_no: c.customer_no || null,
+          name: c.customer_name || null
+        }))
+      });
       return;
     }
 
@@ -1965,9 +1981,10 @@
     setStatus("manualCustomerSearchStatus", "選択中", "warn");
     renderSelectedManualCustomer({ customer, tickets: [], reservations: [] });
     showToast(`${customer.customer_name || "顧客"} 様を選択しました`);
+    showJson({ ok: true, message: "顧客を選択中", selected_customer_id: customerRowId(customer), customer });
 
     try {
-      const detail = await apiGet("/api/owner/customers/detail", { customer_id: customer.id }, true);
+      const detail = await apiGet("/api/owner/customers/detail", { customer_id: customerRowId(customer) }, true);
       state.selectedManualCustomerDetail = detail;
       renderSelectedManualCustomer(detail);
       applyLastReservationToManualForm(detail);
@@ -2237,7 +2254,7 @@
       const body = {
         source: state.manualSource,
         actor_name: "owner",
-        customer_id: state.selectedManualCustomer?.id || "",
+        customer_id: customerRowId(state.selectedManualCustomer) || "",
         customer_no: state.selectedManualCustomer?.customer_no || "",
         customer_name: $("manualCustomerName").value.trim(),
         customer_kana: $("manualCustomerKana").value.trim(),
