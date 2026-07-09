@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-10H: owner-ipad quick customer search for reservation / 20260709 -->
+<!-- STEP SEITAI-10H-R1: owner-ipad LINE message newline normalize fix / 20260709 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-10H</title>
+  <title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-10H-R1</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -575,7 +575,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10H / owner-ipad.html</span>
+        <span class="badge">STEP SEITAI-10H-R1 / owner-ipad.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>iPad受付・施術画面</h1>
         <p class="lead">
           受付・施術中に使う画面です。店舗設定は出さず、予約確認・来院・施術・回数券・文面コピーに絞っています。
@@ -1013,6 +1013,15 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
+  }
+
+  function normalizeLineText(value) {
+    return String(value ?? "")
+      .replace(/\\r\\n/g, "\n")
+      .replace(/\\n/g, "\n")
+      .replace(/\\r/g, "\n")
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n");
   }
 
   function showToast(text) {
@@ -1748,8 +1757,9 @@
   }
 
   function openMessage(text, options = {}) {
-    state.currentMessage = text || "";
-    state.originalMessage = text || "";
+    const normalized = normalizeLineText(text || "");
+    state.currentMessage = normalized;
+    state.originalMessage = normalized;
     state.currentMessageType = options.type || "";
     state.selectedReservation = options.reservation || null;
     state.selectedFollowup = options.followup || null;
@@ -1763,8 +1773,9 @@
   }
 
   async function copyMessage() {
-    const text = ($("messageEditor").value || "").trim();
+    const text = normalizeLineText($("messageEditor").value || "").trim();
     if (!text) return showToast("コピーする文面がありません。");
+    $("messageEditor").value = text;
     await navigator.clipboard.writeText(text).catch(() => {});
     state.currentMessage = text;
 
@@ -1787,6 +1798,7 @@
 
   function resetMessage() {
     if (!state.originalMessage) return showToast("戻す文面がありません。");
+    state.originalMessage = normalizeLineText(state.originalMessage);
     $("messageEditor").value = state.originalMessage;
     showToast("初期文面に戻しました");
   }
