@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- STEP SEITAI-NEXT-4: four-stage reception and treatment workflow / 20260723 -->
+<!-- STEP SEITAI-NEXT-5: ticket safety and next visit guidance / 20260723 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-4</title>
-  <script src="./config.js?v=step-seitai-4"></script>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-5</title>
+  <script src="./config.js?v=step-seitai-next-5"></script>
   <style>
     :root{
       --bg:#f4f8fb;
@@ -1399,6 +1399,17 @@
     .workflowSecondaryActions .btn{width:100%}
   }
 
+  /* DPRO NEXT-5: ticket safety and next visit guidance */
+  .next5Chip{display:inline-flex;align-items:center;margin-top:9px;padding:7px 10px;border:1px solid #a7f3d0;border-radius:999px;background:#ecfdf5;color:#047857;font-size:12px;font-weight:950}
+  .next5Renew{margin-top:10px;padding:11px 12px;border:1px solid #fde68a;border-radius:14px;background:#fffbeb;color:#92400e;font-size:12px;line-height:1.6;font-weight:850}
+  .next5Drawer{position:fixed;inset:0;z-index:390;display:none;overflow:auto;padding:18px;background:rgba(15,23,42,.52);backdrop-filter:blur(6px)}
+  .next5Drawer.open{display:block}.next5Panel{width:min(720px,100%);margin:0 auto;border:1px solid #dbeafe;border-radius:26px;background:#fff;box-shadow:0 28px 90px rgba(15,23,42,.30);overflow:hidden}
+  .next5Head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:18px;border-bottom:1px solid #e2e8f0;background:linear-gradient(135deg,#ecfdf5,#eff6ff)}
+  .next5Body{padding:18px}.next5Presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.next5Preset{min-height:50px;border:1px solid #bfdbfe;border-radius:14px;background:#fff;color:#1e3a8a;font-weight:950}.next5Preset.selected{border-color:#0f766e;background:#0f766e;color:#fff}
+  .next5Preview{margin-top:14px;padding:14px;border:1px solid #a7f3d0;border-radius:17px;background:#ecfdf5}.next5Preview b{display:block;font-size:26px;color:#065f46}.next5Preview small{display:block;margin-top:5px;color:#047857;line-height:1.6;font-weight:850}
+  .next5Foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:15px 18px;border-top:1px solid #e2e8f0}.next5LocalNote{margin-top:12px;padding:11px 12px;border:1px solid #fed7aa;border-radius:14px;background:#fff7ed;color:#9a3412;font-size:12px;line-height:1.65;font-weight:850}
+  body.next5Open{overflow:hidden}@media(max-width:560px){.next5Drawer{padding:10px}.next5Head{display:block}.next5Head .btn{width:100%;margin-top:10px}.next5Presets{grid-template-columns:1fr}.next5Foot{display:grid;grid-template-columns:1fr}.next5Foot .btn{width:100%}}
+
   </style>
 </head>
 <body>
@@ -1406,7 +1417,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-NEXT-4 / owner.html</span>
+        <span class="badge">STEP SEITAI-NEXT-5 / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -1992,6 +2003,22 @@
         <button class="btn ghost" id="patientHistoryCloseBottomBtn" type="button">閉じる</button>
       </div>
     </div>
+  </div>
+</div>
+
+
+<div class="next5Drawer" id="next5GuideDrawer" aria-hidden="true">
+  <div class="next5Panel">
+    <div class="next5Head"><div><span class="badge">施術完了後のご案内</span><h2 style="margin-top:10px;">次回来院目安</h2><p class="note" id="next5GuidePatient">患者を選択してください。</p></div><button class="btn ghost" id="next5GuideCloseBtn" type="button">閉じる</button></div>
+    <div class="next5Body">
+      <label>目安を簡単選択</label>
+      <div class="next5Presets" id="next5PresetGrid"><button class="next5Preset" data-next5-days="7" type="button">1週間後</button><button class="next5Preset" data-next5-days="14" type="button">2週間後</button><button class="next5Preset" data-next5-days="30" type="button">1か月後</button></div>
+      <label for="next5GuideDate">来院目安日</label><input id="next5GuideDate" type="date">
+      <label for="next5GuideNote">患者への補足</label><textarea id="next5GuideNote" placeholder="例：痛みが強くなる前にご来院ください。"></textarea>
+      <div class="next5Preview"><b id="next5GuidePreviewDate">未設定</b><small id="next5GuidePreviewMeta">目安日を選ぶとLINE案内文を作成できます。</small></div>
+      <div class="next5LocalNote">目安はこのブラウザ内に保存します。現行リポジトリに次回来院保存APIがないため、別端末とは自動共有されません。</div>
+    </div>
+    <div class="next5Foot"><span class="status" id="next5GuideStatus">未保存</span><div class="row"><button class="btn primary" id="next5GuideSaveBtn" type="button">目安を保存</button><button class="btn warn" id="next5GuideCopyBtn" type="button">LINE文面をコピー</button><button class="btn dark" id="next5GuideReserveBtn" type="button">この患者で次回予約</button></div></div>
   </div>
 </div>
 
@@ -4405,6 +4432,31 @@ ${activeTickets.length ? activeTickets.map((ticket) => `
     initTabs();
     initSettingsPanel();
   }
+
+
+  /* DPRO NEXT-5: ticket safety and next visit guidance */
+  const NEXT5_STORE_KEY=`DPRO_SEITAI_NEXT_VISIT_GUIDES:${CONFIG.shopCode||"dpro_seitai_demo"}`;
+  const next5TicketBusy=new Set();let next5Target=null;
+  function next5Store(){try{return JSON.parse(localStorage.getItem(NEXT5_STORE_KEY)||"{}")||{}}catch{return{}}}
+  function next5SaveStore(v){try{localStorage.setItem(NEXT5_STORE_KEY,JSON.stringify(v||{}));return true}catch{return false}}
+  function next5Key(e={}){const id=String(e.customer_id||e.customer_uuid||"");if(id)return`customer:${id}`;if(e.customer_no)return`no:${e.customer_no}`;if(e.phone)return`phone:${String(e.phone).replace(/\D/g,"")}`;return`reservation:${e.reservation_id||e.id||e.customer_name||"unknown"}`}
+  function next5Add(dateText,days){const p=String(dateText||todayText()).slice(0,10).split("-").map(Number),d=p.length===3?new Date(p[0],p[1]-1,p[2]):new Date();d.setDate(d.getDate()+Number(days||0));return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+  function next5Base(e={}){return String(e.reservation_date||e.visit_date||state.date||todayText()).slice(0,10)}
+  function next5Guide(e={}){const s=next5Store()[next5Key(e)];return s?.date?{...s,saved:true}:{date:next5Add(next5Base(e),14),days:14,note:"",saved:false}}
+  function next5Message(e,g){return`${e.customer_name||"お客様"}様\n\n本日はご来院ありがとうございました。\n次回来院の目安は ${g.date||"未設定"} 頃です。${g.note?`\n${g.note}`:""}\n\n症状の変化やご都合に合わせて、このLINEからお気軽にご相談ください。`}
+  function next5Preview(){const d=$("next5GuideDate")?.value||"",n=$("next5GuideNote")?.value.trim()||"";$("next5GuidePreviewDate").textContent=d||"未設定";$("next5GuidePreviewMeta").textContent=d?`${next5Target?.customer_name||"患者"} 様へ案内できます。${n||"補足なし"}`:"目安日を選ぶとLINE案内文を作成できます。"}
+  function next5Open(e={},done=false){next5Target=e;const g=next5Guide(e);$("next5GuidePatient").textContent=`${e.customer_name||"患者"} 様${done?"｜施術完了後の次回確認":""}`;$("next5GuideDate").value=g.date||"";$("next5GuideNote").value=g.note||"";setStatus("next5GuideStatus",g.saved?"保存済み":"自動目安",g.saved?"ok":"warn");$("next5PresetGrid").querySelectorAll("[data-next5-days]").forEach(b=>b.classList.toggle("selected",Number(b.dataset.next5Days)===Number(g.days)));next5Preview();$("next5GuideDrawer").classList.add("open");document.body.classList.add("next5Open")}
+  function next5Close(){$("next5GuideDrawer").classList.remove("open");document.body.classList.remove("next5Open")}
+  function next5Save(){if(!next5Target)return showToast("患者を選択してください");const date=$("next5GuideDate").value;if(!date)return showToast("目安日を選択してください");const base=next5Base(next5Target),days=Math.max(0,Math.round((new Date(`${date}T00:00:00`)-new Date(`${base}T00:00:00`))/86400000)),store=next5Store();store[next5Key(next5Target)]={date,days,note:$("next5GuideNote").value.trim(),saved_at:new Date().toISOString(),customer_name:next5Target.customer_name||"",customer_id:next5Target.customer_id||"",reservation_id:next5Target.reservation_id||next5Target.id||""};if(!next5SaveStore(store))return showToast("保存できませんでした");setStatus("next5GuideStatus","保存済み","ok");showToast("次回来院目安を保存しました");renderReservations();if(typeof renderPatientHistory==="function"&&state.selectedPatientDetail)renderPatientHistory()}
+  async function next5Copy(){if(!next5Target||!$("next5GuideDate").value)return showToast("目安日を選択してください");const text=next5Message(next5Target,{date:$("next5GuideDate").value,note:$("next5GuideNote").value.trim()});if(typeof setMessageEditor==="function"){setMessageEditor(text,{type:"manual",customerName:next5Target.customer_name||"患者"});await copyCurrentMessage()}else{openMessage(text,{type:"manual",hint:`次回来院目安：${next5Target.customer_name||"患者"} 様`});await copyMessage()}}
+  function next5Renew(t={}){const r=Number(t.remaining_count||0);let x=null;if(t.expires_at)x=Math.ceil((new Date(`${String(t.expires_at).slice(0,10)}T00:00:00`)-new Date(`${todayText()}T00:00:00`))/86400000);return r<=2||(x!==null&&x<=30)}
+  function next5RenewText(t={}){return`${t.customer_name||"お客様"}様\n\n現在ご利用中の${t.ticket_name||"回数券"}は、残り${Number(t.remaining_count||0)}回です。\n有効期限：${t.expires_at||"ご確認ください"}\n\n継続をご希望の場合は、このLINEにそのままご返信ください。`}
+  function next5DecorateReservations(){document.querySelectorAll("#reservationList [data-reservation-id]").forEach(card=>{const id=String(card.dataset.reservationId||""),r=state.reservations.find(v=>String(v.reservation_id||v.id)===id);if(!r||card.querySelector("[data-next5-guide]")||!["completed","treatment_done"].includes(r.status))return;const g=next5Guide(r),area=card.querySelector(".workflowSecondaryActions,.actionRow")||card,chip=document.createElement("span"),btn=document.createElement("button");chip.className="next5Chip";chip.textContent=`次回来院目安：${g.date}${g.saved?"（保存済み）":""}`;btn.className="btn primary small";btn.type="button";btn.dataset.next5Guide=id;btn.textContent="次回来院目安";area.append(chip,btn)})}
+  function next5DecorateTickets(){const cards=$("ticketList")?.querySelectorAll(".item,.reservationCard")||[];cards.forEach((card,i)=>{const t=(state.lowTickets||[])[i];if(!t||card.querySelector("[data-next5-ticket]")||!next5Renew(t))return;const box=document.createElement("div");box.className="next5Renew";box.innerHTML=`回数券更新候補です。残数・期限を確認してください。<div class="actionRow"><button class="btn warn small" data-next5-ticket="${i}" type="button">更新案内文面</button></div>`;card.appendChild(box)})}
+  const next5RenderReservations=renderReservations;renderReservations=function(){next5RenderReservations();next5DecorateReservations()};const next5RenderTickets=renderTickets;renderTickets=function(){next5RenderTickets();next5DecorateTickets()};
+  if(typeof renderPatientSummary==="function"){const oldSummary=renderPatientSummary;renderPatientSummary=function(detail,reservations,activeTickets,followups){oldSummary(detail,reservations,activeTickets,followups);const grid=$("patientHistoryContent")?.querySelector(".patientSummaryGrid");if(!grid||grid.querySelector("[data-next5-patient]"))return;const c=detail?.customer||{},last=(reservations||[]).find(v=>["completed","treatment_done"].includes(v.status))||{},e={...last,...c},g=next5Guide(e),box=document.createElement("div");box.className="patientSummaryBox";box.dataset.next5Patient="1";box.innerHTML=`<h3>次回来院目安</h3><div class="next5Chip">${escapeHtml(g.date)} ${g.saved?"保存済み":"自動目安"}</div><div class="actionRow"><button class="btn primary small" data-next5-patient-open="1" type="button">目安を設定・変更</button></div>`;grid.appendChild(box)}}
+  const next5Action=handleReservationAction;handleReservationAction=async function(action,id,button){const before=state.reservations.find(v=>String(v.reservation_id||v.id)===String(id));if(action==="ticket"){const key=`ticket:${id}`;if(next5TicketBusy.has(key))return showToast("回数券使用を処理中です");if(!window.confirm(`${before?.customer_name||"患者"} 様の回数券を1回使用しますか？`))return;next5TicketBusy.add(key);try{await next5Action(action,id,button)}finally{next5TicketBusy.delete(key)}return}await next5Action(action,id,button);if(action==="complete"){const now=state.reservations.find(v=>String(v.reservation_id||v.id)===String(id));if(now&&["completed","treatment_done"].includes(now.status))next5Open(now,true)}};
+  const next5InitEvents=initEvents;initEvents=function(){next5InitEvents();if(typeof openManualReservation!=="function")$("next5GuideReserveBtn").style.display="none";$("next5GuideCloseBtn").addEventListener("click",next5Close);$("next5GuideSaveBtn").addEventListener("click",next5Save);$("next5GuideCopyBtn").addEventListener("click",next5Copy);$("next5GuideDate").addEventListener("change",next5Preview);$("next5GuideNote").addEventListener("input",next5Preview);$("next5PresetGrid").addEventListener("click",e=>{const b=e.target.closest("[data-next5-days]");if(!b||!next5Target)return;const days=Number(b.dataset.next5Days||14);$("next5GuideDate").value=next5Add(next5Base(next5Target),days);$("next5PresetGrid").querySelectorAll("[data-next5-days]").forEach(n=>n.classList.toggle("selected",n===b));next5Preview()});$("next5GuideDrawer").addEventListener("click",e=>{if(e.target?.id==="next5GuideDrawer")next5Close()});$("next5GuideReserveBtn").addEventListener("click",async()=>{if(typeof openManualReservation!=="function"||!next5Target)return;const target=next5Target,date=$("next5GuideDate").value;next5Close();await openManualReservation("phone");$("manualCustomerName").value=target.customer_name||"";$("manualPhone").value=target.phone||"";if(date)$("manualDate").value=date});document.addEventListener("click",e=>{const g=e.target.closest("[data-next5-guide]");if(g){const r=state.reservations.find(v=>String(v.reservation_id||v.id)===String(g.dataset.next5Guide));if(r)next5Open(r);return}if(e.target.closest("[data-next5-patient-open]")&&state.selectedPatientDetail){const c=state.selectedPatientDetail.customer||{},rows=typeof patientReservations==="function"?patientReservations(state.selectedPatientDetail):[],last=rows.find(v=>["completed","treatment_done"].includes(v.status))||{};next5Open({...last,...c});return}const t=e.target.closest("[data-next5-ticket]");if(t){const row=(state.lowTickets||[])[Number(t.dataset.next5Ticket)];if(!row)return;const text=next5RenewText(row);if(typeof setMessageEditor==="function")setMessageEditor(text,{type:"manual",customerName:row.customer_name||"患者"});else openMessage(text,{type:"manual",hint:`回数券更新案内：${row.customer_name||"患者"} 様`})}})};
 
   async function init() {
     $("dateInput").value = todayText();

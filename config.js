@@ -23,7 +23,7 @@
 (() => {
   "use strict";
 
-  const STEP_VERSION = "STEP-SEITAI-NEXT-4-CONFIG-20260723";
+  const STEP_VERSION = "STEP-SEITAI-NEXT-5-CONFIG-20260723";
 
   const CONFIG = {
     version: STEP_VERSION,

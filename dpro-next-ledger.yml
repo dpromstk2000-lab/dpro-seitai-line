@@ -1,24 +1,26 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "受付・施術進捗の見える化"
-current_step: "SEITAI-NEXT-4-COMPLETE"
-previous_step: "SEITAI-NEXT-3-COMPLETE"
-next_step: "SEITAI-NEXT-5"
-completed_at_jst: "2026-07-23 17:12:31 +0900"
-baseline_sha: "ed4f615e3dcf9066985fc42f823d2b96734e239d"
-backup_tag: "backup-seitai-before-next-4-20260723"
+step_name: "回数券・確認・次回来院目安"
+current_step: "SEITAI-NEXT-5-COMPLETE"
+previous_step: "SEITAI-NEXT-4-COMPLETE"
+next_step: "SEITAI-NEXT-6"
+completed_at_jst: "2026-07-23 20:41:09 +0900"
+baseline_sha: "f25ff99504ebc066aa05b64a8a61ca5096fbe94d"
+backup_tag: "backup-seitai-before-next-5-20260723"
 backup_tag_status: "created"
-target_files:
-  - "owner.html"
-  - "owner-ipad.html"
-  - "config.js"
+target_files: ["owner.html", "owner-ipad.html", "config.js", "system-check.html"]
 implemented:
-  - "予約・来院・施術中・完了の4段階をPCとiPadへ統一表示"
-  - "各予約に現在地を示す進捗バーを追加"
-  - "各予約の次に行う操作を1つだけ強調"
-  - "4段階の件数から該当予約へ直接移動"
-  - "treatment_doneとcompletedの既存内部値を維持した表示統合"
-  - "iPad公開画面から固定デモ管理コード説明を除去"
+  - "施術完了後の次回来院目安"
+  - "1週間後・2週間後・1か月後・任意日"
+  - "患者履歴への次回来院目安表示"
+  - "次回来院目安LINE文面"
+  - "回数券使用前確認と二重操作防止"
+  - "回数券更新候補と個別LINE文面"
+persistence:
+  next_visit_mode: "browser_local_storage"
+  cross_device_sync: false
+  worker_endpoint_available: false
+  reason: "現行リポジトリにWorkerソースと次回来院保存APIがないため"
 checks:
   previous_step: "OK"
   backup_tag: "OK"
@@ -27,11 +29,11 @@ checks:
   javascript_syntax: "OK"
   html_id_duplicates: "OK"
   existing_function_preservation: "OK"
-  four_stage_board_pc: "OK"
-  four_stage_board_ipad: "OK"
-  single_primary_next_action: "OK"
-  internal_status_compatibility: "OK"
-  industry_workflow_logic: "OK"
+  ticket_double_action_guard: "OK"
+  ticket_renewal_candidate: "OK"
+  next_visit_presets: "OK"
+  next_visit_patient_history: "OK"
+  next_visit_line_message: "OK"
   api_unchanged: "OK"
   overall: "OK"
 change_record:
@@ -41,13 +43,10 @@ change_record:
   screen_function_changed: true
   existing_data_changed: false
 performance_policy:
-  additional_api_request_for_workflow_board: false
-  workflow_counts_source: "existing ownerToday response"
-  all_records_initial_load: false
-  all_images_initial_load: false
+  additional_initial_api_request: false
+  next_visit_storage_scope: "current browser only"
 rollback:
   method: "backup_tag"
-  tag: "backup-seitai-before-next-4-20260723"
-  command_reference: "git checkout backup-seitai-before-next-4-20260723"
+  tag: "backup-seitai-before-next-5-20260723"
 workflow_self_delete_after_success: true
 auto_commit_push: true
