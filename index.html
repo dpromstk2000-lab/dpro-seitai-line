@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- STEP SEITAI-10I: customer reservation UX polish / auto slots / closed day reason / member link / 20260709 -->
+<!-- STEP SEITAI-NEXT-7: member repeat reservation prefill / 20260723 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜予約｜STEP SEITAI-10I</title>
-  <script src="./config.js?v=step-seitai-4"></script>
+  <title>DPRO 整骨院・整体 LINE｜かんたん予約｜STEP SEITAI-NEXT-7</title>
+  <script src="./config.js?v=step-seitai-next-7"></script>
   <style>
     :root{
       --bg:#f4f8fb;
@@ -516,6 +516,20 @@
       .confirmRow{grid-template-columns:1fr}
       h1{font-size:30px}
     }
+
+    /* DPRO NEXT-7: member repeat reservation prefill */
+    .next7PrefillNotice{
+      display:none;
+      border:1px solid #99f6e4;
+      border-radius:18px;
+      background:linear-gradient(180deg,#ecfdf5,#ffffff);
+      padding:14px;
+      color:#065f46;
+    }
+    .next7PrefillNotice.show{display:block}
+    .next7PrefillNotice b{display:block;font-size:17px;margin-bottom:4px}
+    .next7PrefillNotice p{margin:0;font-size:13px;line-height:1.7;font-weight:800}
+
   </style>
 </head>
 <body>
@@ -523,7 +537,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10I / index.html</span>
+        <span class="badge">STEP SEITAI-NEXT-7 / index.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>かんたん予約</h1>
         <p class="lead">
           メニュー、担当者、気になる内容、日時を選んで予約できます。
@@ -549,6 +563,12 @@
     <section class="grid">
       <div class="span8">
         <div class="grid">
+
+          <section class="card span12 next7PrefillNotice" id="next7PrefillNotice" aria-live="polite">
+            <b>前回の予約内容を反映しました</b>
+            <p id="next7PrefillText">メニュー・担当者・お客様情報を確認し、日付と時間を選んで予約してください。</p>
+          </section>
+
           <section class="card span12" id="sectionMenu">
             <div class="stepTitle">
               <span class="stepNo">1</span>
@@ -807,7 +827,8 @@
     selectedDate: "",
     slots: [],
     selectedSlot: null,
-    lastReservationResult: null
+    lastReservationResult: null,
+    prefillApplied: false
   };
 
   const concernOptions = [
@@ -1219,6 +1240,69 @@
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+
+  /* DPRO NEXT-7: URL prefill from member history */
+  function readNext7Prefill() {
+    const url = new URL(location.href);
+    const keys = ["repeat","menu_code","staff_preference","staff_code","concern_tags","request_note","customer_name","customer_kana","phone","customer_no","preferred_date"];
+    const data = {};
+    keys.forEach((key) => {
+      const value = url.searchParams.get(key);
+      if (value !== null && value !== "") data[key] = value;
+    });
+    return data;
+  }
+
+  function applyNext7Prefill() {
+    const data = readNext7Prefill();
+    if (!data.repeat && !data.menu_code && !data.phone && !data.customer_name) return false;
+
+    if (data.menu_code) {
+      const menu = state.menus.find((m) => String(m.menu_code || m.id) === String(data.menu_code));
+      if (menu) state.selectedMenu = menu;
+    }
+
+    const allowedPreferences = ["any","same_as_last","specific","female_preferred"];
+    if (allowedPreferences.includes(data.staff_preference)) state.staffPreference = data.staff_preference;
+    if (data.staff_code && state.staff.some((s) => String(s.staff_code || s.id) === String(data.staff_code))) {
+      state.staffPreference = "specific";
+      state.selectedStaffCode = data.staff_code;
+    }
+
+    const concerns = String(data.concern_tags || "").split(",").map((v) => v.trim()).filter(Boolean);
+    state.selectedConcerns = concerns.filter((v) => concernOptions.includes(v));
+
+    if (data.customer_name) $("customerName").value = data.customer_name;
+    if (data.customer_kana) $("customerKana").value = data.customer_kana;
+    if (data.phone) $("phone").value = data.phone;
+    if (data.request_note) $("requestNote").value = data.request_note;
+
+    const preferredDate = /^\d{4}-\d{2}-\d{2}$/.test(data.preferred_date || "") && data.preferred_date >= todayText()
+      ? data.preferred_date
+      : addDaysText(todayText(), 1);
+    $("dateInput").value = preferredDate;
+    state.selectedDate = preferredDate;
+    state.selectedSlot = null;
+    state.slots = [];
+    state.prefillApplied = true;
+
+    document.querySelectorAll("[data-pref]").forEach((button) => {
+      button.classList.toggle("selected", button.dataset.pref === state.staffPreference);
+    });
+    $("staffSelectArea").style.display = state.staffPreference === "specific" ? "block" : "none";
+    renderMenus();
+    renderStaff();
+    renderConcerns();
+    updateDateLabel();
+    updateSummary();
+
+    $("next7PrefillNotice").classList.add("show");
+    $("next7PrefillText").textContent = data.preferred_date
+      ? `前回内容と次回来院目安 ${preferredDate} を反映しました。空き時間を選んでください。`
+      : "前回のメニュー・担当者・お客様情報を反映しました。日付と時間を確認してください。";
+    return true;
+  }
+
   async function loadSettings() {
     setStatus("apiStatus", "店舗設定確認中", "warn");
     const data = await apiGet(endpoint("publicSettings"));
@@ -1239,6 +1323,7 @@
     $("dateInput").min = minDate;
     $("dateInput").value = addDaysText(minDate, 1);
     state.selectedDate = $("dateInput").value;
+    applyNext7Prefill();
     updateDateLabel();
 
     $("settingsNote").textContent = `予約は${Number(state.settings.reservation_max_months_ahead || 2)}か月先まで、${Number(state.settings.reservation_slot_minutes || 30)}分単位で受付します。`;
@@ -1407,7 +1492,7 @@
         start_time: state.selectedSlot.time,
         concern_tags: state.selectedConcerns,
         request_note: $("requestNote").value.trim(),
-        source: "line"
+        source: state.prefillApplied ? "member_repeat" : "line"
       };
 
       const data = await apiPost(endpoint("reservationCreate"), body);

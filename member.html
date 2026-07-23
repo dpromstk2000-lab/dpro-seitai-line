@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- STEP SEITAI-9C: auto date-time selection and closed-day message / 20260709 -->
+<!-- STEP SEITAI-NEXT-7: member history and repeat reservation / 20260723 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜会員証・予約確認｜STEP SEITAI-9C</title>
-  <script src="./config.js?v=step-seitai-4"></script>
+  <title>DPRO 整骨院・整体 LINE｜会員ホーム・来院履歴｜STEP SEITAI-NEXT-7</title>
+  <script src="./config.js?v=step-seitai-next-7"></script>
   <style>
     :root{
       --bg:#f4f8fb;
@@ -411,6 +411,107 @@
       .row .btn{width:auto}
       .slots{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
+
+    /* DPRO NEXT-7: member history and repeat reservation */
+    .memberNext7Overview{
+      border:1px solid #99f6e4;
+      background:
+        radial-gradient(circle at top right,rgba(20,160,133,.10),transparent 300px),
+        linear-gradient(180deg,#ffffff,#f4fffc);
+    }
+    .next7Metrics{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-top:14px;
+    }
+    .next7Metric{
+      border:1px solid #ccfbf1;
+      border-radius:18px;
+      background:#fff;
+      padding:14px;
+      min-width:0;
+    }
+    .next7Metric span{
+      display:block;
+      color:#64748b;
+      font-size:11px;
+      font-weight:900;
+    }
+    .next7Metric b{
+      display:block;
+      margin-top:4px;
+      color:#065f46;
+      font-size:24px;
+      line-height:1.2;
+      letter-spacing:-.03em;
+      word-break:break-word;
+    }
+    .next7ActionRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top:14px;
+    }
+    .historyList{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+    .historyItem{
+      border:1px solid #e2e8f0;
+      border-radius:18px;
+      background:#fff;
+      padding:14px;
+    }
+    .historyTop{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .historyTitle{
+      font-size:17px;
+      font-weight:950;
+      line-height:1.45;
+    }
+    .historyMeta{
+      margin-top:5px;
+      color:#64748b;
+      font-size:12px;
+      line-height:1.7;
+    }
+    .historyActions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .next7ScopeNote{
+      margin-top:12px;
+      padding:11px 12px;
+      border:1px solid #dbeafe;
+      border-radius:14px;
+      background:#f8fbff;
+      color:#475569;
+      font-size:12px;
+      line-height:1.7;
+      font-weight:800;
+    }
+    @media(max-width:760px){
+      .next7Metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:560px){
+      .next7Metrics{grid-template-columns:1fr 1fr}
+      .next7ActionRow{display:grid;grid-template-columns:1fr}
+      .next7ActionRow .btn{width:100%}
+      .historyTop{display:block}
+      .historyTop .pill{margin-top:8px}
+      .historyActions{display:grid;grid-template-columns:1fr}
+      .historyActions .btn{width:100%}
+    }
+
   </style>
 </head>
 
@@ -419,11 +520,11 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-9C / member.html</span>
+        <span class="badge">STEP SEITAI-NEXT-7 / member.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>会員証・予約確認</h1>
         <p class="lead">
-          お客様がLINEから、会員証・現在の予約・回数券残数を確認できます。
-          予約変更・キャンセルもここから操作できます。
+          お客様がLINEから、会員証・現在の予約・来院履歴・回数券を確認できます。
+          前回と同じ内容で予約することもできます。
         </p>
       </div>
       <div class="heroPanel">
@@ -434,6 +535,7 @@
           <span class="chip">会員証</span>
           <span class="chip">予約確認</span>
           <span class="chip">回数券</span>
+          <span class="chip">来院履歴</span>
         </div>
       </div>
     </section>
@@ -491,7 +593,32 @@
         </div>
       </div>
 
-      <div class="card span8">
+      
+      <div class="card span12 memberNext7Overview" id="memberNext7Overview">
+        <div class="sectionHead">
+          <div>
+            <span class="badge">DPRO NEXT｜次の来院につなげる</span>
+            <h2 style="margin-top:10px;">会員ホーム</h2>
+            <p class="note">次の予約、来院回数、回数券、前回内容をまとめて確認できます。</p>
+          </div>
+          <span class="status" id="memberNext7Status">未確認</span>
+        </div>
+        <div class="next7Metrics">
+          <div class="next7Metric"><span>次の予約</span><b id="next7UpcomingView">-</b></div>
+          <div class="next7Metric"><span>来院回数</span><b id="next7VisitCountView">-</b></div>
+          <div class="next7Metric"><span>回数券残数</span><b id="next7TicketView">-</b></div>
+          <div class="next7Metric"><span>次回来院目安</span><b id="next7GuideView">-</b></div>
+        </div>
+        <div id="recommendBox" class="alert" style="margin-top:14px;">
+          会員情報を確認すると、次回予約や回数券の案内を表示します。
+        </div>
+        <div class="next7ActionRow">
+          <a class="btn primary large" id="repeatLastReservationBtn" href="./index.html" style="display:none;">前回と同じ内容で予約</a>
+          <a class="btn dark large" href="./index.html">内容を選んで新しく予約</a>
+          <button class="btn ghost large" id="refreshMemberBtn" type="button">最新情報に更新</button>
+        </div>
+      </div>
+<div class="card span8">
         <div class="sectionHead">
           <div>
             <h2>現在の予約</h2>
@@ -527,16 +654,22 @@
         <div id="ticketList" class="list"></div>
       </div>
 
-      <div class="card span6">
-        <h2>来院メモ</h2>
-        <p class="note">
-          来院履歴の詳細表示は次STEPで専用APIを追加して強化予定です。
-          現時点では、現在予約と回数券の確認を優先しています。
-        </p>
-        <div id="recommendBox" class="empty" style="text-align:left;">
-          会員情報を確認すると、次回来院のおすすめや回数券案内をここに表示します。
+      
+      <div class="card span12" id="memberHistorySection">
+        <div class="sectionHead">
+          <div>
+            <h2>来院履歴・前回内容</h2>
+            <p class="note">直近の来院・施術履歴から、メニューや担当者を確認できます。</p>
+          </div>
+          <span class="status" id="historyStatus">未確認</span>
+        </div>
+        <div id="historyList" class="historyList"></div>
+        <div class="next7ScopeNote">
+          履歴は既存の会員予約APIが返す範囲で、直近20件まで表示します。
+          次回来院目安は、店舗側で同じブラウザに保存した場合だけ表示されます。
         </div>
       </div>
+
     </section>
   </div>
 </main>
@@ -630,6 +763,7 @@
     customer: null,
     reservations: [],
     tickets: [],
+    prefillSource: "member_history",
     menus: [],
     staff: [],
     resources: [],
@@ -946,7 +1080,7 @@
     const [profile, tickets, reservations] = await Promise.all([
       apiGet(endpoint("memberProfile"), params),
       apiGet(endpoint("memberTicket"), params).catch((error) => ({ ok:false, tickets:[], error: error.message })),
-      apiGet(endpoint("memberReservations"), params).catch((error) => ({ ok:false, reservations:[], error: error.message }))
+      apiGet(endpoint("memberReservations"), { ...params, include_history:"1", limit:20 }).catch((error) => ({ ok:false, reservations:[], error: error.message }))
     ]);
 
     state.customer = profile.customer;
@@ -957,8 +1091,148 @@
     renderMember();
     renderReservations();
     renderTickets();
+    renderHistory();
+    renderMemberOverview();
     renderRecommend();
     setStatus("lookupStatus", "確認OK", "ok");
+  }
+
+
+  /* DPRO NEXT-7: member history and repeat reservation */
+  function activeMemberReservations() {
+    return (state.reservations || [])
+      .filter((r) => ["reserved","arrived","in_treatment"].includes(String(r.status || "")))
+      .sort((a, b) => `${a.reservation_date || ""} ${a.start_time || ""}`.localeCompare(`${b.reservation_date || ""} ${b.start_time || ""}`));
+  }
+
+  function historyMemberReservations() {
+    const today = todayText();
+    return (state.reservations || [])
+      .filter((r) => {
+        const status = String(r.status || "");
+        if (["completed","treatment_done","cancelled","no_show"].includes(status)) return true;
+        return Boolean(r.reservation_date && String(r.reservation_date) < today && status !== "reserved");
+      })
+      .sort((a, b) => `${b.reservation_date || ""} ${b.start_time || ""}`.localeCompare(`${a.reservation_date || ""} ${a.start_time || ""}`))
+      .slice(0, 20);
+  }
+
+  function latestReservationForRepeat() {
+    const history = historyMemberReservations();
+    if (history.length) return history[0];
+    return (state.reservations || [])
+      .slice()
+      .sort((a, b) => `${b.reservation_date || ""} ${b.start_time || ""}`.localeCompare(`${a.reservation_date || ""} ${a.start_time || ""}`))[0] || null;
+  }
+
+  function next7GuideForCustomer() {
+    const c = state.customer || {};
+    const storeKey = `DPRO_SEITAI_NEXT_VISIT_GUIDES:${CONFIG.shopCode || "dpro_seitai_demo"}`;
+    try {
+      const store = JSON.parse(localStorage.getItem(storeKey) || "{}") || {};
+      const keys = [
+        c.id || c.customer_id || c.customer_uuid ? `customer:${c.id || c.customer_id || c.customer_uuid}` : "",
+        c.customer_no ? `no:${c.customer_no}` : "",
+        c.phone ? `phone:${String(c.phone).replace(/\D/g, "")}` : ""
+      ].filter(Boolean);
+      for (const key of keys) {
+        if (store[key]?.date) return store[key];
+      }
+    } catch {}
+    return null;
+  }
+
+  function repeatReservationUrl(reservation) {
+    const r = reservation || {};
+    const c = state.customer || {};
+    const url = new URL("./index.html", location.href);
+    const menuCode = r.menu_code || state.menuMap[r.menu_id]?.menu_code || "";
+    const staffCode = r.staff_code || state.staffMap[r.staff_id]?.staff_code || "";
+    const concerns = Array.isArray(r.concern_tags) ? r.concern_tags.join(",") : "";
+    const guide = next7GuideForCustomer();
+    const params = {
+      repeat: "last",
+      menu_code: menuCode,
+      staff_preference: staffCode ? "specific" : "same_as_last",
+      staff_code: staffCode,
+      concern_tags: concerns,
+      request_note: r.request_note || "",
+      customer_name: c.customer_name || "",
+      customer_kana: c.customer_kana || "",
+      phone: c.phone || "",
+      customer_no: c.customer_no || "",
+      preferred_date: guide?.date || ""
+    };
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value) !== "") url.searchParams.set(key, String(value));
+    });
+    return url.toString();
+  }
+
+  function renderMemberOverview() {
+    const c = state.customer;
+    if (!c) return;
+    const active = activeMemberReservations();
+    const latest = latestReservationForRepeat();
+    const usableTickets = (state.tickets || []).filter((t) => ["active","usable",""].includes(String(t.status || "")));
+    const remaining = usableTickets.reduce((sum, t) => sum + Number(t.remaining_count || 0), 0);
+    const guide = next7GuideForCustomer();
+
+    $("next7UpcomingView").textContent = active[0]
+      ? `${active[0].reservation_date || "-"} ${formatTime(active[0].start_time)}`
+      : "予約なし";
+    $("next7VisitCountView").textContent = `${Number(c.total_visit_count || historyMemberReservations().length || 0)}回`;
+    $("next7TicketView").textContent = usableTickets.length ? `${remaining}回` : "なし";
+    $("next7GuideView").textContent = guide?.date || "未設定";
+    setStatus("memberNext7Status", "確認OK", "ok");
+
+    const repeatBtn = $("repeatLastReservationBtn");
+    if (latest) {
+      repeatBtn.href = repeatReservationUrl(latest);
+      repeatBtn.style.display = "inline-flex";
+    } else {
+      repeatBtn.style.display = "none";
+    }
+  }
+
+  function renderHistory() {
+    const box = $("historyList");
+    const rows = historyMemberReservations();
+    if (!state.customer) {
+      setStatus("historyStatus", "未確認", "");
+      box.innerHTML = `<div class="empty">会員情報を確認すると、来院履歴が表示されます。</div>`;
+      return;
+    }
+
+    setStatus("historyStatus", `${rows.length}件`, rows.length ? "ok" : "warn");
+    if (!rows.length) {
+      const lastVisit = state.customer.last_visit_date || "";
+      box.innerHTML = `<div class="empty">${lastVisit ? `最終来院日は ${escapeHtml(lastVisit)} です。` : "表示できる来院履歴はありません。"}<br>次回予約は会員ホームから進めます。</div>`;
+      return;
+    }
+
+    box.innerHTML = rows.map((r) => {
+      const menu = menuName(r.menu_id || r.menu_code);
+      const staff = staffName(r.staff_id || r.staff_code);
+      return `
+        <div class="historyItem">
+          <div class="historyTop">
+            <div>
+              <div class="historyTitle">${escapeHtml(r.reservation_date || "-")} ${formatTime(r.start_time)}　${escapeHtml(menu)}</div>
+              <div class="historyMeta">
+                担当：${escapeHtml(staff)}<br>
+                状態：${escapeHtml(statusLabel(r.status))}
+                ${r.request_note ? `<br>前回メモ：${escapeHtml(r.request_note)}` : ""}
+              </div>
+            </div>
+            <span class="pill ${statusClass(r.status)}">${escapeHtml(statusLabel(r.status))}</span>
+          </div>
+          <div class="historyActions">
+            <a class="btn primary" href="${escapeHtml(repeatReservationUrl(r))}">この内容で予約</a>
+          </div>
+        </div>
+      `;
+    }).join("");
   }
 
   function renderMember() {
@@ -979,7 +1253,7 @@
 
   function renderReservations() {
     const box = $("reservationList");
-    const rows = state.reservations || [];
+    const rows = activeMemberReservations();
 
     if (!state.customer) {
       box.innerHTML = `<div class="empty">会員情報を確認すると、現在の予約が表示されます。</div>`;
@@ -1073,7 +1347,7 @@
     if (!state.customer) return;
 
     const activeTicket = (state.tickets || []).find((t) => t.status === "active");
-    const reservationCount = (state.reservations || []).length;
+    const reservationCount = activeMemberReservations().length;
 
     if (reservationCount > 0) {
       $("recommendBox").innerHTML = `
@@ -1355,6 +1629,7 @@
     });
 
     $("copyContactTextBtn").addEventListener("click", copyContactText);
+    $("refreshMemberBtn").addEventListener("click", loadMember);
 
     $("closeChangeBtn").addEventListener("click", closeChangeDrawer);
     $("loadSlotsBtn").addEventListener("click", loadSlots);

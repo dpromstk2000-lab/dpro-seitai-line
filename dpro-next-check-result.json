@@ -1,24 +1,66 @@
 {
   "ok": true,
-  "step": "SEITAI-NEXT-6-COMPLETE",
-  "next_step": "SEITAI-NEXT-7",
-  "baseline_sha": "70853f3ca32e5d4c361b23b1c726e75ea54faddc",
-  "backup_tag": "backup-seitai-before-next-6-20260723",
-  "checks": {
-    "html_syntax": "OK",
-    "javascript_syntax": "OK",
-    "id_duplicates": "OK",
-    "reception_priority_queue": "OK",
-    "staff_mobile": "OK",
-    "role_separation": "OK",
-    "existing_features": "OK",
-    "api_unchanged": "OK"
-  },
-  "changes": {
-    "worker": false,
-    "supabase": false,
-    "api": false,
-    "screen": true,
-    "new_screen": "staff.html"
+  "step": "SEITAI-NEXT-7",
+  "recovery_revision": "R1",
+  "recovery_reason": "dynamic data-id excluded from fixed HTML id duplicate check",
+  "current_step": "SEITAI-NEXT-7-COMPLETE",
+  "next_step": "SEITAI-NEXT-8",
+  "baseline_sha": "504911c90147615ec8c3bfce0e468e19b203f9ee",
+  "backup_tag": "backup-seitai-before-next-7-20260723",
+  "overall": "OK",
+  "implemented": [
+    "member_home",
+    "visit_history",
+    "same_as_last_reservation",
+    "index_url_prefill",
+    "ticket_and_reservation_preserved"
+  ],
+  "history_source": "existing memberReservations with include_history=1",
+  "history_limit": 20,
+  "member_initial_api_requests": 3,
+  "worker_changed": false,
+  "supabase_changed": false,
+  "api_changed": false,
+  "screen_function_changed": true,
+  "existing_data_changed": false,
+  "details": {
+    "overall": "OK",
+    "html_javascript": {
+      "member.html": {
+        "ids": 48,
+        "inline_scripts": 2,
+        "bytes": 58094
+      },
+      "index.html": {
+        "ids": 44,
+        "inline_scripts": 2,
+        "bytes": 54921
+      },
+      "owner.html": {
+        "ids": 155,
+        "inline_scripts": 2,
+        "bytes": 184888
+      },
+      "owner-ipad.html": {
+        "ids": 83,
+        "inline_scripts": 2,
+        "bytes": 101886
+      },
+      "staff.html": {
+        "ids": 17,
+        "inline_scripts": 2,
+        "bytes": 20895
+      },
+      "system-check.html": {
+        "ids": 57,
+        "inline_scripts": 2,
+        "bytes": 42744
+      }
+    },
+    "member_initial_api_requests": 3,
+    "history_limit": 20,
+    "api_changed": false,
+    "worker_changed": false,
+    "supabase_changed": false
   }
 }

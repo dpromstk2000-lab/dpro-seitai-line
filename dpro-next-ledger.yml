@@ -1,33 +1,34 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "iPad受付・スタッフスマホ最適化"
+step_name: "会員履歴・前回と同じ予約"
 recovery_revision: "R1"
-recovery_reason: "system-check営業デモ手順の完全一致検査を空白許容へ修正"
-current_step: "SEITAI-NEXT-6-COMPLETE"
-previous_step: "SEITAI-NEXT-5-COMPLETE"
-next_step: "SEITAI-NEXT-7"
-completed_at_jst: "2026-07-23 21:17:51 +0900"
-baseline_sha: "70853f3ca32e5d4c361b23b1c726e75ea54faddc"
-backup_tag: "backup-seitai-before-next-6-20260723"
+recovery_reason: "data-idの動的値を固定HTML idと誤認した重複ID検査を修正"
+current_step: "SEITAI-NEXT-7-COMPLETE"
+previous_step: "SEITAI-NEXT-6-COMPLETE"
+next_step: "SEITAI-NEXT-8"
+completed_at_jst: "2026-07-23 21:57:36 +0900"
+baseline_sha: "504911c90147615ec8c3bfce0e468e19b203f9ee"
+backup_tag: "backup-seitai-before-next-7-20260723"
 backup_tag_status: "created"
 target_files:
-  - "owner.html"
-  - "owner-ipad.html"
-  - "staff.html"
+  - "member.html"
+  - "index.html"
   - "system-check.html"
   - "config.js"
 implemented:
-  - "iPad受付優先リスト"
-  - "来院受付を最優先にした受付導線"
-  - "フォロー・回数券注意の初期折りたたみ"
-  - "スタッフ別のスマホ担当患者画面"
-  - "スタッフスマホから施術開始・施術完了"
-  - "担当者・状態フィルター"
-  - "オーナーPC・iPad・system-checkからスタッフ画面への入口"
-role_separation:
-  reception_ipad: "来院受付・電話店頭予約・共用補助操作"
-  staff_mobile: "担当患者・施術開始・施術完了"
-  owner_pc: "予約・回数券・フォロー・設定・患者履歴"
+  - "会員ホームの次回予約・来院回数・回数券集約"
+  - "既存会員予約API結果の現在予約と来院履歴への分類"
+  - "来院履歴の直近20件表示"
+  - "前回メニュー・担当・要望の再予約URL"
+  - "予約画面のURL事前入力"
+  - "同一ブラウザ保存の次回来院目安表示"
+  - "予約変更・キャンセル・回数券の既存機能維持"
+data_scope:
+  member_history_endpoint: "existing memberReservations"
+  include_history_parameter: true
+  history_limit: 20
+  additional_member_api_request: false
+  next_visit_scope: "same browser localStorage only"
 checks:
   previous_step: "OK"
   backup_tag: "OK"
@@ -36,11 +37,10 @@ checks:
   javascript_syntax: "OK"
   html_id_duplicates: "OK"
   existing_function_preservation: "OK"
-  reception_priority_queue: "OK"
-  staff_filter: "OK"
-  staff_start_complete: "OK"
-  staff_role_restriction: "OK"
-  system_check_navigation: "OK"
+  member_history: "OK"
+  repeat_reservation_url: "OK"
+  index_prefill: "OK"
+  member_role_restriction: "OK"
   api_unchanged: "OK"
   overall: "OK"
 change_record:
@@ -48,15 +48,15 @@ change_record:
   supabase_changed: false
   api_changed: false
   screen_function_changed: true
-  new_screen_added: true
+  new_screen_added: false
   existing_data_changed: false
 performance_policy:
-  staff_initial_requests: 2
-  staff_auto_polling: false
-  all_images_initial_load: false
-  owner_today_reused: true
+  member_initial_api_requests: 3
+  member_additional_initial_request: false
+  history_limit: 20
+  all_history_initial_unlimited_load: false
 rollback:
   method: "backup_tag"
-  tag: "backup-seitai-before-next-6-20260723"
+  tag: "backup-seitai-before-next-7-20260723"
 workflow_self_delete_after_success: true
 auto_commit_push: true
