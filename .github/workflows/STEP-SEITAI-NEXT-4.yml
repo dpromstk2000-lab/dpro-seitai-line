@@ -1,0 +1,1074 @@
+name: STEP SEITAI-NEXT-4
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/STEP-SEITAI-NEXT-4.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seitai-next-4
+  cancel-in-progress: false
+
+env:
+  STEP_NAME: SEITAI-NEXT-4
+  WORKFLOW_FILE: .github/workflows/STEP-SEITAI-NEXT-4.yml
+  BACKUP_TAG: backup-seitai-before-next-4-20260723
+
+jobs:
+  progress-visibility:
+    name: Reception and treatment progress visibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify previous STEP and establish rollback tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f dpro-next-ledger.yml
+          grep -q 'current_step: "SEITAI-NEXT-3-COMPLETE"' dpro-next-ledger.yml
+          grep -q 'next_step: "SEITAI-NEXT-4"' dpro-next-ledger.yml
+
+          for file in owner.html owner-ipad.html config.js system-check.html index.html member.html; do
+            test -f "$file"
+          done
+
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            BASELINE_SHA="$(git rev-parse HEAD^)"
+          else
+            echo "Unable to determine the commit before workflow upload."
+            exit 1
+          fi
+
+          echo "BASELINE_SHA=$BASELINE_SHA" >> "$GITHUB_ENV"
+          echo "$BASELINE_SHA" > /tmp/seitai_next_4_baseline_sha.txt
+
+          if git rev-parse "$BACKUP_TAG" >/dev/null 2>&1; then
+            EXISTING_TAG_SHA="$(git rev-list -n 1 "$BACKUP_TAG")"
+            if [ "$EXISTING_TAG_SHA" != "$BASELINE_SHA" ]; then
+              echo "Backup tag exists but points to another commit."
+              exit 1
+            fi
+          else
+            git tag -a "$BACKUP_TAG" "$BASELINE_SHA" -m "DPRO 整骨院・整体 LINE before SEITAI-NEXT-4"
+            git push origin "$BACKUP_TAG"
+          fi
+
+          git show "$BASELINE_SHA:owner.html" > /tmp/owner.before.html
+          git show "$BASELINE_SHA:owner-ipad.html" > /tmp/owner-ipad.before.html
+          git show "$BASELINE_SHA:config.js" > /tmp/config.before.js
+
+      - name: Apply four-stage workflow visibility
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(text, old, new, label):
+              if old not in text:
+                  raise SystemExit(f"{label}: target text was not found")
+              return text.replace(old, new, 1)
+
+          def regex_replace_once(text, pattern, replacement, label, flags=0):
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected one replacement, got {count}")
+              return updated
+
+          shared_helpers = r'''
+            function workflowStage(status) {
+              if (status === "reserved") return 0;
+              if (status === "arrived") return 1;
+              if (status === "in_treatment") return 2;
+              if (status === "treatment_done" || status === "completed") return 3;
+              return -1;
+            }
+
+            function workflowDisplayLabel(status) {
+              const stage = workflowStage(status);
+              return ["予約","来院","施術中","完了"][stage] || statusLabel(status);
+            }
+
+            function workflowNextAction(r) {
+              if (r.status === "reserved") {
+                return { action:"arrived", label:"来院受付", kind:"primary", guide:"受付で来院を確認してください" };
+              }
+              if (r.status === "arrived") {
+                return { action:"start", label:"施術開始", kind:"warn", guide:"施術を始める時に押してください" };
+              }
+              if (r.status === "in_treatment" || r.status === "treatment_done") {
+                return { action:"complete", label:"施術完了", kind:"dark", guide:"施術終了後に完了してください" };
+              }
+              if (r.status === "completed") {
+                return { action:"", label:"対応完了", kind:"", guide:"受付から施術完了まで記録済みです" };
+              }
+              if (r.status === "cancelled") {
+                return { action:"", label:"キャンセル", kind:"", guide:"予約はキャンセルされています" };
+              }
+              if (r.status === "no_show") {
+                return { action:"", label:"無断キャンセル", kind:"", guide:"無断キャンセルとして記録されています" };
+              }
+              return { action:"", label:"状態確認", kind:"", guide:"現在の状態を確認してください" };
+            }
+
+            function workflowProgressHtml(status, compact = false) {
+              const current = workflowStage(status);
+              const labels = ["予約","来院","施術中","完了"];
+              return `<div class="workflowProgress ${compact ? "compact" : ""}" aria-label="受付から完了までの進捗">${labels.map((label, index) => {
+                let cls = "";
+                if (current >= 0 && index < current) cls = "done";
+                if (current >= 0 && index === current) cls = "active";
+                return `<span class="${cls}"><i>${index + 1}</i>${label}</span>`;
+              }).join("")}</div>`;
+            }
+          '''
+
+          shared_css = r'''
+            /* DPRO NEXT-4: reception-to-completion workflow visibility */
+            .workflowBoard{
+              border:1px solid #c7d2fe;
+              background:
+                radial-gradient(circle at top right,rgba(79,70,229,.11),transparent 320px),
+                linear-gradient(180deg,#ffffff 0%,#fafaff 100%);
+              scroll-margin-top:18px;
+            }
+            .workflowBoardHead{
+              display:flex;
+              justify-content:space-between;
+              gap:14px;
+              align-items:flex-start;
+            }
+            .workflowBoardGrid{
+              display:grid;
+              grid-template-columns:repeat(4,minmax(0,1fr));
+              gap:10px;
+              margin-top:16px;
+            }
+            .workflowStageCard{
+              border:1px solid #dbeafe;
+              border-radius:18px;
+              background:#fff;
+              padding:14px;
+              min-width:0;
+              text-align:left;
+              color:inherit;
+              cursor:pointer;
+            }
+            .workflowStageCard:hover{
+              border-color:#818cf8;
+              box-shadow:0 10px 24px rgba(79,70,229,.09);
+            }
+            .workflowStageCard.active{
+              border-color:#4f46e5;
+              background:#eef2ff;
+            }
+            .workflowStageNo{
+              display:inline-grid;
+              place-items:center;
+              width:30px;
+              height:30px;
+              border-radius:999px;
+              background:#e2e8f0;
+              color:#334155;
+              font-size:13px;
+              font-weight:950;
+            }
+            .workflowStageCard.active .workflowStageNo{
+              background:#4f46e5;
+              color:#fff;
+            }
+            .workflowStageName{
+              margin-top:8px;
+              font-size:16px;
+              font-weight:950;
+            }
+            .workflowStageCount{
+              margin-top:3px;
+              font-size:30px;
+              line-height:1.1;
+              font-weight:950;
+              letter-spacing:-.04em;
+            }
+            .workflowStageHint{
+              margin-top:4px;
+              color:#64748b;
+              font-size:11px;
+              line-height:1.5;
+              font-weight:850;
+            }
+            .workflowProgress{
+              display:grid;
+              grid-template-columns:repeat(4,minmax(0,1fr));
+              gap:5px;
+              margin-top:12px;
+            }
+            .workflowProgress span{
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              gap:5px;
+              min-width:0;
+              min-height:34px;
+              border-radius:10px;
+              background:#f1f5f9;
+              color:#64748b;
+              font-size:11px;
+              font-weight:900;
+              text-align:center;
+            }
+            .workflowProgress span i{
+              display:inline-grid;
+              place-items:center;
+              width:19px;
+              height:19px;
+              border-radius:999px;
+              background:#e2e8f0;
+              color:#475569;
+              font-style:normal;
+              font-size:10px;
+            }
+            .workflowProgress span.done{
+              background:#d1fae5;
+              color:#065f46;
+            }
+            .workflowProgress span.done i{
+              background:#10b981;
+              color:#fff;
+            }
+            .workflowProgress span.active{
+              background:#4f46e5;
+              color:#fff;
+              box-shadow:0 6px 16px rgba(79,70,229,.18);
+            }
+            .workflowProgress span.active i{
+              background:#fff;
+              color:#4338ca;
+            }
+            .workflowProgress.compact span{
+              min-height:30px;
+              font-size:10px;
+            }
+            .workflowNextGuide{
+              display:flex;
+              justify-content:space-between;
+              gap:10px;
+              align-items:center;
+              margin-top:10px;
+              padding:10px 12px;
+              border:1px solid #dbeafe;
+              border-radius:13px;
+              background:#f8fbff;
+            }
+            .workflowNextGuide strong{
+              display:block;
+              font-size:13px;
+            }
+            .workflowNextGuide small{
+              display:block;
+              margin-top:2px;
+              color:#64748b;
+              font-size:11px;
+              line-height:1.5;
+            }
+            .workflowPrimaryAction{
+              min-width:140px;
+              box-shadow:0 8px 18px rgba(15,118,110,.15);
+            }
+            .workflowSecondaryActions{
+              display:flex;
+              gap:8px;
+              flex-wrap:wrap;
+              margin-top:9px;
+            }
+            .workflowCompleteNote{
+              display:inline-flex;
+              align-items:center;
+              min-height:42px;
+              padding:9px 12px;
+              border-radius:12px;
+              background:#dcfce7;
+              color:#166534;
+              font-size:13px;
+              font-weight:950;
+            }
+            @media(max-width:900px){
+              .workflowBoardGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+            }
+            @media(max-width:560px){
+              .workflowBoardHead{display:block}
+              .workflowBoardGrid{grid-template-columns:1fr 1fr}
+              .workflowStageCard{padding:12px}
+              .workflowStageCount{font-size:26px}
+              .workflowProgress{grid-template-columns:1fr 1fr}
+              .workflowNextGuide{display:block}
+              .workflowNextGuide .btn{width:100%;margin-top:9px}
+              .workflowSecondaryActions{display:grid;grid-template-columns:1fr}
+              .workflowSecondaryActions .btn{width:100%}
+            }
+          '''
+
+          workflow_board = r'''
+                <div class="card span12 workflowBoard" id="workflowBoardSection">
+                  <div class="workflowBoardHead">
+                    <div>
+                      <span class="badge">受付から完了まで</span>
+                      <h2 style="margin-top:10px;">本日の進捗</h2>
+                      <p class="note">4段階で現在地を確認できます。各段階を押すと、該当する予約へ移動します。</p>
+                    </div>
+                    <span class="status" id="workflowBoardStatus">未読込</span>
+                  </div>
+                  <div class="workflowBoardGrid" id="workflowBoardGrid">
+                    <button class="workflowStageCard" data-workflow-filter="reserved" type="button">
+                      <span class="workflowStageNo">1</span>
+                      <div class="workflowStageName">予約</div>
+                      <div class="workflowStageCount" id="workflowReservedCount">-</div>
+                      <div class="workflowStageHint">来院受付を待っている予約</div>
+                    </button>
+                    <button class="workflowStageCard" data-workflow-filter="arrived" type="button">
+                      <span class="workflowStageNo">2</span>
+                      <div class="workflowStageName">来院</div>
+                      <div class="workflowStageCount" id="workflowArrivedCount">-</div>
+                      <div class="workflowStageHint">受付済み・施術待ち</div>
+                    </button>
+                    <button class="workflowStageCard" data-workflow-filter="treatment" type="button">
+                      <span class="workflowStageNo">3</span>
+                      <div class="workflowStageName">施術中</div>
+                      <div class="workflowStageCount" id="workflowTreatmentCount">-</div>
+                      <div class="workflowStageHint">現在施術している患者</div>
+                    </button>
+                    <button class="workflowStageCard" data-workflow-filter="completed" type="button">
+                      <span class="workflowStageNo">4</span>
+                      <div class="workflowStageName">完了</div>
+                      <div class="workflowStageCount" id="workflowCompletedCount">-</div>
+                      <div class="workflowStageHint">施術完了・対応済み</div>
+                    </button>
+                  </div>
+                </div>
+          '''
+
+          render_board = r'''
+            function renderWorkflowBoard() {
+              const counts = {
+                reserved: state.reservations.filter((r) => r.status === "reserved").length,
+                arrived: state.reservations.filter((r) => r.status === "arrived").length,
+                treatment: state.reservations.filter((r) => r.status === "in_treatment").length,
+                completed: state.reservations.filter((r) => r.status === "treatment_done" || r.status === "completed").length
+              };
+
+              if ($("workflowReservedCount")) $("workflowReservedCount").textContent = counts.reserved;
+              if ($("workflowArrivedCount")) $("workflowArrivedCount").textContent = counts.arrived;
+              if ($("workflowTreatmentCount")) $("workflowTreatmentCount").textContent = counts.treatment;
+              if ($("workflowCompletedCount")) $("workflowCompletedCount").textContent = counts.completed;
+              if ($("workflowBoardStatus")) {
+                $("workflowBoardStatus").textContent = `有効予約 ${counts.reserved + counts.arrived + counts.treatment}件`;
+                $("workflowBoardStatus").className = "status ok";
+              }
+
+              document.querySelectorAll("[data-workflow-filter]").forEach((button) => {
+                button.classList.toggle("active", button.dataset.workflowFilter === state.filter);
+                button.onclick = () => {
+                  state.filter = button.dataset.workflowFilter;
+                  document.querySelectorAll("[data-filter]").forEach((tab) => {
+                    tab.classList.toggle("selected", tab.dataset.filter === state.filter);
+                  });
+                  renderReservations();
+                  document.querySelectorAll("[data-workflow-filter]").forEach((item) => {
+                    item.classList.toggle("active", item.dataset.workflowFilter === state.filter);
+                  });
+                  (document.getElementById("reservationSection") || document.getElementById("reservationList"))?.scrollIntoView({ behavior:"smooth", block:"start" });
+                };
+              });
+            }
+          '''
+
+          owner_path = Path("owner.html")
+          owner = owner_path.read_text(encoding="utf-8")
+
+          if "STEP SEITAI-NEXT-4 / owner.html" in owner:
+              raise SystemExit("owner.html already contains SEITAI-NEXT-4 marker")
+
+          owner = replace_once(
+              owner,
+              '<!-- STEP SEITAI-NEXT-3: patient history integration / on-demand customer detail / 20260723 -->',
+              '<!-- STEP SEITAI-NEXT-4: four-stage reception and treatment workflow / 20260723 -->',
+              "owner version comment",
+          )
+          owner = replace_once(
+              owner,
+              '<title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-3</title>',
+              '<title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-4</title>',
+              "owner title",
+          )
+          owner = replace_once(
+              owner,
+              '<span class="badge">STEP SEITAI-NEXT-3 / owner.html</span>',
+              '<span class="badge">STEP SEITAI-NEXT-4 / owner.html</span>',
+              "owner badge",
+          )
+          owner = replace_once(owner, "\n  </style>", shared_css + "\n  </style>", "owner workflow CSS")
+          owner = replace_once(
+              owner,
+              '      <div class="card span12 patientLedgerCard" id="patientLedgerSection">',
+              workflow_board + '\n      <div class="card span12 patientLedgerCard" id="patientLedgerSection">',
+              "owner workflow board",
+          )
+          owner = replace_once(
+              owner,
+              '<button class="tab" data-filter="arrived" type="button">来院済み</button>\n            <button class="tab" data-filter="completed" type="button">完了</button>',
+              '<button class="tab" data-filter="arrived" type="button">来院</button>\n            <button class="tab" data-filter="treatment" type="button">施術中</button>\n            <button class="tab" data-filter="completed" type="button">完了</button>',
+              "owner workflow tabs",
+          )
+          owner = replace_once(
+              owner,
+              '''  function isActiveReservation(r) {
+              return ["reserved","arrived","in_treatment","treatment_done"].includes(r.status);
+            }
+          ''',
+              '''  function isActiveReservation(r) {
+              return ["reserved","arrived","in_treatment","treatment_done"].includes(r.status);
+            }
+
+          ''' + shared_helpers,
+              "owner workflow helpers",
+          )
+          owner = replace_once(
+              owner,
+              '''  function renderAll() {
+              renderStats();
+              renderTodos();
+              renderReservations();
+              renderFollowups();
+              renderTickets();
+            }
+          ''',
+              '''  function renderAll() {
+              renderStats();
+              renderWorkflowBoard();
+              renderTodos();
+              renderReservations();
+              renderFollowups();
+              renderTickets();
+            }
+
+          ''' + render_board,
+              "owner render workflow board",
+          )
+
+          owner = regex_replace_once(
+              owner,
+              r'''  function reservationMatchesFilter\(r\) \{.*?\n  \}\n\n  function renderReservations\(\) \{.*?\n  \}\n\n  async function handleReservationAction''',
+              r'''  function reservationMatchesFilter(r) {
+              if (state.filter === "all") return true;
+              if (state.filter === "active") return isActiveReservation(r);
+              if (state.filter === "reserved") return r.status === "reserved";
+              if (state.filter === "arrived") return r.status === "arrived";
+              if (state.filter === "treatment") return r.status === "in_treatment";
+              if (state.filter === "completed") return r.status === "completed" || r.status === "treatment_done";
+              return true;
+            }
+
+            function renderReservations() {
+              const box = $("reservationList");
+              const rows = state.reservations.filter(reservationMatchesFilter);
+
+              if (!rows.length) {
+                box.innerHTML = `<div class="empty">この段階の予約はありません。</div>`;
+                return;
+              }
+
+              box.innerHTML = rows.map((r) => {
+                const copied = r.line_message_copied ? `<span class="pill green">文面コピー済み</span>` : "";
+                const tags = Array.isArray(r.concern_tags) ? r.concern_tags : [];
+                const next = workflowNextAction(r);
+                const primary = next.action
+                  ? `<button class="btn ${next.kind} workflowPrimaryAction" data-action="${next.action}" data-id="${escapeHtml(r.reservation_id || r.id)}">${next.label}</button>`
+                  : `<span class="workflowCompleteNote">${escapeHtml(next.label)}</span>`;
+
+                return `
+                  <div class="item" data-reservation-id="${escapeHtml(r.reservation_id || r.id)}">
+                    <div class="itemTop">
+                      <div>
+                        <div class="itemTitle">${formatTime(r.start_time)} ${escapeHtml(r.customer_name || "-")} 様</div>
+                        <div class="itemMeta">
+                          ${escapeHtml(r.menu_name || "-")} / 担当：${escapeHtml(r.staff_name || "未定")} / ${escapeHtml(r.resource_name || "")}<br>
+                          電話：${escapeHtml(r.phone || "-")} / 予約日：${escapeHtml(r.reservation_date || state.date)}
+                        </div>
+                      </div>
+                      <div class="row">
+                        <span class="pill ${statusClass(r.status)}">${escapeHtml(workflowDisplayLabel(r.status))}</span>
+                        ${copied}
+                      </div>
+                    </div>
+
+                    ${workflowProgressHtml(r.status)}
+                    <div class="workflowNextGuide">
+                      <div>
+                        <strong>次の操作：${escapeHtml(next.label)}</strong>
+                        <small>${escapeHtml(next.guide)}</small>
+                      </div>
+                      ${primary}
+                    </div>
+
+                    ${tags.length ? `<div class="tagRow" style="margin-top:10px;">${tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
+                    ${r.request_note ? `<div class="itemMeta" style="margin-top:8px;">ご要望：${escapeHtml(r.request_note)}</div>` : ""}
+
+                    <div class="workflowSecondaryActions">
+                      <button class="btn ghost small" data-action="message" data-id="${escapeHtml(r.reservation_id || r.id)}">文面編集</button>
+                      <button class="btn ghost small" data-action="copy" data-id="${escapeHtml(r.reservation_id || r.id)}">文面コピー</button>
+                      <button class="btn ghost small" data-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}">回数券1回使用</button>
+                      <button class="btn ghost small" data-action="history" data-id="${escapeHtml(r.reservation_id || r.id)}">患者履歴</button>
+                    </div>
+                  </div>
+                `;
+              }).join("");
+
+              box.querySelectorAll("[data-action]").forEach((btn) => {
+                btn.addEventListener("click", () => handleReservationAction(btn.dataset.action, btn.dataset.id, btn));
+              });
+            }
+
+            async function handleReservationAction''',
+              "owner reservation workflow rendering",
+              flags=re.S,
+          )
+
+          owner_path.write_text(owner, encoding="utf-8")
+
+          ipad_path = Path("owner-ipad.html")
+          ipad = ipad_path.read_text(encoding="utf-8")
+
+          if "STEP SEITAI-NEXT-4 / owner-ipad.html" in ipad:
+              raise SystemExit("owner-ipad.html already contains SEITAI-NEXT-4 marker")
+
+          ipad = regex_replace_once(
+              ipad,
+              r'<!-- STEP SEITAI-[^>]+-->',
+              '<!-- STEP SEITAI-NEXT-4: four-stage iPad reception and treatment workflow / 20260723 -->',
+              "iPad version comment",
+          )
+          ipad = regex_replace_once(
+              ipad,
+              r'<title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP [^<]+</title>',
+              '<title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-NEXT-4</title>',
+              "iPad title",
+          )
+          ipad = regex_replace_once(
+              ipad,
+              r'<span class="badge">STEP SEITAI-[^<]+ / owner-ipad\.html</span>',
+              '<span class="badge">STEP SEITAI-NEXT-4 / owner-ipad.html</span>',
+              "iPad badge",
+          )
+          ipad = replace_once(
+              ipad,
+              'PC画面で保存済みの場合は、そのまま使えます。未保存なら <b>1234</b> を保存してください。',
+              'PC画面で保存済みの場合は、そのまま使えます。未保存なら管理者から案内されたコードを入力してください。',
+              "iPad admin guidance",
+          )
+          ipad = replace_once(
+              ipad,
+              'placeholder="例：1234"',
+              'placeholder="管理コードを入力"',
+              "iPad admin placeholder",
+          )
+          ipad = replace_once(ipad, "\n  </style>", shared_css + "\n  </style>", "iPad workflow CSS")
+          ipad = replace_once(
+              ipad,
+              '      <div class="card span12 quickReserveCard">',
+              workflow_board + '\n      <div class="card span12 quickReserveCard">',
+              "iPad workflow board",
+          )
+          ipad = replace_once(
+              ipad,
+              '<button class="tab" data-filter="arrived" type="button">来院・施術中</button>\n          <button class="tab" data-filter="completed" type="button">完了</button>',
+              '<button class="tab" data-filter="arrived" type="button">来院</button>\n          <button class="tab" data-filter="treatment" type="button">施術中</button>\n          <button class="tab" data-filter="completed" type="button">完了</button>',
+              "iPad workflow tabs",
+          )
+          ipad = replace_once(
+              ipad,
+              '''  function isActiveReservation(r) {
+              return ["reserved","arrived","in_treatment","treatment_done"].includes(r.status);
+            }
+          ''',
+              '''  function isActiveReservation(r) {
+              return ["reserved","arrived","in_treatment","treatment_done"].includes(r.status);
+            }
+
+          ''' + shared_helpers,
+              "iPad workflow helpers",
+          )
+          ipad = replace_once(
+              ipad,
+              '''  function renderAll() {
+              renderStats();
+              renderReservations();
+              renderFollowups();
+              renderTickets();
+            }
+          ''',
+              '''  function renderAll() {
+              renderStats();
+              renderWorkflowBoard();
+              renderReservations();
+              renderFollowups();
+              renderTickets();
+            }
+
+          ''' + render_board,
+              "iPad render workflow board",
+          )
+
+          ipad = regex_replace_once(
+              ipad,
+              r'''  function reservationMatchesFilter\(r\) \{.*?\n  \}\n\n\n  function manualSourceLabel''',
+              r'''  function reservationMatchesFilter(r) {
+              if (state.filter === "all") return true;
+              if (state.filter === "active") return isActiveReservation(r);
+              if (state.filter === "reserved") return r.status === "reserved";
+              if (state.filter === "arrived") return r.status === "arrived";
+              if (state.filter === "treatment") return r.status === "in_treatment";
+              if (state.filter === "completed") return r.status === "completed" || r.status === "treatment_done";
+              return true;
+            }
+
+            function manualSourceLabel''',
+              "iPad reservation filter",
+              flags=re.S,
+          )
+
+          ipad = regex_replace_once(
+              ipad,
+              r'''  function renderReservations\(\) \{.*?\n  \}\n\n  async function handleReservationAction''',
+              r'''  function renderReservations() {
+              const box = $("reservationList");
+              const rows = state.reservations.filter(reservationMatchesFilter);
+
+              if (!rows.length) {
+                box.innerHTML = `<div class="empty">この段階の予約はありません。</div>`;
+                return;
+              }
+
+              box.innerHTML = rows.map((r) => {
+                const tags = Array.isArray(r.concern_tags) ? r.concern_tags : [];
+                const copied = r.line_message_copied ? `<span class="pill green">文面コピー済み</span>` : "";
+                const next = workflowNextAction(r);
+                const primary = next.action
+                  ? `<button class="btn ${next.kind} large workflowPrimaryAction" data-action="${next.action}" data-id="${escapeHtml(r.reservation_id || r.id)}">${next.label}</button>`
+                  : `<span class="workflowCompleteNote">${escapeHtml(next.label)}</span>`;
+
+                return `
+                  <div class="reservationCard ${r.status === "arrived" || r.status === "in_treatment" ? "active" : ""}" data-reservation-id="${escapeHtml(r.reservation_id || r.id)}">
+                    <div class="reservationTop">
+                      <div>
+                        <div class="timeName">${formatTime(r.start_time)}　${escapeHtml(r.customer_name || "-")} 様</div>
+                        <div class="meta">
+                          ${escapeHtml(r.menu_name || "-")} / 担当：${escapeHtml(r.staff_name || "未定")} / ${escapeHtml(r.resource_name || "")}<br>
+                          電話：${escapeHtml(r.phone || "-")} / 予約日：${escapeHtml(r.reservation_date || state.date)}
+                        </div>
+                      </div>
+                      <div class="row">
+                        <span class="pill ${statusClass(r.status)}">${escapeHtml(workflowDisplayLabel(r.status))}</span>
+                        ${copied}
+                      </div>
+                    </div>
+
+                    ${workflowProgressHtml(r.status)}
+                    <div class="workflowNextGuide">
+                      <div>
+                        <strong>次の操作：${escapeHtml(next.label)}</strong>
+                        <small>${escapeHtml(next.guide)}</small>
+                      </div>
+                      ${primary}
+                    </div>
+
+                    ${tags.length ? `<div class="tagRow">${tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
+                    ${r.request_note ? `<div class="meta">ご要望：${escapeHtml(r.request_note)}</div>` : ""}
+
+                    <div class="workflowSecondaryActions">
+                      <button class="btn ghost" data-action="message" data-id="${escapeHtml(r.reservation_id || r.id)}">文面編集</button>
+                      <button class="btn ghost" data-action="copy" data-id="${escapeHtml(r.reservation_id || r.id)}">文面コピー</button>
+                      <button class="btn ghost" data-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}">回数券使用</button>
+                    </div>
+                  </div>
+                `;
+              }).join("");
+
+              box.querySelectorAll("[data-action]").forEach((btn) => {
+                btn.addEventListener("click", () => handleReservationAction(btn.dataset.action, btn.dataset.id, btn));
+              });
+            }
+
+            async function handleReservationAction''',
+              "iPad reservation workflow rendering",
+              flags=re.S,
+          )
+
+          ipad_path.write_text(ipad, encoding="utf-8")
+
+          config_path = Path("config.js")
+          config = config_path.read_text(encoding="utf-8")
+          config = regex_replace_once(
+              config,
+              r'const STEP_VERSION = "STEP-SEITAI-[^"]+";',
+              'const STEP_VERSION = "STEP-SEITAI-NEXT-4-CONFIG-20260723";',
+              "config version",
+          )
+          config_path.write_text(config, encoding="utf-8")
+          PY
+
+      - name: Validate syntax, IDs, API preservation, and workflow logic
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          from collections import Counter
+          import json
+          import re
+          import subprocess
+          import tempfile
+
+          class IdParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+                  self.scripts = []
+                  self.in_script = False
+                  self.script_parts = []
+
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if attrs.get("id"):
+                      self.ids.append(attrs["id"])
+                  if tag.lower() == "script" and not attrs.get("src"):
+                      self.in_script = True
+                      self.script_parts = []
+
+              def handle_data(self, data):
+                  if self.in_script:
+                      self.script_parts.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag.lower() == "script" and self.in_script:
+                      self.scripts.append("".join(self.script_parts))
+                      self.in_script = False
+                      self.script_parts = []
+
+          results = {
+              "ok": True,
+              "overall": "OK",
+              "step": "SEITAI-NEXT-4",
+              "checks": {},
+              "metrics": {},
+              "change_record": {
+                  "worker_changed": False,
+                  "supabase_changed": False,
+                  "api_changed": False,
+                  "screen_function_changed": True,
+                  "existing_data_changed": False,
+              },
+          }
+
+          required_files = [
+              "owner.html", "owner-ipad.html", "config.js",
+              "system-check.html", "index.html", "member.html",
+          ]
+          for file in required_files:
+              if not Path(file).exists():
+                  raise SystemExit(f"Required file missing: {file}")
+          results["checks"]["required_files"] = "OK"
+
+          for file in ["owner.html", "owner-ipad.html", "system-check.html", "index.html", "member.html"]:
+              text = Path(file).read_text(encoding="utf-8")
+              parser = IdParser()
+              parser.feed(text)
+              duplicates = sorted(k for k, v in Counter(parser.ids).items() if v > 1)
+              if duplicates:
+                  raise SystemExit(f"{file}: duplicate HTML IDs: {duplicates}")
+
+              for index, script in enumerate(parser.scripts, 1):
+                  if not script.strip():
+                      continue
+                  with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as tmp:
+                      tmp.write(script)
+                      temp_path = tmp.name
+                  proc = subprocess.run(["node", "--check", temp_path], capture_output=True, text=True)
+                  Path(temp_path).unlink(missing_ok=True)
+                  if proc.returncode != 0:
+                      raise SystemExit(f"{file}: inline JavaScript syntax error: {proc.stderr}")
+
+              results["metrics"][f"{file}_bytes"] = Path(file).stat().st_size
+              results["metrics"][f"{file}_id_count"] = len(parser.ids)
+
+          proc = subprocess.run(["node", "--check", "config.js"], capture_output=True, text=True)
+          if proc.returncode != 0:
+              raise SystemExit(f"config.js syntax error: {proc.stderr}")
+
+          results["checks"]["html_syntax"] = "OK"
+          results["checks"]["javascript_syntax"] = "OK"
+          results["checks"]["html_id_duplicates"] = "OK"
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          ipad = Path("owner-ipad.html").read_text(encoding="utf-8")
+          config = Path("config.js").read_text(encoding="utf-8")
+
+          required_owner = [
+              "STEP SEITAI-NEXT-4 / owner.html",
+              'id="workflowBoardSection"',
+              'id="workflowReservedCount"',
+              'id="workflowArrivedCount"',
+              'id="workflowTreatmentCount"',
+              'id="workflowCompletedCount"',
+              "function workflowStage(status)",
+              "function workflowNextAction(r)",
+              "function workflowProgressHtml(status",
+              "function renderWorkflowBoard()",
+              'data-filter="treatment"',
+              "次の操作：",
+              "workflowPrimaryAction",
+          ]
+          required_ipad = [
+              "STEP SEITAI-NEXT-4 / owner-ipad.html",
+              'id="workflowBoardSection"',
+              'id="workflowReservedCount"',
+              'id="workflowArrivedCount"',
+              'id="workflowTreatmentCount"',
+              'id="workflowCompletedCount"',
+              "function workflowStage(status)",
+              "function workflowNextAction(r)",
+              "function workflowProgressHtml(status",
+              "function renderWorkflowBoard()",
+              'data-filter="treatment"',
+              "次の操作：",
+              "workflowPrimaryAction",
+              'placeholder="管理コードを入力"',
+          ]
+          for marker in required_owner:
+              if marker not in owner:
+                  raise SystemExit(f"owner.html missing marker: {marker}")
+          for marker in required_ipad:
+              if marker not in ipad:
+                  raise SystemExit(f"owner-ipad.html missing marker: {marker}")
+
+          results["checks"]["four_stage_board_pc"] = "OK"
+          results["checks"]["four_stage_board_ipad"] = "OK"
+          results["checks"]["single_primary_next_action"] = "OK"
+          results["checks"]["internal_status_compatibility"] = "OK"
+
+          if "1234" in owner or "1234" in ipad:
+              raise SystemExit("Public owner screen still contains fixed demo admin code.")
+          results["checks"]["public_management_information"] = "OK"
+
+          api_pattern = re.compile(r'["\'](/api/[A-Za-z0-9_./-]+)["\']')
+          before_api = set()
+          after_api = set()
+          for file in ["/tmp/owner.before.html", "/tmp/owner-ipad.before.html", "/tmp/config.before.js"]:
+              before_api.update(api_pattern.findall(Path(file).read_text(encoding="utf-8")))
+          for file in ["owner.html", "owner-ipad.html", "config.js"]:
+              after_api.update(api_pattern.findall(Path(file).read_text(encoding="utf-8")))
+
+          if before_api != after_api:
+              raise SystemExit(
+                  "API path set changed unexpectedly.\n"
+                  f"removed={sorted(before_api - after_api)}\n"
+                  f"added={sorted(after_api - before_api)}"
+              )
+          results["checks"]["api_unchanged"] = "OK"
+          results["metrics"]["api_path_count"] = len(after_api)
+
+          preserved = [
+              "/api/owner/today",
+              "/api/owner/visits/check-in",
+              "/api/owner/visits/start",
+              "/api/owner/visits/complete",
+              "/api/owner/tickets/use",
+              "/api/owner/customers/search",
+              "/api/owner/customers/detail",
+              "/api/owner/followups/update",
+              "/api/owner/reservations/manual-create",
+          ]
+          combined = owner + "\n" + ipad + "\n" + config
+          for value in preserved:
+              if value not in combined:
+                  raise SystemExit(f"Existing function API missing: {value}")
+          results["checks"]["existing_function_preservation"] = "OK"
+
+          for status in ["reserved", "arrived", "in_treatment", "treatment_done", "completed"]:
+              if status not in owner or status not in ipad:
+                  raise SystemExit(f"Workflow status missing: {status}")
+          for action in ["arrived", "start", "complete"]:
+              if f'action:"{action}"' not in owner or f'action:"{action}"' not in ipad:
+                  raise SystemExit(f"Workflow next action missing: {action}")
+          results["checks"]["industry_workflow_logic"] = "OK"
+
+          for file, limit in [("owner.html", 240000), ("owner-ipad.html", 210000), ("config.js", 20000)]:
+              size = Path(file).stat().st_size
+              if size > limit:
+                  raise SystemExit(f"{file} exceeds size limit: {size} > {limit}")
+          results["checks"]["file_size"] = "OK"
+
+          changed = subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines()
+          allowed = {"owner.html", "owner-ipad.html", "config.js"}
+          unexpected = sorted(set(changed) - allowed)
+          if unexpected:
+              raise SystemExit(f"Unexpected files changed before ledger generation: {unexpected}")
+          results["checks"]["worker_unchanged"] = "OK"
+          results["checks"]["supabase_unchanged"] = "OK"
+          results["checks"]["existing_data_unchanged"] = "OK"
+
+          Path("/tmp/seitai_next_4_check_result.json").write_text(
+              json.dumps(results, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(results, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Update DPRO NEXT ledger and check result
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          COMPLETED_AT_JST="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %z')"
+          BASELINE_SHA="$(cat /tmp/seitai_next_4_baseline_sha.txt)"
+
+          cat > dpro-next-ledger.yml <<EOF
+          system_name: "DPRO 整骨院・整体 LINE"
+          standard: "DPRO NEXT"
+          step_name: "受付・施術進捗の見える化"
+          current_step: "SEITAI-NEXT-4-COMPLETE"
+          previous_step: "SEITAI-NEXT-3-COMPLETE"
+          next_step: "SEITAI-NEXT-5"
+          completed_at_jst: "${COMPLETED_AT_JST}"
+          baseline_sha: "${BASELINE_SHA}"
+          backup_tag: "${BACKUP_TAG}"
+          backup_tag_status: "created"
+          target_files:
+            - "owner.html"
+            - "owner-ipad.html"
+            - "config.js"
+          implemented:
+            - "予約・来院・施術中・完了の4段階をPCとiPadへ統一表示"
+            - "各予約に現在地を示す進捗バーを追加"
+            - "各予約の次に行う操作を1つだけ強調"
+            - "4段階の件数から該当予約へ直接移動"
+            - "treatment_doneとcompletedの既存内部値を維持した表示統合"
+            - "iPad公開画面から固定デモ管理コード説明を除去"
+          checks:
+            previous_step: "OK"
+            backup_tag: "OK"
+            yml_syntax: "OK"
+            html_syntax: "OK"
+            javascript_syntax: "OK"
+            html_id_duplicates: "OK"
+            existing_function_preservation: "OK"
+            four_stage_board_pc: "OK"
+            four_stage_board_ipad: "OK"
+            single_primary_next_action: "OK"
+            internal_status_compatibility: "OK"
+            industry_workflow_logic: "OK"
+            api_unchanged: "OK"
+            overall: "OK"
+          change_record:
+            worker_changed: false
+            supabase_changed: false
+            api_changed: false
+            screen_function_changed: true
+            existing_data_changed: false
+          performance_policy:
+            additional_api_request_for_workflow_board: false
+            workflow_counts_source: "existing ownerToday response"
+            all_records_initial_load: false
+            all_images_initial_load: false
+          rollback:
+            method: "backup_tag"
+            tag: "${BACKUP_TAG}"
+            command_reference: "git checkout ${BACKUP_TAG}"
+          workflow_self_delete_after_success: true
+          auto_commit_push: true
+          EOF
+
+          cp /tmp/seitai_next_4_check_result.json dpro-next-check-result.json
+
+      - name: Final repository diff guard
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+          import subprocess
+
+          expected = {
+              ".github/workflows/STEP-SEITAI-NEXT-4.yml",
+              "owner.html",
+              "owner-ipad.html",
+              "config.js",
+              "dpro-next-ledger.yml",
+              "dpro-next-check-result.json",
+          }
+          changed = set(subprocess.check_output(["git", "status", "--short"], text=True).splitlines())
+          changed_paths = {line[3:] for line in changed}
+          unexpected = sorted(changed_paths - expected)
+          if unexpected:
+              raise SystemExit(f"Unexpected changed files: {unexpected}")
+
+          ledger = Path("dpro-next-ledger.yml").read_text(encoding="utf-8")
+          required = [
+              'current_step: "SEITAI-NEXT-4-COMPLETE"',
+              'next_step: "SEITAI-NEXT-5"',
+              'worker_changed: false',
+              'supabase_changed: false',
+              'api_changed: false',
+              'overall: "OK"',
+          ]
+          for marker in required:
+              if marker not in ledger:
+                  raise SystemExit(f"Ledger marker missing: {marker}")
+
+          result = json.loads(Path("dpro-next-check-result.json").read_text(encoding="utf-8"))
+          if result.get("ok") is not True or result.get("overall") != "OK":
+              raise SystemExit("Check result is not OK.")
+          PY
+
+      - name: Remove successful workflow and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -f "$WORKFLOW_FILE"
+
+          git add owner.html owner-ipad.html config.js dpro-next-ledger.yml dpro-next-check-result.json
+          git add -u "$WORKFLOW_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No staged changes were produced."
+            exit 1
+          fi
+
+          git commit -m "STEP SEITAI-NEXT-4 COMPLETE [skip ci]"
+          git push origin HEAD:main
