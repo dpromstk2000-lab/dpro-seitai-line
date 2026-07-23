@@ -15,7 +15,7 @@
   https://dpro-seitai-line-api.dpromstk2000.workers.dev
 
   管理コード：
-  Cloudflare Secrets の ADMIN_TOKEN は 1234 で設定済み
+  管理コードはCloudflare Secretsで店舗ごとに設定する
   ※ただし、この公開 config.js には管理コードを直書きしない
   ※owner.html / system-check.html 側で入力して localStorage 保存する想定
 ========================================================= */
@@ -23,7 +23,7 @@
 (() => {
   "use strict";
 
-  const STEP_VERSION = "STEP-SEITAI-4-CONFIG-20260708";
+  const STEP_VERSION = "STEP-SEITAI-NEXT-2-CONFIG-20260723";
 
   const CONFIG = {
     version: STEP_VERSION,
@@ -57,7 +57,7 @@
     /*
       管理コードは公開ファイルに直書きしない。
       owner.html / system-check.html 側で入力欄から保存して使う。
-      現在の Cloudflare Secrets 側 ADMIN_TOKEN は 1234。
+      管理コードの値は公開ファイルへ記載しない。
     */
     adminCodeStorageKey: "DPRO_SEITAI_ADMIN_CODE",
     adminCodeHeaderName: "X-DPRO-Admin-Code",

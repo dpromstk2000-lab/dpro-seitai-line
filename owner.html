@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-10G-R5: customer id field fallback fix / 20260709 -->
+<!-- STEP SEITAI-NEXT-2: DPRO NEXT owner dashboard / today-first workflow / left settings navigation / 20260723 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-10G-R5</title>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-2</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -699,6 +699,301 @@
       .field3,.field4,.field6,.field8{grid-column:span 12}
       .kv div:nth-child(odd){margin-top:4px}
     }
+  
+    /* DPRO NEXT-2: today-first owner dashboard */
+    .nextTodayBoard{
+      border:1px solid rgba(20,160,133,.34);
+      background:
+        radial-gradient(circle at top right,rgba(20,160,133,.13),transparent 320px),
+        linear-gradient(180deg,#ffffff 0%,#f8fffc 100%);
+      box-shadow:0 18px 48px rgba(15,118,110,.10);
+      scroll-margin-top:16px;
+    }
+    .nextBoardHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+    }
+    .nextEyebrow{
+      display:inline-flex;
+      align-items:center;
+      min-height:30px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--soft);
+      color:var(--brand2);
+      font-size:12px;
+      font-weight:950;
+      letter-spacing:.04em;
+    }
+    .nextBoardHead h2{
+      margin-top:10px;
+      font-size:clamp(24px,3vw,34px);
+    }
+    .nextTodayDate{
+      margin-top:10px;
+      font-size:14px;
+      font-weight:950;
+      color:#0f766e;
+    }
+    .nextBoardActions{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      flex-wrap:wrap;
+      max-width:520px;
+    }
+    .nextTodoSummary{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-top:18px;
+    }
+    .nextSummaryItem{
+      display:grid;
+      gap:3px;
+      min-width:0;
+      padding:14px;
+      border:1px solid #dbeae6;
+      border-radius:18px;
+      background:rgba(255,255,255,.92);
+      color:inherit;
+      text-decoration:none;
+      transition:.15s transform,.15s border-color,.15s box-shadow;
+    }
+    .nextSummaryItem:hover{
+      transform:translateY(-1px);
+      border-color:rgba(20,160,133,.52);
+      box-shadow:0 10px 24px rgba(15,118,110,.08);
+    }
+    .nextSummaryItem span{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+    }
+    .nextSummaryItem b{
+      font-size:30px;
+      line-height:1.1;
+      letter-spacing:-.04em;
+    }
+    .nextSummaryItem small{
+      color:#64748b;
+      font-size:11px;
+      font-weight:800;
+    }
+    .nextTodoLegend{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      margin:16px 0 10px;
+      color:#475569;
+      font-size:12px;
+      font-weight:900;
+    }
+    .nextTodoLegend span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .nextLegendDot{
+      width:9px;
+      height:9px;
+      border-radius:50%;
+      background:#94a3b8;
+    }
+    .nextLegendDot.urgent{background:#dc2626}
+    .nextLegendDot.waiting{background:#f59e0b}
+    .nextLegendDot.followup{background:#4f46e5}
+    .nextLegendDot.ticket{background:#0f766e}
+    .nextTodoList{
+      display:grid;
+      gap:10px;
+    }
+    .nextTodoCard{
+      border:1px solid #e2e8f0;
+      border-left:6px solid #94a3b8;
+      border-radius:18px;
+      background:#fff;
+      padding:14px;
+    }
+    .nextTodoCard.urgent{
+      border-color:#fecaca;
+      border-left-color:#dc2626;
+      background:#fffafa;
+    }
+    .nextTodoCard.waiting{
+      border-color:#fde68a;
+      border-left-color:#f59e0b;
+      background:#fffdf7;
+    }
+    .nextTodoCard.current{
+      border-color:#99f6e4;
+      border-left-color:#0f766e;
+      background:#f4fffc;
+    }
+    .nextTodoCard.followup{
+      border-color:#c7d2fe;
+      border-left-color:#4f46e5;
+      background:#fafaff;
+    }
+    .nextTodoCard.ticket{
+      border-color:#a7f3d0;
+      border-left-color:#0f766e;
+      background:#f7fffb;
+    }
+    .nextTodoTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+    }
+    .nextTodoTime{
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:-.03em;
+      line-height:1.2;
+    }
+    .nextTodoName{
+      margin-top:3px;
+      font-size:17px;
+      font-weight:950;
+      line-height:1.4;
+    }
+    .nextTodoMeta{
+      margin-top:5px;
+      color:#64748b;
+      font-size:13px;
+      line-height:1.65;
+    }
+    .nextTodoBadge{
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      min-height:30px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#e2e8f0;
+      color:#334155;
+      font-size:12px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+    .nextTodoBadge.urgent{background:#fee2e2;color:#991b1b}
+    .nextTodoBadge.waiting{background:#fef3c7;color:#92400e}
+    .nextTodoBadge.current{background:#ccfbf1;color:#115e59}
+    .nextTodoBadge.followup{background:#e0e7ff;color:#3730a3}
+    .nextTodoBadge.ticket{background:#d1fae5;color:#065f46}
+    .nextProgress{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:5px;
+      margin-top:12px;
+    }
+    .nextProgress span{
+      display:grid;
+      place-items:center;
+      min-height:28px;
+      border-radius:9px;
+      background:#f1f5f9;
+      color:#64748b;
+      font-size:10px;
+      font-weight:900;
+      text-align:center;
+    }
+    .nextProgress span.done{
+      background:#d1fae5;
+      color:#065f46;
+    }
+    .nextProgress span.active{
+      background:var(--brand);
+      color:#fff;
+      box-shadow:0 6px 16px rgba(20,160,133,.20);
+    }
+    .nextTodoActions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .nextTodoActions .btn.primary,
+    .nextTodoActions .btn.warn,
+    .nextTodoActions .btn.dark{
+      min-width:128px;
+    }
+    #quickReservationSection,
+    #reservationSection,
+    #followupSection,
+    #ticketSection{
+      scroll-margin-top:18px;
+    }
+
+    /* DPRO NEXT-2: PC settings use left navigation */
+    .settingsModal > .settingsPanel{
+      display:grid;
+      grid-template-columns:220px minmax(0,1fr);
+      gap:20px;
+      align-items:start;
+    }
+    .settingsModal > .settingsPanel .settingsNav{
+      grid-column:1;
+      grid-row:1;
+      display:grid;
+      gap:8px;
+      align-content:start;
+      position:sticky;
+      top:104px;
+      margin:0;
+      padding:10px;
+      border-radius:18px;
+    }
+    .settingsModal > .settingsPanel .settingsTab{
+      width:100%;
+      min-height:44px;
+      border-radius:12px;
+      padding:10px 12px;
+      text-align:left;
+    }
+    .settingsModal > .settingsPanel .settingsSection{
+      grid-column:2;
+      grid-row:1;
+      min-width:0;
+      margin:0;
+    }
+
+    @media(max-width:900px){
+      .nextBoardHead{display:block}
+      .nextBoardActions{justify-content:flex-start;max-width:none;margin-top:14px}
+      .nextTodoSummary{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .settingsModal > .settingsPanel{display:block}
+      .settingsModal > .settingsPanel .settingsNav{
+        position:static;
+        display:flex;
+        overflow-x:auto;
+        flex-wrap:nowrap;
+        margin:0 0 16px;
+        scrollbar-width:thin;
+      }
+      .settingsModal > .settingsPanel .settingsTab{
+        width:auto;
+        flex:0 0 auto;
+        white-space:nowrap;
+        text-align:center;
+      }
+    }
+    @media(max-width:560px){
+      .nextTodayBoard{padding:15px}
+      .nextBoardActions .btn{width:100%}
+      .nextTodoSummary{grid-template-columns:1fr 1fr}
+      .nextSummaryItem{padding:12px}
+      .nextSummaryItem b{font-size:26px}
+      .nextTodoTop{display:block}
+      .nextTodoBadge{margin-top:8px}
+      .nextProgress{grid-template-columns:1fr 1fr}
+      .nextTodoActions{display:grid;grid-template-columns:1fr}
+      .nextTodoActions .btn{width:100%;min-width:0}
+    }
+
   </style>
 </head>
 <body>
@@ -706,7 +1001,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10G-R5 / owner.html</span>
+        <span class="badge">STEP SEITAI-NEXT-2 / owner.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>オーナー管理画面</h1>
         <p class="lead">
           今日やること、本日の予約、来院ステータス、回数券、フォロー対象、LINE文面コピーをまとめて確認します。
@@ -729,13 +1024,64 @@
 <main>
   <div class="wrap">
     <section class="grid">
+    <div class="card span12 nextTodayBoard" id="todayBoard">
+      <div class="nextBoardHead">
+        <div>
+          <span class="nextEyebrow">DPRO NEXT｜本日の業務</span>
+          <h2>今日やること</h2>
+          <p class="note">
+            上から順番に対応すれば、受付・施術・フォローを迷わず進められます。
+            詳細機能は必要な時だけ開きます。
+          </p>
+          <div class="nextTodayDate" id="todayDateLabel">表示日を確認中...</div>
+        </div>
+        <div class="nextBoardActions">
+          <button class="btn primary" id="refreshTodoBtn" type="button">今日の状況を更新</button>
+          <a class="btn ghost" href="#quickReservationSection">電話・店頭予約</a>
+          <a class="btn ghost" href="#reservationSection">予約一覧</a>
+        </div>
+      </div>
+
+      <div class="nextTodoSummary" aria-label="本日の重要件数">
+        <a class="nextSummaryItem" href="#reservationSection">
+          <span>本日の予約</span>
+          <b id="todoReservationCount">-</b>
+          <small>時間順に確認</small>
+        </a>
+        <a class="nextSummaryItem" href="#reservationSection">
+          <span>受付・施術中</span>
+          <b id="todoWaitingCount">-</b>
+          <small>次の操作あり</small>
+        </a>
+        <a class="nextSummaryItem" href="#followupSection">
+          <span>フォロー</span>
+          <b id="todoFollowupCount">-</b>
+          <small>個別確認して送信</small>
+        </a>
+        <a class="nextSummaryItem" href="#ticketSection">
+          <span>回数券注意</span>
+          <b id="todoTicketCount">-</b>
+          <small>残数・期限を確認</small>
+        </a>
+      </div>
+
+      <div class="nextTodoLegend">
+        <span><i class="nextLegendDot urgent"></i>至急</span>
+        <span><i class="nextLegendDot waiting"></i>受付・施術</span>
+        <span><i class="nextLegendDot followup"></i>フォロー</span>
+        <span><i class="nextLegendDot ticket"></i>回数券</span>
+      </div>
+
+      <div id="todoList" class="nextTodoList" aria-live="polite"></div>
+    </div>
+
       <div class="card span4">
         <h2>管理コード</h2>
-        <p class="note">Cloudflare Worker の ADMIN_TOKEN に設定したコードを、このブラウザに保存します。今回は <b>1234</b> です。</p>
+        <p class="note">管理者から案内された管理コードを、このブラウザ内だけに保存します。公開画面には管理コードを表示しません。</p>
         <div class="adminBar">
           <div>
             <label for="adminCodeInput">管理コード</label>
-            <input id="adminCodeInput" type="password" placeholder="例：1234" autocomplete="off">
+            <input id="adminCodeInput" type="password" placeholder="管理コードを入力" autocomplete="off">
           </div>
           <button class="btn primary" id="saveAdminBtn" type="button">保存</button>
         </div>
@@ -788,18 +1134,9 @@
         </div>
       </div>
 
-      <div class="card span12">
-        <div class="sectionHead">
-          <div>
-            <h2>今日やること</h2>
-            <p class="note">予約、フォロー、回数券注意をまとめて表示します。</p>
-          </div>
-          <button class="btn ghost small" id="refreshTodoBtn" type="button">更新</button>
-        </div>
-        <div id="todoList" class="list"></div>
-      </div>
 
-      <div class="card span12 quickActionCard">
+
+      <div class="card span12 quickActionCard" id="quickReservationSection">
         <div class="sectionHead">
           <div>
             <h2>電話・店頭予約を追加</h2>
@@ -815,7 +1152,7 @@
         </div>
       </div>
 
-      <div class="card span8">
+      <div class="card span8" id="reservationSection">
         <div class="sectionHead">
           <div>
             <h2>予約一覧</h2>
@@ -844,7 +1181,7 @@
         </div>
       </div>
 
-      <div class="card span6">
+      <div class="card span6" id="followupSection">
         <div class="sectionHead">
           <div>
             <h2>フォロー対象</h2>
@@ -855,7 +1192,7 @@
         <div id="followupList" class="list"></div>
       </div>
 
-      <div class="card span6">
+      <div class="card span6" id="ticketSection">
         <div class="sectionHead">
           <div>
             <h2>回数券残数注意</h2>
@@ -1437,68 +1774,182 @@
   function renderStats() {
     const stats = state.data?.stats || {};
     const arrived = Number(stats.arrived || 0) + Number(stats.in_treatment || 0);
-    $("statReservation").textContent = Number(stats.reservation_count ?? state.reservations.filter(isActiveReservation).length);
+    const reservationCount = Number(stats.reservation_count ?? state.reservations.filter(isActiveReservation).length);
+    const followupCount = Number(stats.active_followup_count ?? state.followups.length);
+    const ticketCount = Number(stats.low_ticket_count ?? state.lowTickets.length);
+    const waitingCount = state.reservations.filter((r) =>
+      ["arrived","in_treatment","treatment_done"].includes(r.status)
+    ).length;
+
+    $("statReservation").textContent = reservationCount;
     $("statArrived").textContent = arrived;
-    $("statFollowup").textContent = Number(stats.active_followup_count ?? state.followups.length);
-    $("statTicket").textContent = Number(stats.low_ticket_count ?? state.lowTickets.length);
+    $("statFollowup").textContent = followupCount;
+    $("statTicket").textContent = ticketCount;
+
+    if ($("todoReservationCount")) $("todoReservationCount").textContent = reservationCount;
+    if ($("todoWaitingCount")) $("todoWaitingCount").textContent = waitingCount;
+    if ($("todoFollowupCount")) $("todoFollowupCount").textContent = followupCount;
+    if ($("todoTicketCount")) $("todoTicketCount").textContent = ticketCount;
+    if ($("todayDateLabel")) $("todayDateLabel").textContent = `表示日：${state.date || todayText()}`;
   }
 
   function renderTodos() {
     const box = $("todoList");
-    const active = state.reservations.filter(isActiveReservation);
-    const followups = state.followups || [];
-    const tickets = state.lowTickets || [];
+    const active = [...state.reservations]
+      .filter(isActiveReservation)
+      .sort((a, b) => String(a.start_time || "").localeCompare(String(b.start_time || "")));
+    const followups = [...(state.followups || [])].sort((a, b) => {
+      const priorityA = a.priority === "high" ? 0 : 1;
+      const priorityB = b.priority === "high" ? 0 : 1;
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      return String(a.due_date || "").localeCompare(String(b.due_date || ""));
+    });
+    const tickets = [...(state.lowTickets || [])]
+      .sort((a, b) => Number(a.remaining_count || 0) - Number(b.remaining_count || 0));
 
     const items = [];
+    const isToday = state.date === todayText();
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-    if (active.length) {
-      items.push(`
-        <div class="item active">
-          <div class="itemTop">
-            <div>
-              <div class="itemTitle">本日の予約 ${active.length}件</div>
-              <div class="itemMeta">${active.map((r) => `${formatTime(r.start_time)} ${r.customer_name || ""}様`).join(" / ")}</div>
-            </div>
-            <span class="pill green">予約</span>
-          </div>
-        </div>
-      `);
+    function reservationStage(status) {
+      if (status === "reserved") return 0;
+      if (status === "arrived") return 1;
+      if (status === "in_treatment") return 2;
+      if (status === "treatment_done" || status === "completed") return 3;
+      return 0;
     }
 
-    if (followups.length) {
-      items.push(`
-        <div class="item">
-          <div class="itemTop">
-            <div>
-              <div class="itemTitle">LINEフォロー ${followups.length}件</div>
-              <div class="itemMeta">${followups.slice(0,3).map((f) => `${f.customer_name || ""}様：${f.title || f.followup_type || ""}`).join(" / ")}</div>
-            </div>
-            <span class="pill orange">フォロー</span>
-          </div>
-        </div>
-      `);
+    function progressHtml(status) {
+      const current = reservationStage(status);
+      const labels = ["予約","来院","施術中","完了"];
+      return `<div class="nextProgress">${labels.map((label, index) => {
+        const cls = index < current ? "done" : (index === current ? "active" : "");
+        return `<span class="${cls}">${label}</span>`;
+      }).join("")}</div>`;
     }
 
-    if (tickets.length) {
-      items.push(`
-        <div class="item">
-          <div class="itemTop">
-            <div>
-              <div class="itemTitle">回数券残数注意 ${tickets.length}件</div>
-              <div class="itemMeta">${tickets.slice(0,3).map((t) => `${t.ticket_name || "回数券"} 残り${t.remaining_count}回`).join(" / ")}</div>
-            </div>
-            <span class="pill red">残り少</span>
-          </div>
-        </div>
-      `);
+    function nextReservationAction(r) {
+      if (r.status === "reserved") return { action:"arrived", label:"来院受付", kind:"primary" };
+      if (r.status === "arrived") return { action:"start", label:"施術開始", kind:"warn" };
+      if (r.status === "in_treatment" || r.status === "treatment_done") {
+        return { action:"complete", label:"施術完了", kind:"dark" };
+      }
+      return null;
     }
+
+    active.forEach((r) => {
+      const rawTime = formatTime(r.start_time);
+      const parts = rawTime.split(":").map(Number);
+      const reservationMinutes = (parts[0] || 0) * 60 + (parts[1] || 0);
+      const overdue = isToday && r.status === "reserved" && reservationMinutes < nowMinutes;
+      const action = nextReservationAction(r);
+      let cardClass = "";
+      let badgeClass = "";
+      let badgeText = statusLabel(r.status);
+
+      if (overdue) {
+        cardClass = "urgent";
+        badgeClass = "urgent";
+        badgeText = "受付確認";
+      } else if (r.status === "arrived") {
+        cardClass = "waiting";
+        badgeClass = "waiting";
+        badgeText = "施術待ち";
+      } else if (r.status === "in_treatment" || r.status === "treatment_done") {
+        cardClass = "current";
+        badgeClass = "current";
+        badgeText = r.status === "in_treatment" ? "施術中" : "完了確認";
+      }
+
+      items.push(`
+        <article class="nextTodoCard ${cardClass}">
+          <div class="nextTodoTop">
+            <div>
+              <div class="nextTodoTime">${escapeHtml(rawTime || "--:--")}</div>
+              <div class="nextTodoName">${escapeHtml(r.customer_name || "-")} 様</div>
+              <div class="nextTodoMeta">
+                ${escapeHtml(r.menu_name || "-")} ／ 担当：${escapeHtml(r.staff_name || "未定")}
+                ${r.request_note ? `<br>要望：${escapeHtml(r.request_note)}` : ""}
+              </div>
+            </div>
+            <span class="nextTodoBadge ${badgeClass}">${escapeHtml(badgeText)}</span>
+          </div>
+          ${progressHtml(r.status)}
+          <div class="nextTodoActions">
+            ${action ? `<button class="btn ${action.kind}" data-todo-reservation-action="${action.action}" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">${action.label}</button>` : ""}
+            <button class="btn ghost" data-todo-reservation-action="message" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">LINE文面確認</button>
+            <button class="btn ghost" data-todo-reservation-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">回数券1回使用</button>
+          </div>
+        </article>
+      `);
+    });
+
+    followups.forEach((f) => {
+      const high = f.priority === "high";
+      items.push(`
+        <article class="nextTodoCard followup">
+          <div class="nextTodoTop">
+            <div>
+              <div class="nextTodoName">${escapeHtml(f.customer_name || "-")} 様</div>
+              <div class="nextTodoMeta">
+                ${escapeHtml(f.title || f.followup_type || "フォロー")}
+                ／ 期限：${escapeHtml(f.due_date || "-")}
+              </div>
+            </div>
+            <span class="nextTodoBadge followup">${high ? "優先フォロー" : "フォロー"}</span>
+          </div>
+          <div class="nextTodoActions">
+            <button class="btn primary" data-todo-followup-action="show" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">文面を確認</button>
+            <button class="btn ghost" data-todo-followup-action="copy" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">文面コピー</button>
+            <button class="btn dark" data-todo-followup-action="done" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">対応済み</button>
+          </div>
+        </article>
+      `);
+    });
+
+    tickets.forEach((t) => {
+      items.push(`
+        <article class="nextTodoCard ticket">
+          <div class="nextTodoTop">
+            <div>
+              <div class="nextTodoName">${escapeHtml(t.customer_name || t.ticket_name || "回数券確認")}</div>
+              <div class="nextTodoMeta">
+                ${escapeHtml(t.ticket_name || "回数券")} ／ 残り ${Number(t.remaining_count || 0)}回
+                ／ 有効期限：${escapeHtml(t.expires_at || "-")}
+              </div>
+            </div>
+            <span class="nextTodoBadge ticket">残り${Number(t.remaining_count || 0)}回</span>
+          </div>
+          <div class="nextTodoActions">
+            <a class="btn ghost" href="#ticketSection">回数券一覧で確認</a>
+          </div>
+        </article>
+      `);
+    });
 
     if (!items.length) {
-      box.innerHTML = `<div class="empty">この日に表示する「今日やること」はありません。</div>`;
+      box.innerHTML = `
+        <div class="empty">
+          この日に優先対応はありません。新しい予約や電話・店頭予約は上のボタンから登録できます。
+        </div>
+      `;
       return;
     }
 
     box.innerHTML = items.join("");
+
+    box.querySelectorAll("[data-todo-reservation-action]").forEach((button) => {
+      button.addEventListener("click", () => {
+        handleReservationAction(button.dataset.todoReservationAction, button.dataset.id, button);
+      });
+    });
+
+    box.querySelectorAll("[data-todo-followup-action]").forEach((button) => {
+      button.addEventListener("click", () => {
+        handleFollowupAction(button.dataset.todoFollowupAction, button.dataset.id, button);
+      });
+    });
   }
 
   function reservationMatchesFilter(r) {

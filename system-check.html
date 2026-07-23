@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-10F</title>
+  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-NEXT-2</title>
   <script src="./config.js"></script>
   <style>
     :root{
@@ -416,7 +416,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10F / system-check.html</span>
+        <span class="badge">STEP SEITAI-NEXT-2 / system-check.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>システム確認画面</h1>
         <p class="lead">
           API接続、管理コード保存、店舗設定、予約枠、営業前デモ準備、各デモ画面の入口を確認します。
@@ -440,11 +440,11 @@
         <h2>1. 管理コード</h2>
         <p class="note">
           Cloudflare Worker の ADMIN_TOKEN に設定したコードを保存します。
-          今回は <b>1234</b> です。公開ファイルには直書きせず、このブラウザ内だけに保存します。
+          管理者から案内されたコードを、このブラウザ内だけに保存します。コードの値は公開画面に表示しません。
         </p>
 
         <label for="adminCodeInput">管理コード</label>
-        <input id="adminCodeInput" type="password" placeholder="例：1234" autocomplete="off">
+        <input id="adminCodeInput" type="password" placeholder="管理コードを入力" autocomplete="off">
 
         <div class="row" style="margin-top:12px;">
           <button class="btn primary" id="saveAdminBtn">保存</button>
