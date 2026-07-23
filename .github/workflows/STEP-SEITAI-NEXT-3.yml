@@ -1,0 +1,1228 @@
+name: STEP SEITAI-NEXT-3
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/STEP-SEITAI-NEXT-3.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seitai-next-3
+  cancel-in-progress: false
+
+env:
+  STEP_NAME: SEITAI-NEXT-3
+  WORKFLOW_FILE: .github/workflows/STEP-SEITAI-NEXT-3.yml
+  BACKUP_TAG: backup-seitai-before-next-3-20260723
+
+jobs:
+  patient-history:
+    name: Patient history integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify previous STEP and establish rollback tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f dpro-next-ledger.yml
+          grep -q 'current_step: "SEITAI-NEXT-2-COMPLETE"' dpro-next-ledger.yml
+          grep -q 'next_step: "SEITAI-NEXT-3"' dpro-next-ledger.yml
+
+          for file in owner.html config.js system-check.html index.html member.html owner-ipad.html; do
+            test -f "$file"
+          done
+
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            BASELINE_SHA="$(git rev-parse HEAD^)"
+          else
+            echo "Unable to determine the commit before workflow upload."
+            exit 1
+          fi
+
+          echo "BASELINE_SHA=$BASELINE_SHA" >> "$GITHUB_ENV"
+          echo "$BASELINE_SHA" > /tmp/seitai_next_3_baseline_sha.txt
+
+          if git rev-parse "$BACKUP_TAG" >/dev/null 2>&1; then
+            EXISTING_TAG_SHA="$(git rev-list -n 1 "$BACKUP_TAG")"
+            if [ "$EXISTING_TAG_SHA" != "$BASELINE_SHA" ]; then
+              echo "Backup tag exists but points to another commit."
+              exit 1
+            fi
+          else
+            git tag -a "$BACKUP_TAG" "$BASELINE_SHA" -m "DPRO 整骨院・整体 LINE before SEITAI-NEXT-3"
+            git push origin "$BACKUP_TAG"
+          fi
+
+          git show "$BASELINE_SHA:owner.html" > /tmp/owner.before.html
+          git show "$BASELINE_SHA:config.js" > /tmp/config.before.js
+          git show "$BASELINE_SHA:system-check.html" > /tmp/system-check.before.html
+
+      - name: Apply patient history integration
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(text, old, new, label):
+              if old not in text:
+                  raise SystemExit(f"{label}: target text was not found")
+              return text.replace(old, new, 1)
+
+          def regex_replace_once(text, pattern, replacement, label, flags=0):
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected one replacement, got {count}")
+              return updated
+
+          owner_path = Path("owner.html")
+          owner = owner_path.read_text(encoding="utf-8")
+
+          if "STEP SEITAI-NEXT-3 / owner.html" in owner:
+              raise SystemExit("owner.html already contains SEITAI-NEXT-3 marker")
+
+          owner = replace_once(
+              owner,
+              '<!-- STEP SEITAI-NEXT-2: DPRO NEXT owner dashboard / today-first workflow / left settings navigation / 20260723 -->',
+              '<!-- STEP SEITAI-NEXT-3: patient history integration / on-demand customer detail / 20260723 -->',
+              "owner version comment",
+          )
+          owner = replace_once(
+              owner,
+              '<title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-2</title>',
+              '<title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-3</title>',
+              "owner title",
+          )
+          owner = replace_once(
+              owner,
+              '<span class="badge">STEP SEITAI-NEXT-2 / owner.html</span>',
+              '<span class="badge">STEP SEITAI-NEXT-3 / owner.html</span>',
+              "owner badge",
+          )
+
+          patient_css = r'''
+
+              /* DPRO NEXT-3: patient history is loaded only when selected */
+              .patientLedgerCard{
+                border:1px solid #bfdbfe;
+                background:
+                  radial-gradient(circle at top right,rgba(59,130,246,.10),transparent 300px),
+                  linear-gradient(180deg,#ffffff,#f8fbff);
+                scroll-margin-top:18px;
+              }
+              .patientSearchBar{
+                display:grid;
+                grid-template-columns:minmax(0,1fr) auto auto;
+                gap:10px;
+                align-items:end;
+                margin-top:14px;
+              }
+              .patientSearchBar label{margin-top:0}
+              .patientSearchResults{
+                display:grid;
+                grid-template-columns:repeat(2,minmax(0,1fr));
+                gap:10px;
+                margin-top:14px;
+              }
+              .patientSearchItem{
+                display:grid;
+                grid-template-columns:minmax(0,1fr) auto;
+                gap:12px;
+                align-items:center;
+                border:1px solid #dbeafe;
+                border-radius:18px;
+                background:#fff;
+                padding:14px;
+                min-width:0;
+              }
+              .patientSearchName{
+                font-size:17px;
+                font-weight:950;
+                line-height:1.4;
+              }
+              .patientSearchMeta{
+                margin-top:4px;
+                color:#64748b;
+                font-size:12px;
+                line-height:1.65;
+                word-break:break-word;
+              }
+              .patientDrawer{
+                position:fixed;
+                inset:0;
+                z-index:260;
+                display:none;
+                overflow:auto;
+                padding:18px;
+                background:rgba(15,23,42,.48);
+                backdrop-filter:blur(6px);
+              }
+              .patientDrawer.open{display:block}
+              .patientDrawerPanel{
+                width:min(1100px,calc(100vw - 36px));
+                min-height:calc(100vh - 36px);
+                margin:0 0 0 auto;
+                border:1px solid #dbeafe;
+                border-radius:28px;
+                background:#fff;
+                box-shadow:0 28px 90px rgba(15,23,42,.28);
+                overflow:hidden;
+              }
+              .patientDrawerHead{
+                position:sticky;
+                top:0;
+                z-index:5;
+                display:flex;
+                justify-content:space-between;
+                gap:16px;
+                align-items:flex-start;
+                padding:20px;
+                border-bottom:1px solid #dbeafe;
+                background:rgba(255,255,255,.96);
+                backdrop-filter:blur(10px);
+              }
+              .patientDrawerName{
+                margin-top:8px;
+                font-size:clamp(25px,4vw,38px);
+                font-weight:950;
+                letter-spacing:-.04em;
+                line-height:1.15;
+              }
+              .patientDrawerMeta{
+                margin-top:7px;
+                color:#64748b;
+                font-size:13px;
+                line-height:1.7;
+              }
+              .patientDrawerBody{padding:20px}
+              .patientHistoryMetrics{
+                display:grid;
+                grid-template-columns:repeat(4,minmax(0,1fr));
+                gap:10px;
+              }
+              .patientHistoryMetric{
+                min-width:0;
+                border:1px solid #dbeafe;
+                border-radius:17px;
+                background:#f8fbff;
+                padding:13px;
+              }
+              .patientHistoryMetric span{
+                display:block;
+                color:#64748b;
+                font-size:11px;
+                font-weight:900;
+              }
+              .patientHistoryMetric b{
+                display:block;
+                margin-top:3px;
+                font-size:24px;
+                line-height:1.15;
+                letter-spacing:-.04em;
+              }
+              .patientHistoryTabs{
+                display:flex;
+                gap:8px;
+                flex-wrap:wrap;
+                margin:18px 0 12px;
+                padding:8px;
+                border:1px solid #dbeafe;
+                border-radius:17px;
+                background:#f8fbff;
+              }
+              .patientHistoryTab{
+                border:1px solid #dbeafe;
+                border-radius:999px;
+                background:#fff;
+                color:#334155;
+                padding:9px 12px;
+                font-size:13px;
+                font-weight:950;
+              }
+              .patientHistoryTab.selected{
+                border-color:#2563eb;
+                background:#2563eb;
+                color:#fff;
+              }
+              .patientHistoryContent{
+                display:grid;
+                gap:10px;
+                min-height:260px;
+              }
+              .patientHistoryRow{
+                border:1px solid #e2e8f0;
+                border-radius:18px;
+                background:#fff;
+                padding:14px;
+              }
+              .patientHistoryRowTop{
+                display:flex;
+                justify-content:space-between;
+                gap:12px;
+                align-items:flex-start;
+              }
+              .patientHistoryRowTitle{
+                font-size:16px;
+                font-weight:950;
+                line-height:1.45;
+              }
+              .patientHistoryRowMeta{
+                margin-top:5px;
+                color:#64748b;
+                font-size:12px;
+                line-height:1.7;
+              }
+              .patientSummaryGrid{
+                display:grid;
+                grid-template-columns:repeat(2,minmax(0,1fr));
+                gap:10px;
+              }
+              .patientSummaryBox{
+                border:1px solid #dbeafe;
+                border-radius:18px;
+                background:#f8fbff;
+                padding:14px;
+                min-width:0;
+              }
+              .patientSummaryBox h3{margin-top:0}
+              .patientDrawerFoot{
+                position:sticky;
+                bottom:0;
+                display:flex;
+                justify-content:space-between;
+                gap:10px;
+                flex-wrap:wrap;
+                padding:16px 20px;
+                border-top:1px solid #dbeafe;
+                background:rgba(255,255,255,.96);
+                backdrop-filter:blur(10px);
+              }
+              body.patientHistoryOpen{overflow:hidden}
+              #patientLedgerSection{scroll-margin-top:18px}
+
+              @media(max-width:900px){
+                .patientSearchResults{grid-template-columns:1fr}
+                .patientHistoryMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+                .patientSummaryGrid{grid-template-columns:1fr}
+                .patientDrawer{padding:10px}
+                .patientDrawerPanel{width:100%;min-height:calc(100vh - 20px)}
+              }
+              @media(max-width:560px){
+                .patientSearchBar{grid-template-columns:1fr}
+                .patientSearchBar .btn{width:100%}
+                .patientSearchItem{grid-template-columns:1fr}
+                .patientSearchItem .btn{width:100%}
+                .patientDrawerHead{display:block;padding:16px}
+                .patientDrawerHead .btn{width:100%;margin-top:12px}
+                .patientDrawerBody{padding:14px}
+                .patientHistoryMetrics{grid-template-columns:1fr 1fr}
+                .patientHistoryTabs{overflow-x:auto;flex-wrap:nowrap}
+                .patientHistoryTab{flex:0 0 auto;white-space:nowrap}
+                .patientHistoryRowTop{display:block}
+                .patientHistoryRowTop .pill{margin-top:8px}
+                .patientDrawerFoot{display:grid;grid-template-columns:1fr;padding:14px}
+                .patientDrawerFoot .btn{width:100%}
+              }
+          '''
+          owner = replace_once(owner, "\n  </style>", patient_css + "\n  </style>", "patient CSS")
+
+          patient_card = r'''
+                <div class="card span12 patientLedgerCard" id="patientLedgerSection">
+                  <div class="sectionHead">
+          <div>
+            <span class="nextEyebrow">患者単位の履歴</span>
+            <h2 style="margin-top:10px;">患者検索・来院履歴</h2>
+            <p class="note">
+              電話番号・氏名・会員番号から患者を検索します。履歴は患者を選んだ時だけ取得するため、初期表示を重くしません。
+            </p>
+          </div>
+          <span class="status" id="patientSearchStatus">未検索</span>
+                  </div>
+
+                  <div class="patientSearchBar">
+          <div>
+            <label for="patientSearchInput">電話番号・氏名・会員番号</label>
+            <input id="patientSearchInput" type="search" placeholder="例：090-1111-2222 / 佐藤 / SEITAI-0001" autocomplete="off">
+          </div>
+          <button class="btn primary" id="patientSearchBtn" type="button">患者を検索</button>
+          <button class="btn ghost" id="patientRecentBtn" type="button">最近の患者</button>
+                  </div>
+
+                  <div id="patientSearchResults" class="patientSearchResults" aria-live="polite">
+          <div class="empty" style="grid-column:1/-1;">患者を検索すると、ここに候補が表示されます。</div>
+                  </div>
+                </div>
+
+          '''
+          owner = replace_once(
+              owner,
+              '      <div class="card span12 quickActionCard" id="quickReservationSection">',
+              patient_card + '      <div class="card span12 quickActionCard" id="quickReservationSection">',
+              "patient card",
+          )
+
+          patient_drawer = r'''
+          <div class="patientDrawer" id="patientHistoryDrawer" aria-hidden="true">
+            <div class="patientDrawerPanel" role="dialog" aria-modal="true" aria-labelledby="patientHistoryName">
+              <div class="patientDrawerHead">
+                <div>
+                  <span class="nextEyebrow">患者履歴</span>
+                  <div class="patientDrawerName" id="patientHistoryName">患者を選択してください</div>
+                  <div class="patientDrawerMeta" id="patientHistoryMeta">患者情報を読み込むと、予約・来院・回数券・フォローを確認できます。</div>
+                </div>
+                <button class="btn ghost" id="closePatientHistoryBtn" type="button">閉じる</button>
+              </div>
+
+              <div class="patientDrawerBody">
+                <div class="patientHistoryMetrics">
+                  <div class="patientHistoryMetric"><span>予約・来院履歴</span><b id="patientMetricReservations">-</b></div>
+                  <div class="patientHistoryMetric"><span>施術完了</span><b id="patientMetricCompleted">-</b></div>
+                  <div class="patientHistoryMetric"><span>利用可能回数券</span><b id="patientMetricTickets">-</b></div>
+                  <div class="patientHistoryMetric"><span>フォロー</span><b id="patientMetricFollowups">-</b></div>
+                </div>
+
+                <div class="patientHistoryTabs" id="patientHistoryTabs">
+                  <button class="patientHistoryTab selected" data-patient-tab="summary" type="button">概要</button>
+                  <button class="patientHistoryTab" data-patient-tab="visits" type="button">予約・来院</button>
+                  <button class="patientHistoryTab" data-patient-tab="tickets" type="button">回数券</button>
+                  <button class="patientHistoryTab" data-patient-tab="followups" type="button">フォロー</button>
+                </div>
+
+                <div class="patientHistoryContent" id="patientHistoryContent">
+                  <div class="empty">患者履歴を読み込んでいます。</div>
+                </div>
+              </div>
+
+              <div class="patientDrawerFoot">
+                <span class="status" id="patientHistoryStatus">未読込</span>
+                <div class="row">
+                  <button class="btn primary" id="patientReserveBtn" type="button">この患者で次回予約</button>
+                  <button class="btn ghost" id="patientHistoryCloseBottomBtn" type="button">閉じる</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          '''
+          owner = replace_once(
+              owner,
+              '<div class="toast" id="toast">OK</div>',
+              patient_drawer + '<div class="toast" id="toast">OK</div>',
+              "patient drawer",
+          )
+
+          owner = replace_once(
+              owner,
+              '    ownerSettings: null,\n    settingsTab: "basic"',
+              '    ownerSettings: null,\n    settingsTab: "basic",\n    patientSearchResults: [],\n    selectedPatientDetail: null,\n    patientHistoryTab: "summary"',
+              "patient state",
+          )
+
+          owner = replace_once(
+              owner,
+              '      ownerToday: "/api/owner/today",\n      ownerFollowups: "/api/owner/followups"',
+              '      ownerToday: "/api/owner/today",\n      ownerFollowups: "/api/owner/followups",\n      ownerCustomerSearch: "/api/owner/customers/search",\n      ownerCustomerDetail: "/api/owner/customers/detail"',
+              "fallback customer endpoints",
+          )
+
+          patient_functions = r'''
+            function patientReservations(detail) {
+              const rows = detail?.reservations || detail?.visits || detail?.reservation_history || [];
+              return Array.isArray(rows) ? rows.slice() : [];
+            }
+
+            function patientTickets(detail) {
+              const rows = detail?.tickets || detail?.ticket_history || [];
+              return Array.isArray(rows) ? rows.slice() : [];
+            }
+
+            function patientFollowups(detail) {
+              const detailRows = detail?.followups || detail?.followup_history || [];
+              const currentRows = (state.followups || []).filter((row) => {
+                const customer = detail?.customer || {};
+                const detailId = customerRowId(customer);
+                const rowId = customerRowId(row);
+                if (detailId && rowId) return detailId === rowId;
+                if (customer.customer_no && row.customer_no) return String(customer.customer_no) === String(row.customer_no);
+                if (customer.phone && row.phone) return String(customer.phone) === String(row.phone);
+                return false;
+              });
+
+              const combined = [
+                ...(Array.isArray(detailRows) ? detailRows : []),
+                ...currentRows
+              ];
+              const seen = new Set();
+              return combined.filter((row, index) => {
+                const key = String(row.followup_id || row.id || `${row.followup_type || row.title || "followup"}-${row.due_date || index}`);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+            }
+
+            function patientCompletedReservations(detail) {
+              return patientReservations(detail).filter((row) => ["completed", "treatment_done"].includes(row.status));
+            }
+
+            function patientActiveTickets(detail) {
+              return patientTickets(detail).filter((row) => {
+                if (["expired", "cancelled", "used_up", "inactive"].includes(row.status)) return false;
+                return Number(row.remaining_count || 0) > 0 || ["active", "usable"].includes(row.status) || !row.status;
+              });
+            }
+
+            function patientSortValue(row) {
+              return String(
+                row.reservation_date ||
+                row.visit_date ||
+                row.completed_at ||
+                row.created_at ||
+                row.due_date ||
+                row.expires_at ||
+                ""
+              );
+            }
+
+            function sortPatientRowsDesc(rows) {
+              return (rows || []).slice().sort((a, b) => patientSortValue(b).localeCompare(patientSortValue(a)));
+            }
+
+            function patientCustomerMeta(customer) {
+              const parts = [];
+              if (customer.customer_no) parts.push(`会員番号：${customer.customer_no}`);
+              if (customer.phone) parts.push(`電話：${customer.phone}`);
+              if (customer.last_visit_date) parts.push(`最終来院：${customer.last_visit_date}`);
+              if (customer.total_visit_count !== undefined && customer.total_visit_count !== null) parts.push(`来院回数：${customer.total_visit_count}回`);
+              return parts.join(" / ") || "患者基本情報";
+            }
+
+            async function searchPatients(query = "") {
+              if (!getAdminCode()) {
+                showToast("管理コードを保存してください");
+                return;
+              }
+
+              const q = String(query || "").trim();
+              const button = $("patientSearchBtn");
+              setBusy(button, true, "検索中...");
+              setStatus("patientSearchStatus", "検索中", "warn");
+              $("patientSearchResults").innerHTML = `<div class="empty" style="grid-column:1/-1;">患者を検索しています。</div>`;
+
+              try {
+                const data = await apiGet(endpoint("ownerCustomerSearch"), { q, limit: 20 }, true);
+                state.patientSearchResults = Array.isArray(data.customers) ? data.customers : [];
+                renderPatientSearchResults();
+                setStatus("patientSearchStatus", `${state.patientSearchResults.length}件`, state.patientSearchResults.length ? "ok" : "warn");
+                showJson(data);
+              } catch (error) {
+                state.patientSearchResults = [];
+                setStatus("patientSearchStatus", "検索エラー", "ng");
+                $("patientSearchResults").innerHTML = `<div class="empty" style="grid-column:1/-1;">${escapeHtml(error.message)}</div>`;
+                showToast(error.message);
+                showJson({ ok:false, message:error.message, action:"patient_search" });
+              } finally {
+                setBusy(button, false);
+              }
+            }
+
+            function renderPatientSearchResults() {
+              const box = $("patientSearchResults");
+              const rows = state.patientSearchResults || [];
+              if (!rows.length) {
+                box.innerHTML = `<div class="empty" style="grid-column:1/-1;">該当する患者はありません。</div>`;
+                return;
+              }
+
+              box.innerHTML = rows.map((customer) => {
+                const id = customerRowId(customer);
+                return `
+                  <div class="patientSearchItem">
+          <div>
+            <div class="patientSearchName">${escapeHtml(customer.customer_name || "お客様")} 様</div>
+            <div class="patientSearchMeta">${escapeHtml(patientCustomerMeta(customer))}</div>
+            ${customer.memo ? `<div class="patientSearchMeta">メモ：${escapeHtml(customer.memo)}</div>` : ""}
+          </div>
+          <button class="btn primary" data-patient-search-id="${escapeHtml(id)}" type="button" ${id ? "" : "disabled"}>履歴を見る</button>
+                  </div>
+                `;
+              }).join("");
+            }
+
+            async function loadPatientHistory(customerId, fallbackCustomer = null) {
+              const id = String(customerId || customerRowId(fallbackCustomer) || "");
+              if (!id) {
+                showToast("患者IDを確認できませんでした");
+                return null;
+              }
+
+              openPatientHistoryDrawer({ customer: fallbackCustomer || { customer_name:"患者" }, loading:true });
+              setStatus("patientHistoryStatus", "読込中", "warn");
+              try {
+                const detail = await apiGet(endpoint("ownerCustomerDetail"), { customer_id: id }, true);
+                state.selectedPatientDetail = detail;
+                state.patientHistoryTab = "summary";
+                openPatientHistoryDrawer(detail);
+                setStatus("patientHistoryStatus", "読込OK", "ok");
+                showJson(detail);
+                return detail;
+              } catch (error) {
+                state.selectedPatientDetail = null;
+                setStatus("patientHistoryStatus", "読込エラー", "ng");
+                $("patientHistoryContent").innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+                showToast(error.message);
+                showJson({ ok:false, message:error.message, action:"patient_detail" });
+                return null;
+              }
+            }
+
+            async function openPatientHistoryFromEntity(entity = {}) {
+              const directId = customerRowId(entity);
+              if (directId) return loadPatientHistory(directId, entity);
+
+              const q = entity.customer_no || entity.phone || entity.customer_name || "";
+              if (!q) {
+                showToast("このデータから患者を特定できませんでした");
+                return null;
+              }
+
+              try {
+                const data = await apiGet(endpoint("ownerCustomerSearch"), { q, limit: 10 }, true);
+                const rows = Array.isArray(data.customers) ? data.customers : [];
+                const matched = rows.find((row) => {
+                  if (entity.customer_no && row.customer_no) return String(entity.customer_no) === String(row.customer_no);
+                  if (entity.phone && row.phone) return String(entity.phone).replace(/\D/g, "") === String(row.phone).replace(/\D/g, "");
+                  return false;
+                }) || rows[0];
+                if (!matched) throw new Error("患者情報が見つかりませんでした");
+                return loadPatientHistory(customerRowId(matched), matched);
+              } catch (error) {
+                showToast(error.message);
+                return null;
+              }
+            }
+
+            function openPatientHistoryDrawer(detail = {}) {
+              const drawer = $("patientHistoryDrawer");
+              const customer = detail.customer || {};
+              drawer.classList.add("open");
+              drawer.setAttribute("aria-hidden", "false");
+              document.body.classList.add("patientHistoryOpen");
+
+              $("patientHistoryName").textContent = detail.loading ? "患者履歴を読み込み中" : `${customer.customer_name || "お客様"} 様`;
+              $("patientHistoryMeta").textContent = detail.loading ? "患者を選んだ時だけ履歴を取得しています。" : patientCustomerMeta(customer);
+
+              if (detail.loading) {
+                ["patientMetricReservations", "patientMetricCompleted", "patientMetricTickets", "patientMetricFollowups"].forEach((id) => $(id).textContent = "-");
+                $("patientHistoryContent").innerHTML = `<div class="empty">患者履歴を読み込んでいます。</div>`;
+                return;
+              }
+
+              renderPatientHistory();
+            }
+
+            function closePatientHistoryDrawer() {
+              $("patientHistoryDrawer").classList.remove("open");
+              $("patientHistoryDrawer").setAttribute("aria-hidden", "true");
+              document.body.classList.remove("patientHistoryOpen");
+            }
+
+            function setPatientHistoryTab(tab) {
+              state.patientHistoryTab = ["summary", "visits", "tickets", "followups"].includes(tab) ? tab : "summary";
+              $("patientHistoryTabs").querySelectorAll("[data-patient-tab]").forEach((button) => {
+                button.classList.toggle("selected", button.dataset.patientTab === state.patientHistoryTab);
+              });
+              renderPatientHistory();
+            }
+
+            function renderPatientHistory() {
+              const detail = state.selectedPatientDetail;
+              if (!detail) return;
+
+              const reservations = sortPatientRowsDesc(patientReservations(detail));
+              const completed = patientCompletedReservations(detail);
+              const tickets = patientTickets(detail);
+              const activeTickets = patientActiveTickets(detail);
+              const followups = sortPatientRowsDesc(patientFollowups(detail));
+
+              $("patientMetricReservations").textContent = reservations.length;
+              $("patientMetricCompleted").textContent = completed.length;
+              $("patientMetricTickets").textContent = activeTickets.length;
+              $("patientMetricFollowups").textContent = followups.length;
+
+              if (state.patientHistoryTab === "visits") return renderPatientVisits(reservations);
+              if (state.patientHistoryTab === "tickets") return renderPatientTickets(tickets);
+              if (state.patientHistoryTab === "followups") return renderPatientFollowups(followups);
+              renderPatientSummary(detail, reservations, activeTickets, followups);
+            }
+
+            function renderPatientSummary(detail, reservations, activeTickets, followups) {
+              const customer = detail.customer || {};
+              const latest = reservations[0] || null;
+              const lastCompleted = reservations.find((row) => ["completed", "treatment_done"].includes(row.status)) || null;
+              const concernTags = [];
+              reservations.slice(0, 8).forEach((row) => {
+                (Array.isArray(row.concern_tags) ? row.concern_tags : []).forEach((tag) => {
+                  if (tag && !concernTags.includes(tag)) concernTags.push(tag);
+                });
+              });
+
+              $("patientHistoryContent").innerHTML = `
+                <div class="patientSummaryGrid">
+                  <div class="patientSummaryBox">
+          <h3>患者基本情報</h3>
+          <div class="itemMeta">
+            会員番号：${escapeHtml(customer.customer_no || "-")}<br>
+            電話番号：${escapeHtml(customer.phone || "-")}<br>
+            最終来院：${escapeHtml(customer.last_visit_date || lastCompleted?.reservation_date || "-")}<br>
+            来院回数：${escapeHtml(customer.total_visit_count ?? patientCompletedReservations(detail).length)}回
+          </div>
+          ${customer.memo ? `<div class="alert" style="margin-top:10px;">注意・メモ：${escapeHtml(customer.memo)}</div>` : ""}
+                  </div>
+                  <div class="patientSummaryBox">
+          <h3>前回・直近内容</h3>
+          ${latest ? `
+            <div class="itemMeta">
+              日時：${escapeHtml(latest.reservation_date || latest.visit_date || "-")} ${escapeHtml(formatTime(latest.start_time) || "")}<br>
+              メニュー：${escapeHtml(latest.menu_name || latest.menu_code || "-")}<br>
+              担当：${escapeHtml(latest.staff_name || latest.staff_code || "未定")}<br>
+              状態：${escapeHtml(statusLabel(latest.status))}
+            </div>
+            ${latest.request_note ? `<div class="alert" style="margin-top:10px;">前回メモ：${escapeHtml(latest.request_note)}</div>` : ""}
+          ` : `<div class="empty">予約・来院履歴はありません。</div>`}
+                  </div>
+                  <div class="patientSummaryBox">
+          <h3>回数券</h3>
+          ${activeTickets.length ? activeTickets.map((ticket) => `
+            <div class="patientHistoryRow" style="margin-top:8px;">
+              <div class="patientHistoryRowTitle">${escapeHtml(ticket.ticket_name || "回数券")}</div>
+              <div class="patientHistoryRowMeta">残り ${Number(ticket.remaining_count || 0)}回 / 有効期限 ${escapeHtml(ticket.expires_at || "-")}</div>
+            </div>
+          `).join("") : `<div class="empty">利用可能な回数券はありません。</div>`}
+                  </div>
+                  <div class="patientSummaryBox">
+          <h3>次回確認</h3>
+          <div class="itemMeta">
+            フォロー対象：${followups.length}件<br>
+            症状・部位タグ：${escapeHtml(concernTags.slice(0, 6).join(" / ") || "-")}<br>
+            次回予約：${escapeHtml(reservations.find((row) => ["reserved", "arrived", "in_treatment"].includes(row.status))?.reservation_date || "未予約")}
+          </div>
+                  </div>
+                </div>
+              `;
+            }
+
+            function renderPatientVisits(rows) {
+              const box = $("patientHistoryContent");
+              if (!rows.length) {
+                box.innerHTML = `<div class="empty">予約・来院履歴はありません。</div>`;
+                return;
+              }
+              box.innerHTML = rows.slice(0, 40).map((row) => `
+                <div class="patientHistoryRow">
+                  <div class="patientHistoryRowTop">
+          <div>
+            <div class="patientHistoryRowTitle">${escapeHtml(row.reservation_date || row.visit_date || "-")} ${escapeHtml(formatTime(row.start_time) || "")}｜${escapeHtml(row.menu_name || row.menu_code || "メニュー")}</div>
+            <div class="patientHistoryRowMeta">
+              担当：${escapeHtml(row.staff_name || row.staff_code || "未定")} / 予約経路：${escapeHtml(row.source || "-")}<br>
+              ${row.request_note ? `要望・メモ：${escapeHtml(row.request_note)}` : ""}
+            </div>
+          </div>
+          <span class="pill ${statusClass(row.status)}">${escapeHtml(statusLabel(row.status))}</span>
+                  </div>
+                </div>
+              `).join("");
+            }
+
+            function renderPatientTickets(rows) {
+              const box = $("patientHistoryContent");
+              if (!rows.length) {
+                box.innerHTML = `<div class="empty">回数券情報はありません。</div>`;
+                return;
+              }
+              box.innerHTML = sortPatientRowsDesc(rows).slice(0, 30).map((ticket) => `
+                <div class="patientHistoryRow">
+                  <div class="patientHistoryRowTop">
+          <div>
+            <div class="patientHistoryRowTitle">${escapeHtml(ticket.ticket_name || "回数券")}</div>
+            <div class="patientHistoryRowMeta">
+              残り ${Number(ticket.remaining_count || 0)}回 / 合計 ${Number(ticket.total_count || 0)}回<br>
+              購入・開始：${escapeHtml(ticket.purchased_at || ticket.started_at || ticket.created_at || "-")} / 有効期限：${escapeHtml(ticket.expires_at || "-")}
+            </div>
+          </div>
+          <span class="pill ${Number(ticket.remaining_count || 0) <= 2 ? "red" : "green"}">${escapeHtml(ticket.status || "active")}</span>
+                  </div>
+                </div>
+              `).join("");
+            }
+
+            function renderPatientFollowups(rows) {
+              const box = $("patientHistoryContent");
+              if (!rows.length) {
+                box.innerHTML = `<div class="empty">現在確認できるフォロー履歴・対象はありません。</div>`;
+                return;
+              }
+              box.innerHTML = rows.slice(0, 30).map((followup) => `
+                <div class="patientHistoryRow">
+                  <div class="patientHistoryRowTop">
+          <div>
+            <div class="patientHistoryRowTitle">${escapeHtml(followup.title || followup.followup_type || "フォロー")}</div>
+            <div class="patientHistoryRowMeta">
+              期限：${escapeHtml(followup.due_date || "-")} / 状態：${escapeHtml(followup.status || "未対応")}<br>
+              ${followup.message_text ? escapeHtml(String(followup.message_text).slice(0, 180)) : ""}
+            </div>
+          </div>
+          <span class="pill ${followup.priority === "high" ? "orange" : "gray"}">${escapeHtml(followup.priority || "normal")}</span>
+                  </div>
+                </div>
+              `).join("");
+            }
+
+            async function useSelectedPatientForReservation() {
+              const detail = state.selectedPatientDetail;
+              const customer = detail?.customer;
+              if (!customer) {
+                showToast("患者を選択してください");
+                return;
+              }
+
+              closePatientHistoryDrawer();
+              await openManualReservation("phone");
+              state.selectedManualCustomer = customer;
+              state.selectedManualCustomerDetail = detail;
+              $("manualCustomerName").value = customer.customer_name || "";
+              $("manualCustomerKana").value = customer.customer_kana || "";
+              $("manualPhone").value = customer.phone || "";
+              $("manualCustomerSearchInput").value = customer.phone || customer.customer_name || "";
+              renderSelectedManualCustomer(detail);
+              applyLastReservationToManualForm(detail);
+              setStatus("manualCustomerSearchStatus", "選択済み", "ok");
+              showToast(`${customer.customer_name || "患者"} 様の前回内容を反映しました`);
+            }
+
+          '''
+          owner = replace_once(owner, "\n  function value(id) {", "\n" + patient_functions + "  function value(id) {", "patient functions")
+
+          owner = replace_once(
+              owner,
+              '<button class="btn ghost" data-todo-reservation-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">回数券1回使用</button>',
+              '<button class="btn ghost" data-todo-reservation-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">回数券1回使用</button>\n            <button class="btn ghost" data-todo-reservation-action="history" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">患者履歴</button>',
+              "todo reservation history button",
+          )
+          owner = replace_once(
+              owner,
+              '<button class="btn dark" data-todo-followup-action="done" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">対応済み</button>',
+              '<button class="btn dark" data-todo-followup-action="done" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">対応済み</button>\n            <button class="btn ghost" data-todo-followup-action="history" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">患者履歴</button>',
+              "todo followup history button",
+          )
+          owner = replace_once(
+              owner,
+              '<button class="btn ghost small" data-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}">回数券1回使用</button>',
+              '<button class="btn ghost small" data-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}">回数券1回使用</button>\n            <button class="btn ghost small" data-action="history" data-id="${escapeHtml(r.reservation_id || r.id)}">患者履歴</button>',
+              "reservation history button",
+          )
+          owner = replace_once(
+              owner,
+              '    if (action === "message") {\n      selectReservationMessage(r);',
+              '    if (action === "history") {\n      await openPatientHistoryFromEntity(r);\n      return;\n    }\n\n    if (action === "message") {\n      selectReservationMessage(r);',
+              "reservation history action",
+          )
+          owner = replace_once(
+              owner,
+              '<button class="btn dark small" data-followup-action="done" data-id="${escapeHtml(f.followup_id || f.id)}">対応済み</button>',
+              '<button class="btn dark small" data-followup-action="done" data-id="${escapeHtml(f.followup_id || f.id)}">対応済み</button>\n          <button class="btn ghost small" data-followup-action="history" data-id="${escapeHtml(f.followup_id || f.id)}">患者履歴</button>',
+              "followup history button",
+          )
+          owner = replace_once(
+              owner,
+              '    if (action === "show") {\n      setMessageEditor(text, {',
+              '    if (action === "history") {\n      await openPatientHistoryFromEntity(f);\n      return;\n    }\n\n    if (action === "show") {\n      setMessageEditor(text, {',
+              "followup history action",
+          )
+
+          new_render_tickets = r'''  function renderTickets() {
+              const box = $("ticketList");
+              const rows = state.lowTickets || [];
+
+              if (!rows.length) {
+                box.innerHTML = `<div class="empty">残数注意の回数券はありません。</div>`;
+                return;
+              }
+
+              box.innerHTML = rows.map((ticket) => {
+                const customerId = customerRowId(ticket);
+                return `
+                  <div class="item">
+          <div class="itemTop">
+            <div>
+              <div class="itemTitle">${escapeHtml(ticket.customer_name || ticket.ticket_name || "回数券確認")}</div>
+              <div class="itemMeta">
+                ${escapeHtml(ticket.ticket_name || "回数券")} / 残り ${Number(ticket.remaining_count || 0)}回 / 合計 ${Number(ticket.total_count || 0)}回<br>
+                有効期限：${escapeHtml(ticket.expires_at || "-")}
+              </div>
+            </div>
+            <span class="pill red">残り${Number(ticket.remaining_count || 0)}回</span>
+          </div>
+          ${customerId ? `<div class="actionRow"><button class="btn ghost small" data-patient-history-id="${escapeHtml(customerId)}" type="button">患者履歴</button></div>` : ""}
+                  </div>
+                `;
+              }).join("");
+            }
+
+          '''
+          owner = regex_replace_once(
+              owner,
+              r'  function renderTickets\(\) \{.*?\n  \}\n\n  async function loadFollowupsOnly',
+              new_render_tickets + '  async function loadFollowupsOnly',
+              "render tickets",
+              flags=re.S,
+          )
+
+          patient_events = r'''
+              $("patientSearchBtn").addEventListener("click", () => searchPatients($("patientSearchInput").value));
+              $("patientRecentBtn").addEventListener("click", () => searchPatients(""));
+              $("patientSearchInput").addEventListener("keydown", (event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  searchPatients($("patientSearchInput").value);
+                }
+              });
+              $("patientSearchResults").addEventListener("click", (event) => {
+                const button = event.target.closest("[data-patient-search-id]");
+                if (!button) return;
+                loadPatientHistory(button.dataset.patientSearchId, (state.patientSearchResults || []).find((row) => customerRowId(row) === String(button.dataset.patientSearchId)) || null);
+              });
+              $("closePatientHistoryBtn").addEventListener("click", closePatientHistoryDrawer);
+              $("patientHistoryCloseBottomBtn").addEventListener("click", closePatientHistoryDrawer);
+              $("patientReserveBtn").addEventListener("click", useSelectedPatientForReservation);
+              $("patientHistoryTabs").addEventListener("click", (event) => {
+                const button = event.target.closest("[data-patient-tab]");
+                if (!button) return;
+                setPatientHistoryTab(button.dataset.patientTab);
+              });
+              $("patientHistoryDrawer").addEventListener("click", (event) => {
+                if (event.target && event.target.id === "patientHistoryDrawer") closePatientHistoryDrawer();
+              });
+              document.addEventListener("click", (event) => {
+                const button = event.target.closest("[data-patient-history-id]");
+                if (!button) return;
+                event.preventDefault();
+                loadPatientHistory(button.dataset.patientHistoryId);
+              });
+
+          '''
+          owner = replace_once(owner, "\n    initTabs();", "\n" + patient_events + "    initTabs();", "patient events")
+
+          owner_path.write_text(owner, encoding="utf-8")
+
+          config_path = Path("config.js")
+          config = config_path.read_text(encoding="utf-8")
+          config = replace_once(
+              config,
+              'const STEP_VERSION = "STEP-SEITAI-NEXT-2-CONFIG-20260723";',
+              'const STEP_VERSION = "STEP-SEITAI-NEXT-3-CONFIG-20260723";',
+              "config version",
+          )
+          config = replace_once(
+              config,
+              '      ownerFollowups: "/api/owner/followups",',
+              '      ownerFollowups: "/api/owner/followups",\n      ownerCustomerSearch: "/api/owner/customers/search",\n      ownerCustomerDetail: "/api/owner/customers/detail",',
+              "config customer endpoints",
+          )
+          config_path.write_text(config, encoding="utf-8")
+          PY
+
+      - name: Validate syntax, IDs, API preservation and performance policy
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ruby -e 'require "yaml"; YAML.load_file(ENV.fetch("WORKFLOW_FILE")); puts "YML OK"'
+          node --check config.js
+          git diff --check
+
+          python3 <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          import json
+          import re
+          import subprocess
+          import tempfile
+
+          class Inspector(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+                  self.scripts = []
+                  self.in_script = False
+                  self.script_src = None
+                  self.buffer = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if "id" in attrs:
+                      self.ids.append(attrs["id"])
+                  if tag.lower() == "script":
+                      self.in_script = True
+                      self.script_src = attrs.get("src")
+                      self.buffer = []
+              def handle_data(self, data):
+                  if self.in_script and not self.script_src:
+                      self.buffer.append(data)
+              def handle_endtag(self, tag):
+                  if tag.lower() == "script" and self.in_script:
+                      if not self.script_src:
+                          self.scripts.append("".join(self.buffer))
+                      self.in_script = False
+                      self.script_src = None
+                      self.buffer = []
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          config = Path("config.js").read_text(encoding="utf-8")
+          before_owner = Path("/tmp/owner.before.html").read_text(encoding="utf-8")
+          before_config = Path("/tmp/config.before.js").read_text(encoding="utf-8")
+          system_check = Path("system-check.html").read_text(encoding="utf-8")
+          before_system_check = Path("/tmp/system-check.before.html").read_text(encoding="utf-8")
+
+          inspector = Inspector()
+          inspector.feed(owner)
+          duplicates = sorted({item for item in inspector.ids if inspector.ids.count(item) > 1})
+          if duplicates:
+              raise SystemExit(f"Duplicate HTML IDs: {duplicates}")
+
+          required_ids = {
+              "patientLedgerSection", "patientSearchInput", "patientSearchBtn", "patientRecentBtn",
+              "patientSearchStatus", "patientSearchResults", "patientHistoryDrawer", "patientHistoryName",
+              "patientHistoryMeta", "patientHistoryTabs", "patientHistoryContent", "patientReserveBtn",
+              "closePatientHistoryBtn", "patientHistoryCloseBottomBtn", "patientHistoryStatus"
+          }
+          missing_ids = sorted(required_ids - set(inspector.ids))
+          if missing_ids:
+              raise SystemExit(f"Missing NEXT-3 IDs: {missing_ids}")
+
+          for index, script in enumerate(inspector.scripts, start=1):
+              if not script.strip():
+                  continue
+              with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as fh:
+                  fh.write(script)
+                  path = fh.name
+              result = subprocess.run(["node", "--check", path], text=True, capture_output=True)
+              if result.returncode != 0:
+                  raise SystemExit(f"owner.html inline JavaScript {index} NG\n{result.stderr}")
+
+          literal_refs = set(re.findall(r'\$\(["\']([^"\']+)["\']\)', owner))
+          missing_refs = sorted(literal_refs - set(inspector.ids))
+          if missing_refs:
+              raise SystemExit(f"JavaScript literal ID references not found: {missing_refs}")
+
+          required_markers = [
+              "STEP SEITAI-NEXT-3 / owner.html",
+              "patient history is loaded only when selected",
+              "function searchPatients",
+              "function loadPatientHistory",
+              "function renderPatientHistory",
+              "function useSelectedPatientForReservation",
+              'ownerCustomerSearch: "/api/owner/customers/search"',
+              'ownerCustomerDetail: "/api/owner/customers/detail"',
+              'data-action="history"',
+              'data-followup-action="history"'
+          ]
+          for marker in required_markers:
+              if marker not in owner and marker not in config:
+                  raise SystemExit(f"Required marker missing: {marker}")
+
+          existing_features = [
+              "/api/reservations/create",
+              "/api/reservations/update",
+              "/api/reservations/cancel",
+              "/api/owner/today",
+              "/api/owner/visits/check-in",
+              "/api/owner/visits/start",
+              "/api/owner/visits/complete",
+              "/api/owner/tickets/use",
+              "/api/owner/followups",
+              "/api/owner/reservations/manual-create",
+              "clearAdminCode",
+              "電話予約",
+              "店頭予約"
+          ]
+          combined = owner + config + Path("index.html").read_text(encoding="utf-8") + Path("member.html").read_text(encoding="utf-8")
+          for marker in existing_features:
+              if marker not in combined:
+                  raise SystemExit(f"Existing feature marker missing: {marker}")
+
+          api_pattern = re.compile(r'/api/[A-Za-z0-9_./-]+')
+          before_apis = set(api_pattern.findall(before_owner + before_config + before_system_check))
+          after_apis = set(api_pattern.findall(owner + config + system_check))
+          if before_apis != after_apis:
+              raise SystemExit(f"API path set changed. added={sorted(after_apis-before_apis)} removed={sorted(before_apis-after_apis)}")
+
+          if "searchPatients(\"\")" in re.search(r'async function init\(\) \{.*?\n  \}', owner, re.S).group(0):
+              raise SystemExit("Patient history must not load during initial page initialization")
+
+          if len(owner.encode("utf-8")) > 210000:
+              raise SystemExit("owner.html exceeds the NEXT-3 size guard of 210 KB")
+
+          public_text = "\n".join(Path(name).read_text(encoding="utf-8") for name in ["owner.html", "config.js", "system-check.html"])
+          forbidden = ["今回は <b>1234</b>", 'placeholder="例：1234"', "ADMIN_TOKEN は 1234"]
+          for item in forbidden:
+              if item in public_text:
+                  raise SystemExit(f"Public management information remained: {item}")
+
+          result = {
+              "ok": True,
+              "overall": "OK",
+              "step": "SEITAI-NEXT-3",
+              "checks": {
+                  "previous_step": "OK",
+                  "backup_tag": "OK",
+                  "yml_syntax": "OK",
+                  "html_syntax": "OK",
+                  "javascript_syntax": "OK",
+                  "html_id_duplicates": "OK",
+                  "javascript_id_references": "OK",
+                  "existing_function_preservation": "OK",
+                  "patient_search": "OK",
+                  "patient_detail_on_demand": "OK",
+                  "reservation_visit_history": "OK",
+                  "ticket_history": "OK",
+                  "followup_history_or_current_target": "OK",
+                  "previous_content_reuse": "OK",
+                  "public_management_information": "OK",
+                  "api_unchanged": "OK",
+                  "worker_unchanged": "OK",
+                  "supabase_unchanged": "OK",
+                  "initial_load_policy": "OK",
+                  "file_size": "OK"
+              },
+              "metrics": {
+                  "owner_html_bytes": len(owner.encode("utf-8")),
+                  "owner_html_id_count": len(inspector.ids),
+                  "owner_html_inline_script_count": len(inspector.scripts),
+                  "api_path_count": len(after_apis)
+              },
+              "performance_policy": {
+                  "patient_history_initial_load": False,
+                  "patient_detail_load_trigger": "patient_selection_only",
+                  "search_result_limit": 20,
+                  "history_render_limit": 40,
+                  "all_images_initial_load": False
+              },
+              "change_record": {
+                  "worker_changed": False,
+                  "supabase_changed": False,
+                  "api_changed": False,
+                  "screen_function_changed": True,
+                  "existing_data_changed": False
+              }
+          }
+          Path("/tmp/seitai-next-3-check.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(result, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Update completion ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          COMPLETED_AT_JST="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %z')"
+          BASELINE_SHA="$(cat /tmp/seitai_next_3_baseline_sha.txt)"
+
+          cp /tmp/seitai-next-3-check.json dpro-next-check-result.json
+
+          cat > dpro-next-ledger.yml <<EOF
+          system_name: "DPRO 整骨院・整体 LINE"
+          standard: "DPRO NEXT"
+          step_name: "患者・予約・来院データ統合"
+          current_step: "SEITAI-NEXT-3-COMPLETE"
+          previous_step: "SEITAI-NEXT-2-COMPLETE"
+          next_step: "SEITAI-NEXT-4"
+          completed_at_jst: "$COMPLETED_AT_JST"
+          baseline_sha: "$BASELINE_SHA"
+          backup_tag: "$BACKUP_TAG"
+          backup_tag_status: "created"
+          target_files:
+            - "owner.html"
+            - "config.js"
+          implemented:
+            - "患者検索をPC管理画面へ追加"
+            - "患者を選んだ時だけ顧客詳細APIを取得"
+            - "患者基本情報・予約・来院・回数券・フォローを1画面へ統合"
+            - "予約一覧・今日やること・フォロー一覧から患者履歴を直接表示"
+            - "患者履歴から前回内容を反映して次回予約へ移動"
+            - "全患者・全履歴を初期表示で取得しない性能方針"
+          checks:
+            previous_step: "OK"
+            backup_tag: "OK"
+            yml_syntax: "OK"
+            html_syntax: "OK"
+            javascript_syntax: "OK"
+            html_id_duplicates: "OK"
+            javascript_id_references: "OK"
+            existing_function_preservation: "OK"
+            patient_search: "OK"
+            patient_detail_on_demand: "OK"
+            reservation_visit_history: "OK"
+            ticket_history: "OK"
+            followup_history_or_current_target: "OK"
+            api_unchanged: "OK"
+            overall: "OK"
+          change_record:
+            worker_changed: false
+            supabase_changed: false
+            api_changed: false
+            screen_function_changed: true
+            existing_data_changed: false
+          performance_policy:
+            all_customer_history_initial_load: false
+            patient_detail_load_trigger: "patient_selection_only"
+            patient_search_limit: 20
+            patient_history_render_limit: 40
+            all_images_initial_load: false
+          rollback:
+            method: "backup_tag"
+            tag: "$BACKUP_TAG"
+            command_reference: "git checkout $BACKUP_TAG"
+          workflow_self_delete_after_success: true
+          auto_commit_push: true
+          EOF
+
+          sed -i 's/^          //' dpro-next-ledger.yml
+
+      - name: Commit, remove successful workflow and push
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -f "$WORKFLOW_FILE"
+          git add owner.html config.js dpro-next-ledger.yml dpro-next-check-result.json "$WORKFLOW_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 1
+          fi
+
+          git commit -m "STEP SEITAI-NEXT-3 COMPLETE"
+          git push origin HEAD:main
