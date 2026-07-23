@@ -1,0 +1,10 @@
+# DPRO 整骨院・整体 LINE / STEP SEITAI-NEXT-1
+# baseline_sha=b45b0a3f70dd26eca14cf74e598771e7f682f717
+# backup_tag=backup-seitai-before-next-20260723
+# sha256  bytes  path
+376ee497251305f2ca54b80b2166122da0cbbfcd54aad22ced55701d3bc64247      5970  config.js
+3e78ce81406652439e1dc79db540ece8770964ad4ac693f4870f5a4a7989e1a0     51244  index.html
+249bb6c5817f4e0cde9dfb59d3d2205f09800e4a6009ba021126a1b85313509d     47743  member.html
+aaf968aee0368b752f61ca2d9d431ed692e21f075b42194849a4ec66b2f93896     70823  owner-ipad.html
+8bad62fec360003079e072477f1b93d3ee5a4e13812831894d49ad30bded7a08    116480  owner.html
+8a5a3d5ffe184eedb086606f9e3a379971a9a4346cd993489ec8b1971bf49f2d     41805  system-check.html
