@@ -1,25 +1,41 @@
 {
   "ok": true,
   "overall": "OK",
-  "step": "SEITAI-NEXT-2",
-  "baseline_sha": "27727e564585ce79f932c5142b31f4c1a8f8e37c",
-  "backup_tag": "backup-seitai-before-next-2-20260723",
+  "step": "SEITAI-NEXT-3",
   "checks": {
     "previous_step": "OK",
     "backup_tag": "OK",
     "yml_syntax": "OK",
-    "html_javascript": "OK",
+    "html_syntax": "OK",
+    "javascript_syntax": "OK",
     "html_id_duplicates": "OK",
-    "today_first_dashboard": "OK",
-    "three_action_workflow": "OK",
-    "left_settings_navigation": "OK",
-    "public_admin_information": "OK",
-    "existing_feature_preservation": "OK",
-    "industry_logic": "OK",
+    "javascript_id_references": "OK",
+    "existing_function_preservation": "OK",
+    "patient_search": "OK",
+    "patient_detail_on_demand": "OK",
+    "reservation_visit_history": "OK",
+    "ticket_history": "OK",
+    "followup_history_or_current_target": "OK",
+    "previous_content_reuse": "OK",
+    "public_management_information": "OK",
     "api_unchanged": "OK",
     "worker_unchanged": "OK",
     "supabase_unchanged": "OK",
+    "initial_load_policy": "OK",
     "file_size": "OK"
+  },
+  "metrics": {
+    "owner_html_bytes": 160247,
+    "owner_html_id_count": 136,
+    "owner_html_inline_script_count": 1,
+    "api_path_count": 26
+  },
+  "performance_policy": {
+    "patient_history_initial_load": false,
+    "patient_detail_load_trigger": "patient_selection_only",
+    "search_result_limit": 20,
+    "history_render_limit": 40,
+    "all_images_initial_load": false
   },
   "change_record": {
     "worker_changed": false,
@@ -27,109 +43,5 @@
     "api_changed": false,
     "screen_function_changed": true,
     "existing_data_changed": false
-  },
-  "html_results": {
-    "index.html": {
-      "bytes": 51244,
-      "id_count": 42,
-      "duplicate_ids": [],
-      "inline_script_count": 1
-    },
-    "member.html": {
-      "bytes": 47743,
-      "id_count": 37,
-      "duplicate_ids": [],
-      "inline_script_count": 1
-    },
-    "owner.html": {
-      "bytes": 131640,
-      "id_count": 117,
-      "duplicate_ids": [],
-      "inline_script_count": 1
-    },
-    "owner-ipad.html": {
-      "bytes": 70823,
-      "id_count": 56,
-      "duplicate_ids": [],
-      "inline_script_count": 1
-    },
-    "system-check.html": {
-      "bytes": 41851,
-      "id_count": 54,
-      "duplicate_ids": [],
-      "inline_script_count": 1
-    }
-  },
-  "existing_feature_checks": {
-    "customer_reservation": "OK",
-    "reservation_update": "OK",
-    "reservation_cancel": "OK",
-    "owner_today": "OK",
-    "visit_check_in": "OK",
-    "visit_start": "OK",
-    "visit_complete": "OK",
-    "ticket_use": "OK",
-    "followup_management": "OK",
-    "member_page": "OK",
-    "manual_phone_walkin": "OK",
-    "admin_code_clear": "OK"
-  },
-  "api_paths_before": [
-    "/api/admin/demo/reset",
-    "/api/admin/safety-check",
-    "/api/health",
-    "/api/owner/customers/detail",
-    "/api/owner/customers/search",
-    "/api/owner/followups",
-    "/api/owner/followups/update",
-    "/api/owner/reservations/line-copied",
-    "/api/owner/reservations/manual-create",
-    "/api/owner/settings",
-    "/api/owner/settings/basic",
-    "/api/owner/settings/hours",
-    "/api/owner/settings/menus",
-    "/api/owner/settings/resources",
-    "/api/owner/settings/staff",
-    "/api/owner/templates/save",
-    "/api/owner/tickets/use",
-    "/api/owner/today",
-    "/api/owner/visits/check-in",
-    "/api/owner/visits/complete",
-    "/api/owner/visits/start",
-    "/api/public/appointment-options",
-    "/api/public/settings",
-    "/api/reservations/cancel",
-    "/api/reservations/create",
-    "/api/reservations/update"
-  ],
-  "api_paths_after": [
-    "/api/admin/demo/reset",
-    "/api/admin/safety-check",
-    "/api/health",
-    "/api/owner/customers/detail",
-    "/api/owner/customers/search",
-    "/api/owner/followups",
-    "/api/owner/followups/update",
-    "/api/owner/reservations/line-copied",
-    "/api/owner/reservations/manual-create",
-    "/api/owner/settings",
-    "/api/owner/settings/basic",
-    "/api/owner/settings/hours",
-    "/api/owner/settings/menus",
-    "/api/owner/settings/resources",
-    "/api/owner/settings/staff",
-    "/api/owner/templates/save",
-    "/api/owner/tickets/use",
-    "/api/owner/today",
-    "/api/owner/visits/check-in",
-    "/api/owner/visits/complete",
-    "/api/owner/visits/start",
-    "/api/public/appointment-options",
-    "/api/public/settings",
-    "/api/reservations/cancel",
-    "/api/reservations/create",
-    "/api/reservations/update"
-  ],
-  "warnings": [],
-  "failures": []
+  }
 }

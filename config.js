@@ -23,7 +23,7 @@
 (() => {
   "use strict";
 
-  const STEP_VERSION = "STEP-SEITAI-NEXT-2-CONFIG-20260723";
+  const STEP_VERSION = "STEP-SEITAI-NEXT-3-CONFIG-20260723";
 
   const CONFIG = {
     version: STEP_VERSION,
@@ -90,6 +90,8 @@
       ownerSettings: "/api/owner/settings",
       ownerTicketsUse: "/api/owner/tickets/use",
       ownerFollowups: "/api/owner/followups",
+      ownerCustomerSearch: "/api/owner/customers/search",
+      ownerCustomerDetail: "/api/owner/customers/detail",
 
       demoReset: "/api/admin/demo/reset",
       safetyCheck: "/api/admin/safety-check"

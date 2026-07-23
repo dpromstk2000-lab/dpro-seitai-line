@@ -1,25 +1,23 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "PCオーナー画面・今日やること整理"
-current_step: "SEITAI-NEXT-2-COMPLETE"
-previous_step: "SEITAI-NEXT-1-COMPLETE"
-next_step: "SEITAI-NEXT-3"
-completed_at_jst: "2026-07-23 16:12:26 +0900"
-baseline_sha: "27727e564585ce79f932c5142b31f4c1a8f8e37c"
-backup_tag: "backup-seitai-before-next-2-20260723"
+step_name: "患者・予約・来院データ統合"
+current_step: "SEITAI-NEXT-3-COMPLETE"
+previous_step: "SEITAI-NEXT-2-COMPLETE"
+next_step: "SEITAI-NEXT-4"
+completed_at_jst: "2026-07-23 16:39:58 +0900"
+baseline_sha: "48ddba36d220d7102d272176d31c5f1615711973"
+backup_tag: "backup-seitai-before-next-3-20260723"
 backup_tag_status: "created"
 target_files:
   - "owner.html"
   - "config.js"
-  - "system-check.html"
 implemented:
-  - "今日やることをPC管理画面の最上部へ移動"
-  - "予約・受付・施術・フォロー・回数券を優先順で表示"
-  - "今日やることから来院受付・施術開始・施術完了を直接操作"
-  - "今日やることから個別LINE文面確認・対応済み操作"
-  - "設定画面をPC左メニュー＋内容切替へ変更"
-  - "スマホ・iPadでは設定メニューを横スクロールへ自動変更"
-  - "公開画面と公開コメントから固定デモ管理コード説明を除去"
+  - "患者検索をPC管理画面へ追加"
+  - "患者を選んだ時だけ顧客詳細APIを取得"
+  - "患者基本情報・予約・来院・回数券・フォローを1画面へ統合"
+  - "予約一覧・今日やること・フォロー一覧から患者履歴を直接表示"
+  - "患者履歴から前回内容を反映して次回予約へ移動"
+  - "全患者・全履歴を初期表示で取得しない性能方針"
 checks:
   previous_step: "OK"
   backup_tag: "OK"
@@ -27,9 +25,13 @@ checks:
   html_syntax: "OK"
   javascript_syntax: "OK"
   html_id_duplicates: "OK"
+  javascript_id_references: "OK"
   existing_function_preservation: "OK"
-  industry_logic: "OK"
-  public_management_information: "OK"
+  patient_search: "OK"
+  patient_detail_on_demand: "OK"
+  reservation_visit_history: "OK"
+  ticket_history: "OK"
+  followup_history_or_current_target: "OK"
   api_unchanged: "OK"
   overall: "OK"
 change_record:
@@ -39,13 +41,14 @@ change_record:
   screen_function_changed: true
   existing_data_changed: false
 performance_policy:
-  initial_data_scope: "既存の指定日ownerTodayデータのみ"
   all_customer_history_initial_load: false
+  patient_detail_load_trigger: "patient_selection_only"
+  patient_search_limit: 20
+  patient_history_render_limit: 40
   all_images_initial_load: false
-  additional_api_request_for_dashboard: false
 rollback:
   method: "backup_tag"
-  tag: "backup-seitai-before-next-2-20260723"
-  command_reference: "git checkout backup-seitai-before-next-2-20260723"
+  tag: "backup-seitai-before-next-3-20260723"
+  command_reference: "git checkout backup-seitai-before-next-3-20260723"
 workflow_self_delete_after_success: true
 auto_commit_push: true
