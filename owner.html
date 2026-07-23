@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- STEP SEITAI-NEXT-6: staff smartphone navigation / 20260723 -->
+<!-- STEP SEITAI-NEXT-8: revisit and follow-up center / 20260723 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-6</title>
-  <script src="./config.js?v=step-seitai-next-6"></script>
+  <title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-8</title>
+  <script src="./config.js?v=step-seitai-next-8"></script>
   <style>
     :root{
       --bg:#f4f8fb;
@@ -1410,6 +1410,176 @@
   .next5Foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:15px 18px;border-top:1px solid #e2e8f0}.next5LocalNote{margin-top:12px;padding:11px 12px;border:1px solid #fed7aa;border-radius:14px;background:#fff7ed;color:#9a3412;font-size:12px;line-height:1.65;font-weight:850}
   body.next5Open{overflow:hidden}@media(max-width:560px){.next5Drawer{padding:10px}.next5Head{display:block}.next5Head .btn{width:100%;margin-top:10px}.next5Presets{grid-template-columns:1fr}.next5Foot{display:grid;grid-template-columns:1fr}.next5Foot .btn{width:100%}}
 
+
+    /* DPRO NEXT-8: revisit and follow-up center */
+    .followupCenter{
+      border:1px solid #c7d2fe;
+      background:
+        radial-gradient(circle at top right,rgba(79,70,229,.11),transparent 330px),
+        linear-gradient(180deg,#ffffff,#fafaff);
+      scroll-margin-top:18px;
+    }
+    .followupCenterHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+    }
+    .followupMetrics{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-top:14px;
+    }
+    .followupMetric{
+      border:1px solid #e0e7ff;
+      border-radius:17px;
+      background:#fff;
+      padding:13px;
+      min-width:0;
+    }
+    .followupMetric span{
+      display:block;
+      color:#64748b;
+      font-size:11px;
+      font-weight:900;
+    }
+    .followupMetric b{
+      display:block;
+      margin-top:4px;
+      font-size:26px;
+      line-height:1.1;
+      letter-spacing:-.04em;
+      color:#312e81;
+    }
+    .followupToolbar{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(230px,320px);
+      gap:12px;
+      align-items:end;
+      margin-top:14px;
+      padding:12px;
+      border:1px solid #e0e7ff;
+      border-radius:17px;
+      background:rgba(255,255,255,.88);
+    }
+    .followupFilterBar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .followupFilter{
+      border:1px solid #dbeafe;
+      border-radius:999px;
+      background:#fff;
+      color:#334155;
+      padding:9px 12px;
+      font-size:12px;
+      font-weight:950;
+    }
+    .followupFilter.selected{
+      border-color:#4f46e5;
+      background:#4f46e5;
+      color:#fff;
+    }
+    .followupCenterList{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+    .followupCard{
+      border:1px solid #e2e8f0;
+      border-left:6px solid #94a3b8;
+      border-radius:18px;
+      background:#fff;
+      padding:14px;
+      min-width:0;
+    }
+    .followupCard.overdue{
+      border-color:#fecaca;
+      border-left-color:#dc2626;
+      background:#fffafa;
+    }
+    .followupCard.today{
+      border-color:#fde68a;
+      border-left-color:#f59e0b;
+      background:#fffdf7;
+    }
+    .followupCard.high{
+      box-shadow:0 0 0 2px rgba(79,70,229,.10);
+    }
+    .followupCardTop{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .followupDue{
+      display:inline-flex;
+      align-items:center;
+      min-height:30px;
+      padding:6px 9px;
+      border-radius:999px;
+      background:#e2e8f0;
+      color:#334155;
+      font-size:11px;
+      font-weight:950;
+      white-space:nowrap;
+    }
+    .followupDue.overdue{background:#fee2e2;color:#991b1b}
+    .followupDue.today{background:#fef3c7;color:#92400e}
+    .followupDue.soon{background:#e0e7ff;color:#3730a3}
+    .followupCardText{
+      margin-top:10px;
+      padding:10px 11px;
+      border:1px solid #e0e7ff;
+      border-radius:14px;
+      background:#f8faff;
+      color:#475569;
+      font-size:12px;
+      line-height:1.7;
+      white-space:pre-wrap;
+    }
+    .followupGuideRow{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+      margin-top:9px;
+    }
+    .followupGuideChip{
+      display:inline-flex;
+      padding:6px 9px;
+      border-radius:999px;
+      background:#ecfdf5;
+      color:#065f46;
+      border:1px solid #bbf7d0;
+      font-size:11px;
+      font-weight:900;
+    }
+    .followupScopeNote{
+      margin-top:12px;
+      color:#64748b;
+      font-size:12px;
+      line-height:1.7;
+      font-weight:800;
+    }
+    @media(max-width:900px){
+      .followupToolbar{grid-template-columns:1fr}
+      .followupCenterList{grid-template-columns:1fr}
+    }
+    @media(max-width:560px){
+      .followupCenterHead{display:block}
+      .followupCenterHead .btn{width:100%;margin-top:12px}
+      .followupMetrics{grid-template-columns:1fr 1fr}
+      .followupFilterBar{display:grid;grid-template-columns:1fr 1fr}
+      .followupFilter{width:100%}
+      .followupCardTop{display:block}
+      .followupDue{margin-top:8px}
+      .followupCard .actionRow{display:grid;grid-template-columns:1fr}
+      .followupCard .actionRow .btn{width:100%}
+    }
+
   </style>
 </head>
 <body>
@@ -1665,18 +1835,56 @@
         </div>
       </div>
 
-      <div class="card span6" id="followupSection">
-        <div class="sectionHead">
+      <div class="card span12 followupCenter" id="followupSection">
+        <div class="followupCenterHead">
           <div>
-            <h2>フォロー対象</h2>
-            <p class="note">来院後フォロー、久しぶりフォロー、回数券残数案内など。</p>
+            <span class="nextEyebrow">DPRO NEXT｜再来院につなげる</span>
+            <h2 style="margin-top:10px;">再来院・フォローセンター</h2>
+            <p class="note">
+              期限超過・本日・7日以内・優先度を整理し、患者ごとの文面確認、コピー、対応済み、患者履歴までここで完了します。
+            </p>
           </div>
-          <button class="btn ghost small" id="reloadFollowupsBtn" type="button">再読込</button>
+          <button class="btn ghost" id="reloadFollowupsBtn" type="button">フォローを再読込</button>
         </div>
-        <div id="followupList" class="list"></div>
+
+        <div class="followupMetrics">
+          <div class="followupMetric"><span>期限超過</span><b id="followupOverdueCount">-</b></div>
+          <div class="followupMetric"><span>本日期限</span><b id="followupTodayCount">-</b></div>
+          <div class="followupMetric"><span>7日以内</span><b id="followupSoonCount">-</b></div>
+          <div class="followupMetric"><span>優先対応</span><b id="followupHighCount">-</b></div>
+        </div>
+
+        <div class="followupToolbar">
+          <div>
+            <label>表示する対象</label>
+            <div class="followupFilterBar" id="followupFilterBar">
+              <button class="followupFilter selected" data-followup-filter="all" type="button">すべて</button>
+              <button class="followupFilter" data-followup-filter="overdue" type="button">期限超過</button>
+              <button class="followupFilter" data-followup-filter="today" type="button">本日</button>
+              <button class="followupFilter" data-followup-filter="high" type="button">優先</button>
+              <button class="followupFilter" data-followup-filter="after_visit" type="button">施術後</button>
+              <button class="followupFilter" data-followup-filter="absent" type="button">久しぶり</button>
+              <button class="followupFilter" data-followup-filter="ticket" type="button">回数券</button>
+            </div>
+          </div>
+          <div>
+            <label for="followupTemplateSelect">LINE文面の種類</label>
+            <select id="followupTemplateSelect">
+              <option value="auto">自動（登録済み文面を優先）</option>
+              <option value="after_visit">施術後の状態確認</option>
+              <option value="absent">久しぶり・再来院案内</option>
+              <option value="ticket">回数券の確認案内</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="followupList" class="followupCenterList"></div>
+        <div class="followupScopeNote">
+          フォロー対象は既存APIの結果を利用し、追加通信は行いません。次回来院目安はNEXT-5と同じく、このブラウザ内に保存された情報だけを表示します。
+        </div>
       </div>
 
-      <div class="card span6" id="ticketSection">
+<div class="card span6" id="ticketSection">
         <div class="sectionHead">
           <div>
             <h2>回数券残数注意</h2>
@@ -4459,6 +4667,210 @@ ${activeTickets.length ? activeTickets.map((ticket) => `
   if(typeof renderPatientSummary==="function"){const oldSummary=renderPatientSummary;renderPatientSummary=function(detail,reservations,activeTickets,followups){oldSummary(detail,reservations,activeTickets,followups);const grid=$("patientHistoryContent")?.querySelector(".patientSummaryGrid");if(!grid||grid.querySelector("[data-next5-patient]"))return;const c=detail?.customer||{},last=(reservations||[]).find(v=>["completed","treatment_done"].includes(v.status))||{},e={...last,...c},g=next5Guide(e),box=document.createElement("div");box.className="patientSummaryBox";box.dataset.next5Patient="1";box.innerHTML=`<h3>次回来院目安</h3><div class="next5Chip">${escapeHtml(g.date)} ${g.saved?"保存済み":"自動目安"}</div><div class="actionRow"><button class="btn primary small" data-next5-patient-open="1" type="button">目安を設定・変更</button></div>`;grid.appendChild(box)}}
   const next5Action=handleReservationAction;handleReservationAction=async function(action,id,button){const before=state.reservations.find(v=>String(v.reservation_id||v.id)===String(id));if(action==="ticket"){const key=`ticket:${id}`;if(next5TicketBusy.has(key))return showToast("回数券使用を処理中です");if(!window.confirm(`${before?.customer_name||"患者"} 様の回数券を1回使用しますか？`))return;next5TicketBusy.add(key);try{await next5Action(action,id,button)}finally{next5TicketBusy.delete(key)}return}await next5Action(action,id,button);if(action==="complete"){const now=state.reservations.find(v=>String(v.reservation_id||v.id)===String(id));if(now&&["completed","treatment_done"].includes(now.status))next5Open(now,true)}};
   const next5InitEvents=initEvents;initEvents=function(){next5InitEvents();if(typeof openManualReservation!=="function")$("next5GuideReserveBtn").style.display="none";$("next5GuideCloseBtn").addEventListener("click",next5Close);$("next5GuideSaveBtn").addEventListener("click",next5Save);$("next5GuideCopyBtn").addEventListener("click",next5Copy);$("next5GuideDate").addEventListener("change",next5Preview);$("next5GuideNote").addEventListener("input",next5Preview);$("next5PresetGrid").addEventListener("click",e=>{const b=e.target.closest("[data-next5-days]");if(!b||!next5Target)return;const days=Number(b.dataset.next5Days||14);$("next5GuideDate").value=next5Add(next5Base(next5Target),days);$("next5PresetGrid").querySelectorAll("[data-next5-days]").forEach(n=>n.classList.toggle("selected",n===b));next5Preview()});$("next5GuideDrawer").addEventListener("click",e=>{if(e.target?.id==="next5GuideDrawer")next5Close()});$("next5GuideReserveBtn").addEventListener("click",async()=>{if(typeof openManualReservation!=="function"||!next5Target)return;const target=next5Target,date=$("next5GuideDate").value;next5Close();await openManualReservation("phone");$("manualCustomerName").value=target.customer_name||"";$("manualPhone").value=target.phone||"";if(date)$("manualDate").value=date});document.addEventListener("click",e=>{const g=e.target.closest("[data-next5-guide]");if(g){const r=state.reservations.find(v=>String(v.reservation_id||v.id)===String(g.dataset.next5Guide));if(r)next5Open(r);return}if(e.target.closest("[data-next5-patient-open]")&&state.selectedPatientDetail){const c=state.selectedPatientDetail.customer||{},rows=typeof patientReservations==="function"?patientReservations(state.selectedPatientDetail):[],last=rows.find(v=>["completed","treatment_done"].includes(v.status))||{};next5Open({...last,...c});return}const t=e.target.closest("[data-next5-ticket]");if(t){const row=(state.lowTickets||[])[Number(t.dataset.next5Ticket)];if(!row)return;const text=next5RenewText(row);if(typeof setMessageEditor==="function")setMessageEditor(text,{type:"manual",customerName:row.customer_name||"患者"});else openMessage(text,{type:"manual",hint:`回数券更新案内：${row.customer_name||"患者"} 様`})}})};
+
+
+  /* DPRO NEXT-8: revisit and follow-up center */
+  function next8DateDiff(dateText){
+    if(!dateText) return null;
+    const due=new Date(`${String(dateText).slice(0,10)}T00:00:00`);
+    const today=new Date(`${todayText()}T00:00:00`);
+    if(Number.isNaN(due.getTime())) return null;
+    return Math.round((due-today)/86400000);
+  }
+
+  function next8FollowupType(row={}){
+    const raw=[row.followup_type,row.title,row.category,row.template_key].filter(Boolean).join(" ").toLowerCase();
+    if(/ticket|回数券|残数/.test(raw)) return "ticket";
+    if(/absent|inactive|long|久しぶり|再来|休眠|未訪問|来院なし/.test(raw)) return "absent";
+    if(/after|visit|施術後|来院後|体調|状態確認/.test(raw)) return "after_visit";
+    return "other";
+  }
+
+  function next8DueInfo(row={}){
+    const diff=next8DateDiff(row.due_date);
+    if(diff===null) return { diff:null, label:"期限未設定", cls:"" };
+    if(diff<0) return { diff, label:`期限超過 ${Math.abs(diff)}日`, cls:"overdue" };
+    if(diff===0) return { diff, label:"本日期限", cls:"today" };
+    if(diff<=7) return { diff, label:`あと${diff}日`, cls:"soon" };
+    return { diff, label:`${row.due_date}`, cls:"" };
+  }
+
+  function next8FollowupMessage(row={}){
+    const mode=state.followupTemplateMode||"auto";
+    if(mode==="auto" && row.message_text) return String(row.message_text);
+    const type=mode==="auto" ? next8FollowupType(row) : mode;
+    const name=row.customer_name||"お客様";
+    if(type==="after_visit"){
+      return `${name}様\n\n先日はご来院ありがとうございました。\nその後、お身体の調子はいかがでしょうか。\n気になる変化やご不安がありましたら、このLINEにそのままご返信ください。\n\n無理のない範囲でお過ごしください。`;
+    }
+    if(type==="absent"){
+      return `${name}様\n\nお久しぶりです。お身体の状態はいかがでしょうか。\n気になる症状やメンテナンスのご相談がありましたら、LINEからお気軽にご連絡ください。\n\nご都合に合わせて次回予約も承ります。`;
+    }
+    if(type==="ticket"){
+      const remain=row.remaining_count!==undefined ? `残り${Number(row.remaining_count||0)}回` : "残数";
+      const expiry=row.expires_at ? `\n有効期限：${row.expires_at}` : "";
+      return `${name}様\n\nご利用中の回数券についてご案内です。\n現在の${remain}をご確認ください。${expiry}\n\n継続や次回予約について、このLINEにそのままご返信いただけます。`;
+    }
+    return `${name}様\n\n${row.title||"お身体の状態確認のご連絡です。"}\nご都合のよい時に、このLINEにそのままご返信ください。`;
+  }
+
+  function next8FollowupMatches(row={}){
+    const filter=state.followupFilter||"all";
+    const due=next8DueInfo(row);
+    if(filter==="all") return true;
+    if(filter==="overdue") return due.diff!==null && due.diff<0;
+    if(filter==="today") return due.diff===0;
+    if(filter==="high") return row.priority==="high";
+    return next8FollowupType(row)===filter;
+  }
+
+  function next8FollowupSort(a,b){
+    const ad=next8DueInfo(a), bd=next8DueInfo(b);
+    const aOver=ad.diff!==null && ad.diff<0 ? 0 : 1;
+    const bOver=bd.diff!==null && bd.diff<0 ? 0 : 1;
+    if(aOver!==bOver) return aOver-bOver;
+    const ah=a.priority==="high" ? 0 : 1;
+    const bh=b.priority==="high" ? 0 : 1;
+    if(ah!==bh) return ah-bh;
+    const av=ad.diff===null ? 99999 : ad.diff;
+    const bv=bd.diff===null ? 99999 : bd.diff;
+    return av-bv;
+  }
+
+  function next8UpdateFollowupMetrics(rows){
+    const overdue=rows.filter(r=>{const d=next8DateDiff(r.due_date);return d!==null&&d<0}).length;
+    const today=rows.filter(r=>next8DateDiff(r.due_date)===0).length;
+    const soon=rows.filter(r=>{const d=next8DateDiff(r.due_date);return d!==null&&d>=0&&d<=7}).length;
+    const high=rows.filter(r=>r.priority==="high").length;
+    $("followupOverdueCount").textContent=overdue;
+    $("followupTodayCount").textContent=today;
+    $("followupSoonCount").textContent=soon;
+    $("followupHighCount").textContent=high;
+  }
+
+  renderFollowups=function(){
+    const box=$("followupList");
+    const all=(state.followups||[]).slice();
+    next8UpdateFollowupMetrics(all);
+    const rows=all.filter(next8FollowupMatches).sort(next8FollowupSort);
+
+    document.querySelectorAll("[data-followup-filter]").forEach(button=>{
+      button.classList.toggle("selected",button.dataset.followupFilter===(state.followupFilter||"all"));
+    });
+
+    if(!rows.length){
+      box.innerHTML=`<div class="empty" style="grid-column:1/-1;">この条件に該当するフォロー対象はありません。</div>`;
+      return;
+    }
+
+    box.innerHTML=rows.map(f=>{
+      const id=f.followup_id||f.id;
+      const due=next8DueInfo(f);
+      const type=next8FollowupType(f);
+      const high=f.priority==="high";
+      const preview=next8FollowupMessage(f).slice(0,150);
+      let guide=null;
+      try{ if(typeof next5Guide==="function") guide=next5Guide(f); }catch{}
+      const cardClass=[due.cls,high?"high":""].filter(Boolean).join(" ");
+      const typeLabel={after_visit:"施術後",absent:"久しぶり",ticket:"回数券",other:"個別フォロー"}[type];
+      return `
+        <article class="followupCard ${cardClass}" data-followup-id="${escapeHtml(id)}">
+          <div class="followupCardTop">
+            <div>
+              <div class="itemTitle">${escapeHtml(f.customer_name||"-")} 様</div>
+              <div class="itemMeta">
+                ${escapeHtml(f.title||f.followup_type||"フォロー")} ／ ${escapeHtml(typeLabel)}
+                ${f.last_visit_date?`<br>最終来院：${escapeHtml(f.last_visit_date)}`:""}
+              </div>
+            </div>
+            <span class="followupDue ${due.cls}">${escapeHtml(due.label)}</span>
+          </div>
+          <div class="followupGuideRow">
+            ${high?`<span class="pill orange">優先対応</span>`:""}
+            <span class="pill gray">${escapeHtml(f.priority||"normal")}</span>
+            ${guide?.date?`<span class="followupGuideChip">次回来院目安：${escapeHtml(guide.date)}</span>`:""}
+          </div>
+          <div class="followupCardText">${escapeHtml(preview)}${next8FollowupMessage(f).length>150?"…":""}</div>
+          <div class="actionRow">
+            <button class="btn ghost small" data-followup-action="show" data-id="${escapeHtml(id)}" type="button">文面編集</button>
+            <button class="btn primary small" data-followup-action="copy" data-id="${escapeHtml(id)}" type="button">文面コピー</button>
+            <button class="btn dark small" data-followup-action="done" data-id="${escapeHtml(id)}" type="button">対応済み</button>
+            <button class="btn ghost small" data-followup-action="history" data-id="${escapeHtml(id)}" type="button">患者履歴・次回予約</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    box.querySelectorAll("[data-followup-action]").forEach(button=>{
+      button.addEventListener("click",()=>handleFollowupAction(button.dataset.followupAction,button.dataset.id,button));
+    });
+  };
+
+  handleFollowupAction=async function(action,id,button){
+    const f=(state.followups||[]).find(item=>String(item.followup_id||item.id)===String(id));
+    if(!f) return showToast("フォローが見つかりません。");
+
+    if(action==="history"){
+      await openPatientHistoryFromEntity(f);
+      return;
+    }
+
+    const text=next8FollowupMessage(f);
+    if(action==="show"){
+      setMessageEditor(text,{type:"followup",followup:f,original:text});
+      showToast("フォロー文面を編集できる状態にしました");
+      return;
+    }
+
+    if(action==="done" && !window.confirm(`${f.customer_name||"患者"} 様のフォローを対応済みにしますか？`)) return;
+
+    setBusy(button,true,"処理中...");
+    try{
+      if(action==="copy"){
+        setMessageEditor(text,{type:"followup",followup:f,original:text});
+        await copyCurrentMessage();
+        return;
+      }
+      if(action==="done"){
+        await apiPost("/api/owner/followups/update",{followup_id:id,status:"done"});
+        showToast("フォローを対応済みにしました");
+        await loadOwnerToday(state.date);
+      }
+    }catch(error){
+      showToast(error.message);
+      showJson({ok:false,message:error.message,action});
+    }finally{
+      setBusy(button,false);
+    }
+  };
+
+  const next8InitEvents=initEvents;
+  initEvents=function(){
+    next8InitEvents();
+    state.followupFilter=state.followupFilter||"all";
+    state.followupTemplateMode=state.followupTemplateMode||"auto";
+
+    $("followupFilterBar").addEventListener("click",event=>{
+      const button=event.target.closest("[data-followup-filter]");
+      if(!button) return;
+      state.followupFilter=button.dataset.followupFilter||"all";
+      renderFollowups();
+    });
+
+    $("followupTemplateSelect").addEventListener("change",event=>{
+      state.followupTemplateMode=event.target.value||"auto";
+      renderFollowups();
+      if(state.selectedFollowup){
+        const fresh=(state.followups||[]).find(row=>String(row.followup_id||row.id)===String(state.selectedFollowup.followup_id||state.selectedFollowup.id));
+        if(fresh){
+          const text=next8FollowupMessage(fresh);
+          setMessageEditor(text,{type:"followup",followup:fresh,original:text});
+        }
+      }
+      showToast("フォロー文面の種類を変更しました");
+    });
+  };
+
 
   async function init() {
     $("dateInput").value = todayText();

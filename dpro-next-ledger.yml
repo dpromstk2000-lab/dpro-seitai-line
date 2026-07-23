@@ -1,33 +1,29 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "会員履歴・前回と同じ予約"
-recovery_revision: "R1"
-recovery_reason: "data-idの動的値を固定HTML idと誤認した重複ID検査を修正"
-current_step: "SEITAI-NEXT-7-COMPLETE"
-previous_step: "SEITAI-NEXT-6-COMPLETE"
-next_step: "SEITAI-NEXT-8"
-completed_at_jst: "2026-07-23 21:57:36 +0900"
-baseline_sha: "504911c90147615ec8c3bfce0e468e19b203f9ee"
-backup_tag: "backup-seitai-before-next-7-20260723"
+step_name: "再来院・フォローセンター"
+current_step: "SEITAI-NEXT-8-COMPLETE"
+previous_step: "SEITAI-NEXT-7-COMPLETE"
+next_step: "SEITAI-NEXT-9"
+completed_at_jst: "2026-07-23 22:27:00 +0900"
+baseline_sha: "6c3d64222d73aa698785cb934583b8f20a5f6979"
+backup_tag: "backup-seitai-before-next-8-20260723"
 backup_tag_status: "created"
 target_files:
-  - "member.html"
-  - "index.html"
-  - "system-check.html"
+  - "owner.html"
   - "config.js"
+  - "system-check.html"
 implemented:
-  - "会員ホームの次回予約・来院回数・回数券集約"
-  - "既存会員予約API結果の現在予約と来院履歴への分類"
-  - "来院履歴の直近20件表示"
-  - "前回メニュー・担当・要望の再予約URL"
-  - "予約画面のURL事前入力"
-  - "同一ブラウザ保存の次回来院目安表示"
-  - "予約変更・キャンセル・回数券の既存機能維持"
+  - "期限超過・本日・7日以内・優先対応の集約"
+  - "フォロー種類別フィルター"
+  - "登録済み文面優先と施術後・久しぶり・回数券文面切替"
+  - "期限までの日数・超過日数表示"
+  - "次回来院目安の同一ブラウザ表示"
+  - "文面編集・コピー・対応済み・患者履歴の一画面操作"
+  - "対応済みの確認ダイアログ"
 data_scope:
-  member_history_endpoint: "existing memberReservations"
-  include_history_parameter: true
-  history_limit: 20
-  additional_member_api_request: false
+  followup_endpoint: "existing ownerFollowups"
+  followup_update_endpoint: "existing /api/owner/followups/update"
+  additional_initial_api_request: false
   next_visit_scope: "same browser localStorage only"
 checks:
   previous_step: "OK"
@@ -37,10 +33,10 @@ checks:
   javascript_syntax: "OK"
   html_id_duplicates: "OK"
   existing_function_preservation: "OK"
-  member_history: "OK"
-  repeat_reservation_url: "OK"
-  index_prefill: "OK"
-  member_role_restriction: "OK"
+  followup_metrics: "OK"
+  followup_filters: "OK"
+  followup_template_switch: "OK"
+  followup_copy_done_history: "OK"
   api_unchanged: "OK"
   overall: "OK"
 change_record:
@@ -51,12 +47,11 @@ change_record:
   new_screen_added: false
   existing_data_changed: false
 performance_policy:
-  member_initial_api_requests: 3
-  member_additional_initial_request: false
-  history_limit: 20
-  all_history_initial_unlimited_load: false
+  additional_initial_api_request: false
+  all_followups_unlimited_history_load: false
+  existing_owner_today_reused: true
 rollback:
   method: "backup_tag"
-  tag: "backup-seitai-before-next-7-20260723"
+  tag: "backup-seitai-before-next-8-20260723"
 workflow_self_delete_after_success: true
 auto_commit_push: true
