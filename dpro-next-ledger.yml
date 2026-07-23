@@ -1,26 +1,33 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "回数券・確認・次回来院目安"
-current_step: "SEITAI-NEXT-5-COMPLETE"
-previous_step: "SEITAI-NEXT-4-COMPLETE"
-next_step: "SEITAI-NEXT-6"
-completed_at_jst: "2026-07-23 20:41:09 +0900"
-baseline_sha: "f25ff99504ebc066aa05b64a8a61ca5096fbe94d"
-backup_tag: "backup-seitai-before-next-5-20260723"
+step_name: "iPad受付・スタッフスマホ最適化"
+recovery_revision: "R1"
+recovery_reason: "system-check営業デモ手順の完全一致検査を空白許容へ修正"
+current_step: "SEITAI-NEXT-6-COMPLETE"
+previous_step: "SEITAI-NEXT-5-COMPLETE"
+next_step: "SEITAI-NEXT-7"
+completed_at_jst: "2026-07-23 21:17:51 +0900"
+baseline_sha: "70853f3ca32e5d4c361b23b1c726e75ea54faddc"
+backup_tag: "backup-seitai-before-next-6-20260723"
 backup_tag_status: "created"
-target_files: ["owner.html", "owner-ipad.html", "config.js", "system-check.html"]
+target_files:
+  - "owner.html"
+  - "owner-ipad.html"
+  - "staff.html"
+  - "system-check.html"
+  - "config.js"
 implemented:
-  - "施術完了後の次回来院目安"
-  - "1週間後・2週間後・1か月後・任意日"
-  - "患者履歴への次回来院目安表示"
-  - "次回来院目安LINE文面"
-  - "回数券使用前確認と二重操作防止"
-  - "回数券更新候補と個別LINE文面"
-persistence:
-  next_visit_mode: "browser_local_storage"
-  cross_device_sync: false
-  worker_endpoint_available: false
-  reason: "現行リポジトリにWorkerソースと次回来院保存APIがないため"
+  - "iPad受付優先リスト"
+  - "来院受付を最優先にした受付導線"
+  - "フォロー・回数券注意の初期折りたたみ"
+  - "スタッフ別のスマホ担当患者画面"
+  - "スタッフスマホから施術開始・施術完了"
+  - "担当者・状態フィルター"
+  - "オーナーPC・iPad・system-checkからスタッフ画面への入口"
+role_separation:
+  reception_ipad: "来院受付・電話店頭予約・共用補助操作"
+  staff_mobile: "担当患者・施術開始・施術完了"
+  owner_pc: "予約・回数券・フォロー・設定・患者履歴"
 checks:
   previous_step: "OK"
   backup_tag: "OK"
@@ -29,11 +36,11 @@ checks:
   javascript_syntax: "OK"
   html_id_duplicates: "OK"
   existing_function_preservation: "OK"
-  ticket_double_action_guard: "OK"
-  ticket_renewal_candidate: "OK"
-  next_visit_presets: "OK"
-  next_visit_patient_history: "OK"
-  next_visit_line_message: "OK"
+  reception_priority_queue: "OK"
+  staff_filter: "OK"
+  staff_start_complete: "OK"
+  staff_role_restriction: "OK"
+  system_check_navigation: "OK"
   api_unchanged: "OK"
   overall: "OK"
 change_record:
@@ -41,12 +48,15 @@ change_record:
   supabase_changed: false
   api_changed: false
   screen_function_changed: true
+  new_screen_added: true
   existing_data_changed: false
 performance_policy:
-  additional_initial_api_request: false
-  next_visit_storage_scope: "current browser only"
+  staff_initial_requests: 2
+  staff_auto_polling: false
+  all_images_initial_load: false
+  owner_today_reused: true
 rollback:
   method: "backup_tag"
-  tag: "backup-seitai-before-next-5-20260723"
+  tag: "backup-seitai-before-next-6-20260723"
 workflow_self_delete_after_success: true
 auto_commit_push: true

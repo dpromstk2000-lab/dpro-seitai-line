@@ -1,11 +1,11 @@
 <!doctype html>
-<!-- STEP SEITAI-NEXT-5: ticket safety and next visit guidance / 20260723 -->
+<!-- STEP SEITAI-NEXT-6: reception-first iPad and staff separation / 20260723 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-NEXT-5</title>
-  <script src="./config.js?v=step-seitai-next-5"></script>
+  <title>DPRO 整骨院・整体 LINE｜iPad受付中心・共用画面｜STEP SEITAI-NEXT-6</title>
+  <script src="./config.js?v=step-seitai-next-6"></script>
   <style>
     :root{
       --bg:#f4f8fb;
@@ -761,6 +761,18 @@
   .next5Foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:15px 18px;border-top:1px solid #e2e8f0}.next5LocalNote{margin-top:12px;padding:11px 12px;border:1px solid #fed7aa;border-radius:14px;background:#fff7ed;color:#9a3412;font-size:12px;line-height:1.65;font-weight:850}
   body.next5Open{overflow:hidden}@media(max-width:560px){.next5Drawer{padding:10px}.next5Head{display:block}.next5Head .btn{width:100%;margin-top:10px}.next5Presets{grid-template-columns:1fr}.next5Foot{display:grid;grid-template-columns:1fr}.next5Foot .btn{width:100%}}
 
+
+  /* DPRO NEXT-6: reception-first iPad */
+  .receptionFocus{border:1px solid #99f6e4;background:linear-gradient(180deg,#ffffff,#f3fffb);scroll-margin-top:18px}
+  .receptionFocusGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+  .receptionMetric{border:1px solid #ccfbf1;border-radius:18px;background:#fff;padding:14px;text-align:left;color:inherit}
+  .receptionMetric b{display:block;font-size:30px;line-height:1.1;letter-spacing:-.04em}.receptionMetric span{display:block;margin-top:3px;color:#64748b;font-size:11px;font-weight:900}
+  .receptionMetric.urgent{border-color:#fecaca;background:#fffafa}.receptionMetric.waiting{border-color:#fde68a;background:#fffdf7}.receptionMetric.treatment{border-color:#99f6e4;background:#f4fffc}
+  .receptionQueue{display:grid;gap:9px;margin-top:14px}.receptionRow{display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #e2e8f0;border-radius:17px;background:#fff;padding:12px}
+  .receptionRow.urgent{border-color:#fecaca;background:#fffafa}.receptionRow.waiting{border-color:#fde68a;background:#fffdf7}.receptionRow.treatment{border-color:#99f6e4;background:#f4fffc}.receptionTime{font-size:21px;font-weight:950}.receptionName{font-size:16px;font-weight:950}.receptionMeta{margin-top:3px;color:#64748b;font-size:12px;line-height:1.55}
+  .receptionOtherToggle{border-style:dashed;background:#f8fafc}.receptionSecondaryCard{display:none}.grid.showReceptionSecondary .receptionSecondaryCard{display:block}
+  @media(max-width:700px){.receptionFocusGrid{grid-template-columns:1fr}.receptionRow{grid-template-columns:1fr}.receptionRow .btn{width:100%}}
+
   </style>
 </head>
 <body>
@@ -768,10 +780,10 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-NEXT-5 / owner-ipad.html</span>
-        <h1>DPRO 整骨院・整体 LINE<br>iPad受付・施術画面</h1>
+        <span class="badge">STEP SEITAI-NEXT-6 / owner-ipad.html</span>
+        <h1>DPRO 整骨院・整体 LINE<br>iPad受付中心・共用画面</h1>
         <p class="lead">
-          受付・施術中に使う画面です。店舗設定は出さず、予約確認・来院・施術・回数券・文面コピーに絞っています。
+          受付担当が来院確認を迷わず進めるための画面です。施術開始・完了はスタッフスマホ画面へ役割分離し、従来の共用操作も残します。
         </p>
       </div>
       <div class="heroPanel">
@@ -779,8 +791,8 @@
         <div class="shop" id="shopNameView">DPRO整体院</div>
         <div class="mini" id="shopNoteView">本日の予約と来院状況を確認できます。</div>
         <div class="chips">
-          <span class="chip">受付用</span>
-          <span class="chip">施術用</span>
+          <span class="chip">受付中心</span>
+          <span class="chip">スタッフ連携</span>
           <span class="chip">設定なし</span>
         </div>
       </div>
@@ -820,6 +832,7 @@
           <button class="btn ghost" id="tomorrowBtn" type="button">明日</button>
           <button class="btn dark" id="findBtn" type="button">予約がある日を探す</button>
           <a class="btn ghost" href="./owner.html" style="text-decoration:none;">PC管理画面へ</a>
+          <a class="btn primary" href="./staff.html" style="text-decoration:none;">スタッフスマホ画面</a>
         </div>
 
         <div class="statGrid">
@@ -846,6 +859,20 @@
         </div>
       </div>
 
+
+
+      <div class="card span12 receptionFocus" id="receptionFocusSection">
+        <div class="sectionHead">
+          <div><span class="badge">受付担当が最初に見る場所</span><h2 style="margin-top:10px;">受付優先リスト</h2><p class="note">来院受付が必要な患者を上から確認します。施術開始・完了はスタッフスマホ画面へ分離しました。</p></div>
+          <a class="btn primary" href="./staff.html">スタッフスマホ画面</a>
+        </div>
+        <div class="receptionFocusGrid">
+          <button class="receptionMetric urgent" data-reception-filter="reserved" type="button"><b id="receptionOverdueCount">-</b><span>受付確認・来院待ち</span></button>
+          <button class="receptionMetric waiting" data-reception-filter="arrived" type="button"><b id="receptionWaitingCount">-</b><span>受付済み・施術待ち</span></button>
+          <button class="receptionMetric treatment" data-reception-filter="treatment" type="button"><b id="receptionTreatmentCount">-</b><span>現在施術中</span></button>
+        </div>
+        <div class="receptionQueue" id="receptionQueue" aria-live="polite"></div>
+      </div>
 
       <div class="card span12 workflowBoard" id="workflowBoardSection">
         <div class="workflowBoardHead">
@@ -920,7 +947,9 @@
         <div id="reservationList" class="list"></div>
       </div>
 
-      <div class="card span6">
+      <div class="card span12 receptionOtherToggle"><div class="sectionHead"><div><h2>その他の業務</h2><p class="note">フォローと回数券注意は必要な時だけ開きます。</p></div><button class="btn ghost" id="receptionOtherToggleBtn" type="button">その他業務を表示</button></div></div>
+
+      <div class="card span6 receptionSecondaryCard" id="receptionFollowupCard">
         <div class="sectionHead">
           <div>
             <h2>フォロー対象</h2>
@@ -930,7 +959,7 @@
         <div id="followupList" class="list"></div>
       </div>
 
-      <div class="card span6">
+      <div class="card span6 receptionSecondaryCard" id="receptionTicketCard">
         <div class="sectionHead">
           <div>
             <h2>回数券残数注意</h2>
@@ -1865,8 +1894,25 @@
     throw new Error("28日以内に予約データが見つかりません。");
   }
 
+
+  /* DPRO NEXT-6: reception-first queue */
+  function receptionTimeMinutes(value){const p=String(value||"").slice(0,5).split(":").map(Number);return(p[0]||0)*60+(p[1]||0)}
+  function renderReceptionFocus(){
+    const today=state.date===todayText(),now=new Date(),nowMinutes=now.getHours()*60+now.getMinutes();
+    const reserved=state.reservations.filter((r)=>r.status==="reserved").sort((a,b)=>String(a.start_time||"").localeCompare(String(b.start_time||"")));
+    const arrived=state.reservations.filter((r)=>r.status==="arrived").sort((a,b)=>String(a.start_time||"").localeCompare(String(b.start_time||"")));
+    const treatment=state.reservations.filter((r)=>r.status==="in_treatment"||r.status==="treatment_done").sort((a,b)=>String(a.start_time||"").localeCompare(String(b.start_time||"")));
+    const overdue=reserved.filter((r)=>today&&receptionTimeMinutes(r.start_time)<nowMinutes);
+    $("receptionOverdueCount").textContent=reserved.length;$("receptionWaitingCount").textContent=arrived.length;$("receptionTreatmentCount").textContent=treatment.length;
+    const ordered=[...overdue,...reserved.filter((r)=>!overdue.includes(r)),...arrived,...treatment].slice(0,12),box=$("receptionQueue");
+    if(!ordered.length){box.innerHTML=`<div class="empty">この日の受付優先対応はありません。</div>`;return}
+    box.innerHTML=ordered.map((r)=>{const id=String(r.reservation_id||r.id||""),isOver=overdue.includes(r),cls=isOver?"urgent":r.status==="arrived"?"waiting":"treatment",label=isOver?"受付確認":r.status==="reserved"?"来院待ち":r.status==="arrived"?"施術待ち":"施術中",action=r.status==="reserved"?`<button class="btn primary" data-reception-checkin="${escapeHtml(id)}" type="button">来院受付</button>`:`<a class="btn ghost" href="./staff.html">スタッフ画面</a>`;return`<div class="receptionRow ${cls}"><div class="receptionTime">${escapeHtml(formatTime(r.start_time)||"--:--")}</div><div><div class="receptionName">${escapeHtml(r.customer_name||"-")} 様</div><div class="receptionMeta">${escapeHtml(r.menu_name||"-")} / 担当：${escapeHtml(r.staff_name||"未定")} / ${escapeHtml(label)}</div></div>${action}</div>`}).join("");
+    box.querySelectorAll("[data-reception-checkin]").forEach((button)=>button.addEventListener("click",()=>handleReservationAction("arrived",button.dataset.receptionCheckin,button)));
+  }
+
   function renderAll() {
     renderStats();
+    renderReceptionFocus();
     renderWorkflowBoard();
     renderReservations();
     renderFollowups();
@@ -2293,7 +2339,9 @@
       }
     });
 
-    initTabs();
+    $("receptionOtherToggleBtn").addEventListener("click",()=>{const grid=document.querySelector("main .grid"),open=grid.classList.toggle("showReceptionSecondary");$("receptionOtherToggleBtn").textContent=open?"その他業務を閉じる":"その他業務を表示"});
+  document.querySelectorAll("[data-reception-filter]").forEach((button)=>button.addEventListener("click",()=>{state.filter=button.dataset.receptionFilter;document.querySelectorAll("[data-filter]").forEach((tab)=>tab.classList.toggle("selected",tab.dataset.filter===state.filter));renderReservations();$("reservationList").scrollIntoView({behavior:"smooth",block:"start"})}));
+  initTabs();
   }
 
 

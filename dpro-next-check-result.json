@@ -1,40 +1,24 @@
 {
   "ok": true,
-  "overall": "OK",
-  "step": "SEITAI-NEXT-5",
+  "step": "SEITAI-NEXT-6-COMPLETE",
+  "next_step": "SEITAI-NEXT-7",
+  "baseline_sha": "70853f3ca32e5d4c361b23b1c726e75ea54faddc",
+  "backup_tag": "backup-seitai-before-next-6-20260723",
   "checks": {
-    "previous_step": "OK",
-    "backup_tag": "OK",
     "html_syntax": "OK",
     "javascript_syntax": "OK",
-    "html_id_duplicates": "OK",
-    "ticket_double_action_guard": "OK",
-    "ticket_renewal_candidate": "OK",
-    "next_visit_presets": "OK",
-    "next_visit_patient_history": "OK",
-    "next_visit_line_message": "OK",
-    "api_unchanged": "OK",
-    "worker_unchanged": "OK",
-    "supabase_unchanged": "OK",
-    "file_size": "OK"
+    "id_duplicates": "OK",
+    "reception_priority_queue": "OK",
+    "staff_mobile": "OK",
+    "role_separation": "OK",
+    "existing_features": "OK",
+    "api_unchanged": "OK"
   },
-  "persistence": {
-    "mode": "browser_local_storage",
-    "cross_device_sync": false,
-    "server_persistence": false
-  },
-  "metrics": {
-    "owner_html_bytes": 184750,
-    "owner_ipad_html_bytes": 95383,
-    "owner_id_count": 155,
-    "owner_ipad_id_count": 75,
-    "api_path_count": 26
-  },
-  "change_record": {
-    "worker_changed": false,
-    "supabase_changed": false,
-    "api_changed": false,
-    "screen_function_changed": true,
-    "existing_data_changed": false
+  "changes": {
+    "worker": false,
+    "supabase": false,
+    "api": false,
+    "screen": true,
+    "new_screen": "staff.html"
   }
 }

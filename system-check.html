@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-NEXT-2</title>
-  <script src="./config.js"></script>
+  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-NEXT-6</title>
+  <script src="./config.js?v=step-seitai-next-6"></script>
   <style>
     :root{
       --bg:#f4f7fb;
@@ -368,7 +368,7 @@
     }
     .demoSteps{
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
+      grid-template-columns:repeat(6,minmax(0,1fr));
       gap:10px;
       margin-top:12px;
     }
@@ -416,7 +416,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-NEXT-2 / system-check.html</span>
+        <span class="badge">STEP SEITAI-NEXT-6 / system-check.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>システム確認画面</h1>
         <p class="lead">
           API接続、管理コード保存、店舗設定、予約枠、営業前デモ準備、各デモ画面の入口を確認します。
@@ -592,18 +592,22 @@
             <b>2. PC管理</b>
             電話予約・店頭予約・今日やることを見せる。
           </div>
-          <div class="demoStep">
-            <b>3. iPad受付</b>
-            来院済み・施術中・回数券使用を見せる。
-          </div>
-          <div class="demoStep">
-            <b>4. 会員証</b>
-            テスト太郎で予約と回数券を見せる。
-          </div>
-          <div class="demoStep">
-            <b>5. お客様予約</b>
-            新規予約・担当指名・空き時間を見せる。
-          </div>
+                    <div class="demoStep">
+  <b>3. iPad受付</b>
+  来院受付と受付優先リストを見せる。
+</div>
+<div class="demoStep">
+  <b>4. スタッフスマホ</b>
+  担当患者・施術開始・施術完了を見せる。
+</div>
+<div class="demoStep">
+  <b>5. 会員証</b>
+  テスト太郎で予約と回数券を見せる。
+</div>
+<div class="demoStep">
+  <b>6. お客様予約</b>
+  新規予約・担当指名・空き時間を見せる。
+</div>
         </div>
 
         <div class="demoNavGrid">
@@ -614,12 +618,19 @@
             <div class="demoUrl" id="ownerUrlView">-</div>
           </div>
 
-          <div class="demoNavCard">
-            <div class="demoNavTitle">受付・施術iPad</div>
-            <div class="demoNavText">現場操作、来院済み、施術中、回数券使用を確認。</div>
-            <a class="btn primary" id="openIpadLink" target="_blank" rel="noopener">開く</a>
-            <div class="demoUrl" id="ipadUrlView">-</div>
-          </div>
+                    <div class="demoNavCard">
+  <div class="demoNavTitle">iPad受付</div>
+  <div class="demoNavText">受付優先リスト、来院受付、電話・店頭予約を確認。</div>
+  <a class="btn primary" id="openIpadLink" target="_blank" rel="noopener">開く</a>
+  <div class="demoUrl" id="ipadUrlView">-</div>
+</div>
+
+<div class="demoNavCard">
+  <div class="demoNavTitle">スタッフスマホ</div>
+  <div class="demoNavText">担当患者、施術待ち、施術開始・完了を確認。</div>
+  <a class="btn primary" id="openStaffLink" target="_blank" rel="noopener">開く</a>
+  <div class="demoUrl" id="staffUrlView">-</div>
+</div>
 
           <div class="demoNavCard">
             <div class="demoNavTitle">会員証・予約確認</div>
@@ -837,6 +848,7 @@
       systemCheck: pageUrl("system-check.html"),
       owner: pageUrl("owner.html"),
       ipad: pageUrl("owner-ipad.html"),
+      staff: pageUrl("staff.html"),
       member: `${pageUrl("member.html")}?${memberParams.toString()}`,
       index: pageUrl("index.html")
     };
@@ -847,11 +859,13 @@
 
     $("openOwnerLink").href = urls.owner;
     $("openIpadLink").href = urls.ipad;
+    $("openStaffLink").href = urls.staff;
     $("openMemberLink").href = urls.member;
     $("openIndexLink").href = urls.index;
 
     $("ownerUrlView").textContent = urls.owner;
     $("ipadUrlView").textContent = urls.ipad;
+    $("staffUrlView").textContent = urls.staff;
     $("memberUrlView").textContent = urls.member;
     $("indexUrlView").textContent = urls.index;
 
@@ -866,7 +880,8 @@
       "",
       `system-check：${urls.systemCheck}`,
       `オーナーPC：${urls.owner}`,
-      `受付・施術iPad：${urls.ipad}`,
+      `iPad受付：${urls.ipad}`,
+      `スタッフスマホ：${urls.staff}`,
       `会員証・予約確認：${urls.member}`,
       `お客様予約：${urls.index}`,
       "",
@@ -878,9 +893,10 @@
       "営業前の順番",
       "1. system-check で営業前デモ準備",
       "2. オーナーPCで電話予約・店頭予約・今日やることを確認",
-      "3. iPadで来院済み・施術中・回数券使用を確認",
-      "4. 会員証で予約と回数券を確認",
-      "5. お客様予約で新規予約を確認"
+      "3. iPad受付で来院受付と受付優先リストを確認",
+      "4. スタッフスマホで施術開始・施術完了を確認",
+      "5. 会員証で予約と回数券を確認",
+      "6. お客様予約で新規予約を確認"
     ];
 
     $("demoUrlText").value = lines.join("\n");
