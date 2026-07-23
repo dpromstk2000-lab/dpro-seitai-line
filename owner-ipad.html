@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- STEP SEITAI-10H-R1: owner-ipad LINE message newline normalize fix / 20260709 -->
+<!-- STEP SEITAI-NEXT-4: four-stage iPad reception and treatment workflow / 20260723 -->
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-10H-R1</title>
+  <title>DPRO 整骨院・整体 LINE｜iPad受付・施術画面｜STEP SEITAI-NEXT-4</title>
   <script src="./config.js?v=step-seitai-4"></script>
   <style>
     :root{
@@ -568,6 +568,188 @@
       .btn{width:100%}
       .row .btn{width:auto}
     }
+  /* DPRO NEXT-4: reception-to-completion workflow visibility */
+  .workflowBoard{
+    border:1px solid #c7d2fe;
+    background:
+      radial-gradient(circle at top right,rgba(79,70,229,.11),transparent 320px),
+      linear-gradient(180deg,#ffffff 0%,#fafaff 100%);
+    scroll-margin-top:18px;
+  }
+  .workflowBoardHead{
+    display:flex;
+    justify-content:space-between;
+    gap:14px;
+    align-items:flex-start;
+  }
+  .workflowBoardGrid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px;
+    margin-top:16px;
+  }
+  .workflowStageCard{
+    border:1px solid #dbeafe;
+    border-radius:18px;
+    background:#fff;
+    padding:14px;
+    min-width:0;
+    text-align:left;
+    color:inherit;
+    cursor:pointer;
+  }
+  .workflowStageCard:hover{
+    border-color:#818cf8;
+    box-shadow:0 10px 24px rgba(79,70,229,.09);
+  }
+  .workflowStageCard.active{
+    border-color:#4f46e5;
+    background:#eef2ff;
+  }
+  .workflowStageNo{
+    display:inline-grid;
+    place-items:center;
+    width:30px;
+    height:30px;
+    border-radius:999px;
+    background:#e2e8f0;
+    color:#334155;
+    font-size:13px;
+    font-weight:950;
+  }
+  .workflowStageCard.active .workflowStageNo{
+    background:#4f46e5;
+    color:#fff;
+  }
+  .workflowStageName{
+    margin-top:8px;
+    font-size:16px;
+    font-weight:950;
+  }
+  .workflowStageCount{
+    margin-top:3px;
+    font-size:30px;
+    line-height:1.1;
+    font-weight:950;
+    letter-spacing:-.04em;
+  }
+  .workflowStageHint{
+    margin-top:4px;
+    color:#64748b;
+    font-size:11px;
+    line-height:1.5;
+    font-weight:850;
+  }
+  .workflowProgress{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:5px;
+    margin-top:12px;
+  }
+  .workflowProgress span{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    min-width:0;
+    min-height:34px;
+    border-radius:10px;
+    background:#f1f5f9;
+    color:#64748b;
+    font-size:11px;
+    font-weight:900;
+    text-align:center;
+  }
+  .workflowProgress span i{
+    display:inline-grid;
+    place-items:center;
+    width:19px;
+    height:19px;
+    border-radius:999px;
+    background:#e2e8f0;
+    color:#475569;
+    font-style:normal;
+    font-size:10px;
+  }
+  .workflowProgress span.done{
+    background:#d1fae5;
+    color:#065f46;
+  }
+  .workflowProgress span.done i{
+    background:#10b981;
+    color:#fff;
+  }
+  .workflowProgress span.active{
+    background:#4f46e5;
+    color:#fff;
+    box-shadow:0 6px 16px rgba(79,70,229,.18);
+  }
+  .workflowProgress span.active i{
+    background:#fff;
+    color:#4338ca;
+  }
+  .workflowProgress.compact span{
+    min-height:30px;
+    font-size:10px;
+  }
+  .workflowNextGuide{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    align-items:center;
+    margin-top:10px;
+    padding:10px 12px;
+    border:1px solid #dbeafe;
+    border-radius:13px;
+    background:#f8fbff;
+  }
+  .workflowNextGuide strong{
+    display:block;
+    font-size:13px;
+  }
+  .workflowNextGuide small{
+    display:block;
+    margin-top:2px;
+    color:#64748b;
+    font-size:11px;
+    line-height:1.5;
+  }
+  .workflowPrimaryAction{
+    min-width:140px;
+    box-shadow:0 8px 18px rgba(15,118,110,.15);
+  }
+  .workflowSecondaryActions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:9px;
+  }
+  .workflowCompleteNote{
+    display:inline-flex;
+    align-items:center;
+    min-height:42px;
+    padding:9px 12px;
+    border-radius:12px;
+    background:#dcfce7;
+    color:#166534;
+    font-size:13px;
+    font-weight:950;
+  }
+  @media(max-width:900px){
+    .workflowBoardGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  }
+  @media(max-width:560px){
+    .workflowBoardHead{display:block}
+    .workflowBoardGrid{grid-template-columns:1fr 1fr}
+    .workflowStageCard{padding:12px}
+    .workflowStageCount{font-size:26px}
+    .workflowProgress{grid-template-columns:1fr 1fr}
+    .workflowNextGuide{display:block}
+    .workflowNextGuide .btn{width:100%;margin-top:9px}
+    .workflowSecondaryActions{display:grid;grid-template-columns:1fr}
+    .workflowSecondaryActions .btn{width:100%}
+  }
+
   </style>
 </head>
 <body>
@@ -575,7 +757,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-10H-R1 / owner-ipad.html</span>
+        <span class="badge">STEP SEITAI-NEXT-4 / owner-ipad.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>iPad受付・施術画面</h1>
         <p class="lead">
           受付・施術中に使う画面です。店舗設定は出さず、予約確認・来院・施術・回数券・文面コピーに絞っています。
@@ -600,9 +782,9 @@
     <section class="grid">
       <div class="card span4">
         <h2>管理コード</h2>
-        <p class="note">PC画面で保存済みの場合は、そのまま使えます。未保存なら <b>1234</b> を保存してください。</p>
+        <p class="note">PC画面で保存済みの場合は、そのまま使えます。未保存なら管理者から案内されたコードを入力してください。</p>
         <label for="adminCodeInput">管理コード</label>
-        <input id="adminCodeInput" type="password" placeholder="例：1234" autocomplete="off">
+        <input id="adminCodeInput" type="password" placeholder="管理コードを入力" autocomplete="off">
         <div class="row" style="margin-top:12px;">
           <button class="btn primary" id="saveAdminBtn" type="button">保存</button>
           <button class="btn ghost" id="toggleAdminBtn" type="button">表示/非表示</button>
@@ -653,6 +835,44 @@
         </div>
       </div>
 
+
+      <div class="card span12 workflowBoard" id="workflowBoardSection">
+        <div class="workflowBoardHead">
+          <div>
+            <span class="badge">受付から完了まで</span>
+            <h2 style="margin-top:10px;">本日の進捗</h2>
+            <p class="note">4段階で現在地を確認できます。各段階を押すと、該当する予約へ移動します。</p>
+          </div>
+          <span class="status" id="workflowBoardStatus">未読込</span>
+        </div>
+        <div class="workflowBoardGrid" id="workflowBoardGrid">
+          <button class="workflowStageCard" data-workflow-filter="reserved" type="button">
+            <span class="workflowStageNo">1</span>
+            <div class="workflowStageName">予約</div>
+            <div class="workflowStageCount" id="workflowReservedCount">-</div>
+            <div class="workflowStageHint">来院受付を待っている予約</div>
+          </button>
+          <button class="workflowStageCard" data-workflow-filter="arrived" type="button">
+            <span class="workflowStageNo">2</span>
+            <div class="workflowStageName">来院</div>
+            <div class="workflowStageCount" id="workflowArrivedCount">-</div>
+            <div class="workflowStageHint">受付済み・施術待ち</div>
+          </button>
+          <button class="workflowStageCard" data-workflow-filter="treatment" type="button">
+            <span class="workflowStageNo">3</span>
+            <div class="workflowStageName">施術中</div>
+            <div class="workflowStageCount" id="workflowTreatmentCount">-</div>
+            <div class="workflowStageHint">現在施術している患者</div>
+          </button>
+          <button class="workflowStageCard" data-workflow-filter="completed" type="button">
+            <span class="workflowStageNo">4</span>
+            <div class="workflowStageName">完了</div>
+            <div class="workflowStageCount" id="workflowCompletedCount">-</div>
+            <div class="workflowStageHint">施術完了・対応済み</div>
+          </button>
+        </div>
+      </div>
+
       <div class="card span12 quickReserveCard">
         <div class="sectionHead">
           <div>
@@ -680,7 +900,8 @@
         <div class="tabs" id="tabs">
           <button class="tab selected" data-filter="active" type="button">有効予約</button>
           <button class="tab" data-filter="reserved" type="button">予約済み</button>
-          <button class="tab" data-filter="arrived" type="button">来院・施術中</button>
+          <button class="tab" data-filter="arrived" type="button">来院</button>
+          <button class="tab" data-filter="treatment" type="button">施術中</button>
           <button class="tab" data-filter="completed" type="button">完了</button>
           <button class="tab" data-filter="all" type="button">すべて</button>
         </div>
@@ -1081,15 +1302,62 @@
     return ["reserved","arrived","in_treatment","treatment_done"].includes(r.status);
   }
 
+
+  function workflowStage(status) {
+    if (status === "reserved") return 0;
+    if (status === "arrived") return 1;
+    if (status === "in_treatment") return 2;
+    if (status === "treatment_done" || status === "completed") return 3;
+    return -1;
+  }
+
+  function workflowDisplayLabel(status) {
+    const stage = workflowStage(status);
+    return ["予約","来院","施術中","完了"][stage] || statusLabel(status);
+  }
+
+  function workflowNextAction(r) {
+    if (r.status === "reserved") {
+      return { action:"arrived", label:"来院受付", kind:"primary", guide:"受付で来院を確認してください" };
+    }
+    if (r.status === "arrived") {
+      return { action:"start", label:"施術開始", kind:"warn", guide:"施術を始める時に押してください" };
+    }
+    if (r.status === "in_treatment" || r.status === "treatment_done") {
+      return { action:"complete", label:"施術完了", kind:"dark", guide:"施術終了後に完了してください" };
+    }
+    if (r.status === "completed") {
+      return { action:"", label:"対応完了", kind:"", guide:"受付から施術完了まで記録済みです" };
+    }
+    if (r.status === "cancelled") {
+      return { action:"", label:"キャンセル", kind:"", guide:"予約はキャンセルされています" };
+    }
+    if (r.status === "no_show") {
+      return { action:"", label:"無断キャンセル", kind:"", guide:"無断キャンセルとして記録されています" };
+    }
+    return { action:"", label:"状態確認", kind:"", guide:"現在の状態を確認してください" };
+  }
+
+  function workflowProgressHtml(status, compact = false) {
+    const current = workflowStage(status);
+    const labels = ["予約","来院","施術中","完了"];
+    return `<div class="workflowProgress ${compact ? "compact" : ""}" aria-label="受付から完了までの進捗">${labels.map((label, index) => {
+      let cls = "";
+      if (current >= 0 && index < current) cls = "done";
+      if (current >= 0 && index === current) cls = "active";
+      return `<span class="${cls}"><i>${index + 1}</i>${label}</span>`;
+    }).join("")}</div>`;
+  }
+
   function reservationMatchesFilter(r) {
     if (state.filter === "all") return true;
     if (state.filter === "active") return isActiveReservation(r);
     if (state.filter === "reserved") return r.status === "reserved";
-    if (state.filter === "arrived") return r.status === "arrived" || r.status === "in_treatment";
+    if (state.filter === "arrived") return r.status === "arrived";
+    if (state.filter === "treatment") return r.status === "in_treatment";
     if (state.filter === "completed") return r.status === "completed" || r.status === "treatment_done";
     return true;
   }
-
 
   function manualSourceLabel(source) {
     if (source === "phone") return "電話予約";
@@ -1572,9 +1840,44 @@
 
   function renderAll() {
     renderStats();
+    renderWorkflowBoard();
     renderReservations();
     renderFollowups();
     renderTickets();
+  }
+
+
+  function renderWorkflowBoard() {
+    const counts = {
+      reserved: state.reservations.filter((r) => r.status === "reserved").length,
+      arrived: state.reservations.filter((r) => r.status === "arrived").length,
+      treatment: state.reservations.filter((r) => r.status === "in_treatment").length,
+      completed: state.reservations.filter((r) => r.status === "treatment_done" || r.status === "completed").length
+    };
+
+    if ($("workflowReservedCount")) $("workflowReservedCount").textContent = counts.reserved;
+    if ($("workflowArrivedCount")) $("workflowArrivedCount").textContent = counts.arrived;
+    if ($("workflowTreatmentCount")) $("workflowTreatmentCount").textContent = counts.treatment;
+    if ($("workflowCompletedCount")) $("workflowCompletedCount").textContent = counts.completed;
+    if ($("workflowBoardStatus")) {
+      $("workflowBoardStatus").textContent = `有効予約 ${counts.reserved + counts.arrived + counts.treatment}件`;
+      $("workflowBoardStatus").className = "status ok";
+    }
+
+    document.querySelectorAll("[data-workflow-filter]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.workflowFilter === state.filter);
+      button.onclick = () => {
+        state.filter = button.dataset.workflowFilter;
+        document.querySelectorAll("[data-filter]").forEach((tab) => {
+          tab.classList.toggle("selected", tab.dataset.filter === state.filter);
+        });
+        renderReservations();
+        document.querySelectorAll("[data-workflow-filter]").forEach((item) => {
+          item.classList.toggle("active", item.dataset.workflowFilter === state.filter);
+        });
+        (document.getElementById("reservationSection") || document.getElementById("reservationList"))?.scrollIntoView({ behavior:"smooth", block:"start" });
+      };
+    });
   }
 
   function renderStats() {
@@ -1591,13 +1894,18 @@
     const rows = state.reservations.filter(reservationMatchesFilter);
 
     if (!rows.length) {
-      box.innerHTML = `<div class="empty">この条件の予約はありません。</div>`;
+      box.innerHTML = `<div class="empty">この段階の予約はありません。</div>`;
       return;
     }
 
     box.innerHTML = rows.map((r) => {
       const tags = Array.isArray(r.concern_tags) ? r.concern_tags : [];
       const copied = r.line_message_copied ? `<span class="pill green">文面コピー済み</span>` : "";
+      const next = workflowNextAction(r);
+      const primary = next.action
+        ? `<button class="btn ${next.kind} large workflowPrimaryAction" data-action="${next.action}" data-id="${escapeHtml(r.reservation_id || r.id)}">${next.label}</button>`
+        : `<span class="workflowCompleteNote">${escapeHtml(next.label)}</span>`;
+
       return `
         <div class="reservationCard ${r.status === "arrived" || r.status === "in_treatment" ? "active" : ""}" data-reservation-id="${escapeHtml(r.reservation_id || r.id)}">
           <div class="reservationTop">
@@ -1609,18 +1917,24 @@
               </div>
             </div>
             <div class="row">
-              <span class="pill ${statusClass(r.status)}">${escapeHtml(statusLabel(r.status))}</span>
+              <span class="pill ${statusClass(r.status)}">${escapeHtml(workflowDisplayLabel(r.status))}</span>
               ${copied}
             </div>
+          </div>
+
+          ${workflowProgressHtml(r.status)}
+          <div class="workflowNextGuide">
+            <div>
+              <strong>次の操作：${escapeHtml(next.label)}</strong>
+              <small>${escapeHtml(next.guide)}</small>
+            </div>
+            ${primary}
           </div>
 
           ${tags.length ? `<div class="tagRow">${tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ""}
           ${r.request_note ? `<div class="meta">ご要望：${escapeHtml(r.request_note)}</div>` : ""}
 
-          <div class="actionGrid">
-            ${r.status === "reserved" ? `<button class="btn primary" data-action="arrived" data-id="${escapeHtml(r.reservation_id || r.id)}">来院済み</button>` : ""}
-            ${r.status === "arrived" ? `<button class="btn warn" data-action="start" data-id="${escapeHtml(r.reservation_id || r.id)}">施術中</button>` : ""}
-            ${(r.status === "arrived" || r.status === "in_treatment" || r.status === "treatment_done") ? `<button class="btn dark" data-action="complete" data-id="${escapeHtml(r.reservation_id || r.id)}">施術完了</button>` : ""}
+          <div class="workflowSecondaryActions">
             <button class="btn ghost" data-action="message" data-id="${escapeHtml(r.reservation_id || r.id)}">文面編集</button>
             <button class="btn ghost" data-action="copy" data-id="${escapeHtml(r.reservation_id || r.id)}">文面コピー</button>
             <button class="btn ghost" data-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}">回数券使用</button>
