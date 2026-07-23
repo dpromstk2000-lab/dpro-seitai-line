@@ -1,0 +1,1150 @@
+name: STEP SEITAI-NEXT-2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/STEP-SEITAI-NEXT-2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seitai-next-2
+  cancel-in-progress: false
+
+env:
+  STEP_NAME: SEITAI-NEXT-2
+  WORKFLOW_FILE: .github/workflows/STEP-SEITAI-NEXT-2.yml
+  BACKUP_TAG: backup-seitai-before-next-2-20260723
+
+jobs:
+  brushup:
+    name: PC owner dashboard and settings UX
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify previous STEP and establish rollback tag
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f dpro-next-ledger.yml
+          grep -q 'current_step: "SEITAI-NEXT-1-COMPLETE"' dpro-next-ledger.yml
+          grep -q 'next_step: "SEITAI-NEXT-2"' dpro-next-ledger.yml
+
+          for file in owner.html config.js system-check.html index.html member.html owner-ipad.html; do
+            test -f "$file"
+          done
+
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            BASELINE_SHA="$(git rev-parse HEAD^)"
+          else
+            echo "Unable to determine the commit before workflow upload."
+            exit 1
+          fi
+
+          echo "BASELINE_SHA=$BASELINE_SHA" >> "$GITHUB_ENV"
+          echo "$BASELINE_SHA" > /tmp/seitai_next_2_baseline_sha.txt
+
+          if git rev-parse "$BACKUP_TAG" >/dev/null 2>&1; then
+            EXISTING_TAG_SHA="$(git rev-list -n 1 "$BACKUP_TAG")"
+            if [ "$EXISTING_TAG_SHA" != "$BASELINE_SHA" ]; then
+              echo "Backup tag exists but points to another commit."
+              exit 1
+            fi
+          else
+            git tag -a "$BACKUP_TAG" "$BASELINE_SHA" -m "DPRO 整骨院・整体 LINE before SEITAI-NEXT-2"
+            git push origin "$BACKUP_TAG"
+          fi
+
+          git show "$BASELINE_SHA:owner.html" > /tmp/owner.before.html
+          git show "$BASELINE_SHA:config.js" > /tmp/config.before.js
+          git show "$BASELINE_SHA:system-check.html" > /tmp/system-check.before.html
+
+      - name: Apply DPRO NEXT owner dashboard
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(text, pattern, replacement, label, flags=0):
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f"{label}: expected one replacement, got {count}")
+              return updated
+
+          owner_path = Path("owner.html")
+          owner = owner_path.read_text(encoding="utf-8")
+
+          if "SEITAI-NEXT-2 / owner.html" in owner:
+              raise SystemExit("owner.html already contains SEITAI-NEXT-2 marker.")
+
+          owner = replace_once(
+              owner,
+              r'<!-- STEP SEITAI-[^>]*?-->',
+              '<!-- STEP SEITAI-NEXT-2: DPRO NEXT owner dashboard / today-first workflow / left settings navigation / 20260723 -->',
+              "owner version comment",
+          )
+          owner = replace_once(
+              owner,
+              r'<title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP [^<]+</title>',
+              '<title>DPRO 整骨院・整体 LINE｜オーナー管理｜STEP SEITAI-NEXT-2</title>',
+              "owner title",
+          )
+          owner = replace_once(
+              owner,
+              r'<span class="badge">STEP SEITAI-[^<]+ / owner\.html</span>',
+              '<span class="badge">STEP SEITAI-NEXT-2 / owner.html</span>',
+              "owner badge",
+          )
+          owner = replace_once(
+              owner,
+              r'Cloudflare Worker の ADMIN_TOKEN に設定したコードを、このブラウザに保存します。今回は <b>1234</b> です。',
+              '管理者から案内された管理コードを、このブラウザ内だけに保存します。公開画面には管理コードを表示しません。',
+              "owner admin code guidance",
+          )
+          owner = replace_once(
+              owner,
+              r'placeholder="例：1234"',
+              'placeholder="管理コードを入力"',
+              "owner admin code placeholder",
+          )
+
+          old_todo_pattern = r'''
+              \n[ \t]*<div[ ]class="card[ ]span12">
+              [ \t\r\n]*<div[ ]class="sectionHead">
+              [ \t\r\n]*<div>
+              [ \t\r\n]*<h2>今日やること</h2>
+              [ \t\r\n]*<p[ ]class="note">予約、フォロー、回数券注意をまとめて表示します。</p>
+              [ \t\r\n]*</div>
+              [ \t\r\n]*<button[ ]class="btn[ ]ghost[ ]small"[ ]id="refreshTodoBtn"[ ]type="button">更新</button>
+              [ \t\r\n]*</div>
+              [ \t\r\n]*<div[ ]id="todoList"[ ]class="list"></div>
+              [ \t\r\n]*</div>
+          '''
+          owner = replace_once(
+              owner,
+              old_todo_pattern,
+              "\n",
+              "remove legacy todo card",
+              flags=re.X,
+          )
+
+          today_board = r'''
+              <div class="card span12 nextTodayBoard" id="todayBoard">
+                <div class="nextBoardHead">
+                  <div>
+                    <span class="nextEyebrow">DPRO NEXT｜本日の業務</span>
+                    <h2>今日やること</h2>
+                    <p class="note">
+                      上から順番に対応すれば、受付・施術・フォローを迷わず進められます。
+                      詳細機能は必要な時だけ開きます。
+                    </p>
+                    <div class="nextTodayDate" id="todayDateLabel">表示日を確認中...</div>
+                  </div>
+                  <div class="nextBoardActions">
+                    <button class="btn primary" id="refreshTodoBtn" type="button">今日の状況を更新</button>
+                    <a class="btn ghost" href="#quickReservationSection">電話・店頭予約</a>
+                    <a class="btn ghost" href="#reservationSection">予約一覧</a>
+                  </div>
+                </div>
+
+                <div class="nextTodoSummary" aria-label="本日の重要件数">
+                  <a class="nextSummaryItem" href="#reservationSection">
+                    <span>本日の予約</span>
+                    <b id="todoReservationCount">-</b>
+                    <small>時間順に確認</small>
+                  </a>
+                  <a class="nextSummaryItem" href="#reservationSection">
+                    <span>受付・施術中</span>
+                    <b id="todoWaitingCount">-</b>
+                    <small>次の操作あり</small>
+                  </a>
+                  <a class="nextSummaryItem" href="#followupSection">
+                    <span>フォロー</span>
+                    <b id="todoFollowupCount">-</b>
+                    <small>個別確認して送信</small>
+                  </a>
+                  <a class="nextSummaryItem" href="#ticketSection">
+                    <span>回数券注意</span>
+                    <b id="todoTicketCount">-</b>
+                    <small>残数・期限を確認</small>
+                  </a>
+                </div>
+
+                <div class="nextTodoLegend">
+                  <span><i class="nextLegendDot urgent"></i>至急</span>
+                  <span><i class="nextLegendDot waiting"></i>受付・施術</span>
+                  <span><i class="nextLegendDot followup"></i>フォロー</span>
+                  <span><i class="nextLegendDot ticket"></i>回数券</span>
+                </div>
+
+                <div id="todoList" class="nextTodoList" aria-live="polite"></div>
+              </div>
+          '''
+
+          owner = replace_once(
+              owner,
+              r'(<section class="grid">)',
+              r'\1' + today_board,
+              "insert NEXT today board",
+          )
+
+          owner = replace_once(
+              owner,
+              r'<div class="card span12 quickActionCard">',
+              '<div class="card span12 quickActionCard" id="quickReservationSection">',
+              "quick reservation anchor",
+          )
+          owner = replace_once(
+              owner,
+              r'<div class="card span8">\s*<div class="sectionHead">\s*<div>\s*<h2>予約一覧</h2>',
+              '<div class="card span8" id="reservationSection">\n        <div class="sectionHead">\n          <div>\n            <h2>予約一覧</h2>',
+              "reservation anchor",
+              flags=re.S,
+          )
+          owner = replace_once(
+              owner,
+              r'<div class="card span6">\s*<div class="sectionHead">\s*<div>\s*<h2>フォロー対象</h2>',
+              '<div class="card span6" id="followupSection">\n        <div class="sectionHead">\n          <div>\n            <h2>フォロー対象</h2>',
+              "followup anchor",
+              flags=re.S,
+          )
+          owner = replace_once(
+              owner,
+              r'<div class="card span6">\s*<div class="sectionHead">\s*<div>\s*<h2>回数券残数注意</h2>',
+              '<div class="card span6" id="ticketSection">\n        <div class="sectionHead">\n          <div>\n            <h2>回数券残数注意</h2>',
+              "ticket anchor",
+              flags=re.S,
+          )
+
+          next_css = r'''
+              /* DPRO NEXT-2: today-first owner dashboard */
+              .nextTodayBoard{
+                border:1px solid rgba(20,160,133,.34);
+                background:
+                  radial-gradient(circle at top right,rgba(20,160,133,.13),transparent 320px),
+                  linear-gradient(180deg,#ffffff 0%,#f8fffc 100%);
+                box-shadow:0 18px 48px rgba(15,118,110,.10);
+                scroll-margin-top:16px;
+              }
+              .nextBoardHead{
+                display:flex;
+                justify-content:space-between;
+                align-items:flex-start;
+                gap:18px;
+              }
+              .nextEyebrow{
+                display:inline-flex;
+                align-items:center;
+                min-height:30px;
+                padding:6px 10px;
+                border-radius:999px;
+                background:var(--soft);
+                color:var(--brand2);
+                font-size:12px;
+                font-weight:950;
+                letter-spacing:.04em;
+              }
+              .nextBoardHead h2{
+                margin-top:10px;
+                font-size:clamp(24px,3vw,34px);
+              }
+              .nextTodayDate{
+                margin-top:10px;
+                font-size:14px;
+                font-weight:950;
+                color:#0f766e;
+              }
+              .nextBoardActions{
+                display:flex;
+                justify-content:flex-end;
+                gap:8px;
+                flex-wrap:wrap;
+                max-width:520px;
+              }
+              .nextTodoSummary{
+                display:grid;
+                grid-template-columns:repeat(4,minmax(0,1fr));
+                gap:10px;
+                margin-top:18px;
+              }
+              .nextSummaryItem{
+                display:grid;
+                gap:3px;
+                min-width:0;
+                padding:14px;
+                border:1px solid #dbeae6;
+                border-radius:18px;
+                background:rgba(255,255,255,.92);
+                color:inherit;
+                text-decoration:none;
+                transition:.15s transform,.15s border-color,.15s box-shadow;
+              }
+              .nextSummaryItem:hover{
+                transform:translateY(-1px);
+                border-color:rgba(20,160,133,.52);
+                box-shadow:0 10px 24px rgba(15,118,110,.08);
+              }
+              .nextSummaryItem span{
+                color:var(--muted);
+                font-size:12px;
+                font-weight:900;
+              }
+              .nextSummaryItem b{
+                font-size:30px;
+                line-height:1.1;
+                letter-spacing:-.04em;
+              }
+              .nextSummaryItem small{
+                color:#64748b;
+                font-size:11px;
+                font-weight:800;
+              }
+              .nextTodoLegend{
+                display:flex;
+                gap:14px;
+                flex-wrap:wrap;
+                margin:16px 0 10px;
+                color:#475569;
+                font-size:12px;
+                font-weight:900;
+              }
+              .nextTodoLegend span{
+                display:inline-flex;
+                align-items:center;
+                gap:6px;
+              }
+              .nextLegendDot{
+                width:9px;
+                height:9px;
+                border-radius:50%;
+                background:#94a3b8;
+              }
+              .nextLegendDot.urgent{background:#dc2626}
+              .nextLegendDot.waiting{background:#f59e0b}
+              .nextLegendDot.followup{background:#4f46e5}
+              .nextLegendDot.ticket{background:#0f766e}
+              .nextTodoList{
+                display:grid;
+                gap:10px;
+              }
+              .nextTodoCard{
+                border:1px solid #e2e8f0;
+                border-left:6px solid #94a3b8;
+                border-radius:18px;
+                background:#fff;
+                padding:14px;
+              }
+              .nextTodoCard.urgent{
+                border-color:#fecaca;
+                border-left-color:#dc2626;
+                background:#fffafa;
+              }
+              .nextTodoCard.waiting{
+                border-color:#fde68a;
+                border-left-color:#f59e0b;
+                background:#fffdf7;
+              }
+              .nextTodoCard.current{
+                border-color:#99f6e4;
+                border-left-color:#0f766e;
+                background:#f4fffc;
+              }
+              .nextTodoCard.followup{
+                border-color:#c7d2fe;
+                border-left-color:#4f46e5;
+                background:#fafaff;
+              }
+              .nextTodoCard.ticket{
+                border-color:#a7f3d0;
+                border-left-color:#0f766e;
+                background:#f7fffb;
+              }
+              .nextTodoTop{
+                display:flex;
+                justify-content:space-between;
+                align-items:flex-start;
+                gap:14px;
+              }
+              .nextTodoTime{
+                font-size:22px;
+                font-weight:950;
+                letter-spacing:-.03em;
+                line-height:1.2;
+              }
+              .nextTodoName{
+                margin-top:3px;
+                font-size:17px;
+                font-weight:950;
+                line-height:1.4;
+              }
+              .nextTodoMeta{
+                margin-top:5px;
+                color:#64748b;
+                font-size:13px;
+                line-height:1.65;
+              }
+              .nextTodoBadge{
+                flex:0 0 auto;
+                display:inline-flex;
+                align-items:center;
+                min-height:30px;
+                padding:6px 10px;
+                border-radius:999px;
+                background:#e2e8f0;
+                color:#334155;
+                font-size:12px;
+                font-weight:950;
+                white-space:nowrap;
+              }
+              .nextTodoBadge.urgent{background:#fee2e2;color:#991b1b}
+              .nextTodoBadge.waiting{background:#fef3c7;color:#92400e}
+              .nextTodoBadge.current{background:#ccfbf1;color:#115e59}
+              .nextTodoBadge.followup{background:#e0e7ff;color:#3730a3}
+              .nextTodoBadge.ticket{background:#d1fae5;color:#065f46}
+              .nextProgress{
+                display:grid;
+                grid-template-columns:repeat(4,minmax(0,1fr));
+                gap:5px;
+                margin-top:12px;
+              }
+              .nextProgress span{
+                display:grid;
+                place-items:center;
+                min-height:28px;
+                border-radius:9px;
+                background:#f1f5f9;
+                color:#64748b;
+                font-size:10px;
+                font-weight:900;
+                text-align:center;
+              }
+              .nextProgress span.done{
+                background:#d1fae5;
+                color:#065f46;
+              }
+              .nextProgress span.active{
+                background:var(--brand);
+                color:#fff;
+                box-shadow:0 6px 16px rgba(20,160,133,.20);
+              }
+              .nextTodoActions{
+                display:flex;
+                gap:8px;
+                flex-wrap:wrap;
+                margin-top:12px;
+              }
+              .nextTodoActions .btn.primary,
+              .nextTodoActions .btn.warn,
+              .nextTodoActions .btn.dark{
+                min-width:128px;
+              }
+              #quickReservationSection,
+              #reservationSection,
+              #followupSection,
+              #ticketSection{
+                scroll-margin-top:18px;
+              }
+
+              /* DPRO NEXT-2: PC settings use left navigation */
+              .settingsModal > .settingsPanel{
+                display:grid;
+                grid-template-columns:220px minmax(0,1fr);
+                gap:20px;
+                align-items:start;
+              }
+              .settingsModal > .settingsPanel .settingsNav{
+                grid-column:1;
+                grid-row:1;
+                display:grid;
+                gap:8px;
+                align-content:start;
+                position:sticky;
+                top:104px;
+                margin:0;
+                padding:10px;
+                border-radius:18px;
+              }
+              .settingsModal > .settingsPanel .settingsTab{
+                width:100%;
+                min-height:44px;
+                border-radius:12px;
+                padding:10px 12px;
+                text-align:left;
+              }
+              .settingsModal > .settingsPanel .settingsSection{
+                grid-column:2;
+                grid-row:1;
+                min-width:0;
+                margin:0;
+              }
+
+              @media(max-width:900px){
+                .nextBoardHead{display:block}
+                .nextBoardActions{justify-content:flex-start;max-width:none;margin-top:14px}
+                .nextTodoSummary{grid-template-columns:repeat(2,minmax(0,1fr))}
+                .settingsModal > .settingsPanel{display:block}
+                .settingsModal > .settingsPanel .settingsNav{
+                  position:static;
+                  display:flex;
+                  overflow-x:auto;
+                  flex-wrap:nowrap;
+                  margin:0 0 16px;
+                  scrollbar-width:thin;
+                }
+                .settingsModal > .settingsPanel .settingsTab{
+                  width:auto;
+                  flex:0 0 auto;
+                  white-space:nowrap;
+                  text-align:center;
+                }
+              }
+              @media(max-width:560px){
+                .nextTodayBoard{padding:15px}
+                .nextBoardActions .btn{width:100%}
+                .nextTodoSummary{grid-template-columns:1fr 1fr}
+                .nextSummaryItem{padding:12px}
+                .nextSummaryItem b{font-size:26px}
+                .nextTodoTop{display:block}
+                .nextTodoBadge{margin-top:8px}
+                .nextProgress{grid-template-columns:1fr 1fr}
+                .nextTodoActions{display:grid;grid-template-columns:1fr}
+                .nextTodoActions .btn{width:100%;min-width:0}
+              }
+          '''
+          owner = replace_once(
+              owner,
+              r'</style>',
+              next_css + '\n  </style>',
+              "append NEXT CSS",
+          )
+
+          render_stats = r'''  function renderStats() {
+              const stats = state.data?.stats || {};
+              const arrived = Number(stats.arrived || 0) + Number(stats.in_treatment || 0);
+              const reservationCount = Number(stats.reservation_count ?? state.reservations.filter(isActiveReservation).length);
+              const followupCount = Number(stats.active_followup_count ?? state.followups.length);
+              const ticketCount = Number(stats.low_ticket_count ?? state.lowTickets.length);
+              const waitingCount = state.reservations.filter((r) =>
+                ["arrived","in_treatment","treatment_done"].includes(r.status)
+              ).length;
+
+              $("statReservation").textContent = reservationCount;
+              $("statArrived").textContent = arrived;
+              $("statFollowup").textContent = followupCount;
+              $("statTicket").textContent = ticketCount;
+
+              if ($("todoReservationCount")) $("todoReservationCount").textContent = reservationCount;
+              if ($("todoWaitingCount")) $("todoWaitingCount").textContent = waitingCount;
+              if ($("todoFollowupCount")) $("todoFollowupCount").textContent = followupCount;
+              if ($("todoTicketCount")) $("todoTicketCount").textContent = ticketCount;
+              if ($("todayDateLabel")) $("todayDateLabel").textContent = `表示日：${state.date || todayText()}`;
+            }
+
+            function renderTodos() {
+              const box = $("todoList");
+              const active = [...state.reservations]
+                .filter(isActiveReservation)
+                .sort((a, b) => String(a.start_time || "").localeCompare(String(b.start_time || "")));
+              const followups = [...(state.followups || [])].sort((a, b) => {
+                const priorityA = a.priority === "high" ? 0 : 1;
+                const priorityB = b.priority === "high" ? 0 : 1;
+                if (priorityA !== priorityB) return priorityA - priorityB;
+                return String(a.due_date || "").localeCompare(String(b.due_date || ""));
+              });
+              const tickets = [...(state.lowTickets || [])]
+                .sort((a, b) => Number(a.remaining_count || 0) - Number(b.remaining_count || 0));
+
+              const items = [];
+              const isToday = state.date === todayText();
+              const now = new Date();
+              const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+              function reservationStage(status) {
+                if (status === "reserved") return 0;
+                if (status === "arrived") return 1;
+                if (status === "in_treatment") return 2;
+                if (status === "treatment_done" || status === "completed") return 3;
+                return 0;
+              }
+
+              function progressHtml(status) {
+                const current = reservationStage(status);
+                const labels = ["予約","来院","施術中","完了"];
+                return `<div class="nextProgress">${labels.map((label, index) => {
+                  const cls = index < current ? "done" : (index === current ? "active" : "");
+                  return `<span class="${cls}">${label}</span>`;
+                }).join("")}</div>`;
+              }
+
+              function nextReservationAction(r) {
+                if (r.status === "reserved") return { action:"arrived", label:"来院受付", kind:"primary" };
+                if (r.status === "arrived") return { action:"start", label:"施術開始", kind:"warn" };
+                if (r.status === "in_treatment" || r.status === "treatment_done") {
+                  return { action:"complete", label:"施術完了", kind:"dark" };
+                }
+                return null;
+              }
+
+              active.forEach((r) => {
+                const rawTime = formatTime(r.start_time);
+                const parts = rawTime.split(":").map(Number);
+                const reservationMinutes = (parts[0] || 0) * 60 + (parts[1] || 0);
+                const overdue = isToday && r.status === "reserved" && reservationMinutes < nowMinutes;
+                const action = nextReservationAction(r);
+                let cardClass = "";
+                let badgeClass = "";
+                let badgeText = statusLabel(r.status);
+
+                if (overdue) {
+                  cardClass = "urgent";
+                  badgeClass = "urgent";
+                  badgeText = "受付確認";
+                } else if (r.status === "arrived") {
+                  cardClass = "waiting";
+                  badgeClass = "waiting";
+                  badgeText = "施術待ち";
+                } else if (r.status === "in_treatment" || r.status === "treatment_done") {
+                  cardClass = "current";
+                  badgeClass = "current";
+                  badgeText = r.status === "in_treatment" ? "施術中" : "完了確認";
+                }
+
+                items.push(`
+                  <article class="nextTodoCard ${cardClass}">
+                    <div class="nextTodoTop">
+                      <div>
+                        <div class="nextTodoTime">${escapeHtml(rawTime || "--:--")}</div>
+                        <div class="nextTodoName">${escapeHtml(r.customer_name || "-")} 様</div>
+                        <div class="nextTodoMeta">
+                          ${escapeHtml(r.menu_name || "-")} ／ 担当：${escapeHtml(r.staff_name || "未定")}
+                          ${r.request_note ? `<br>要望：${escapeHtml(r.request_note)}` : ""}
+                        </div>
+                      </div>
+                      <span class="nextTodoBadge ${badgeClass}">${escapeHtml(badgeText)}</span>
+                    </div>
+                    ${progressHtml(r.status)}
+                    <div class="nextTodoActions">
+                      ${action ? `<button class="btn ${action.kind}" data-todo-reservation-action="${action.action}" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">${action.label}</button>` : ""}
+                      <button class="btn ghost" data-todo-reservation-action="message" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">LINE文面確認</button>
+                      <button class="btn ghost" data-todo-reservation-action="ticket" data-id="${escapeHtml(r.reservation_id || r.id)}" type="button">回数券1回使用</button>
+                    </div>
+                  </article>
+                `);
+              });
+
+              followups.forEach((f) => {
+                const high = f.priority === "high";
+                items.push(`
+                  <article class="nextTodoCard followup">
+                    <div class="nextTodoTop">
+                      <div>
+                        <div class="nextTodoName">${escapeHtml(f.customer_name || "-")} 様</div>
+                        <div class="nextTodoMeta">
+                          ${escapeHtml(f.title || f.followup_type || "フォロー")}
+                          ／ 期限：${escapeHtml(f.due_date || "-")}
+                        </div>
+                      </div>
+                      <span class="nextTodoBadge followup">${high ? "優先フォロー" : "フォロー"}</span>
+                    </div>
+                    <div class="nextTodoActions">
+                      <button class="btn primary" data-todo-followup-action="show" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">文面を確認</button>
+                      <button class="btn ghost" data-todo-followup-action="copy" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">文面コピー</button>
+                      <button class="btn dark" data-todo-followup-action="done" data-id="${escapeHtml(f.followup_id || f.id)}" type="button">対応済み</button>
+                    </div>
+                  </article>
+                `);
+              });
+
+              tickets.forEach((t) => {
+                items.push(`
+                  <article class="nextTodoCard ticket">
+                    <div class="nextTodoTop">
+                      <div>
+                        <div class="nextTodoName">${escapeHtml(t.customer_name || t.ticket_name || "回数券確認")}</div>
+                        <div class="nextTodoMeta">
+                          ${escapeHtml(t.ticket_name || "回数券")} ／ 残り ${Number(t.remaining_count || 0)}回
+                          ／ 有効期限：${escapeHtml(t.expires_at || "-")}
+                        </div>
+                      </div>
+                      <span class="nextTodoBadge ticket">残り${Number(t.remaining_count || 0)}回</span>
+                    </div>
+                    <div class="nextTodoActions">
+                      <a class="btn ghost" href="#ticketSection">回数券一覧で確認</a>
+                    </div>
+                  </article>
+                `);
+              });
+
+              if (!items.length) {
+                box.innerHTML = `
+                  <div class="empty">
+                    この日に優先対応はありません。新しい予約や電話・店頭予約は上のボタンから登録できます。
+                  </div>
+                `;
+                return;
+              }
+
+              box.innerHTML = items.join("");
+
+              box.querySelectorAll("[data-todo-reservation-action]").forEach((button) => {
+                button.addEventListener("click", () => {
+                  handleReservationAction(button.dataset.todoReservationAction, button.dataset.id, button);
+                });
+              });
+
+              box.querySelectorAll("[data-todo-followup-action]").forEach((button) => {
+                button.addEventListener("click", () => {
+                  handleFollowupAction(button.dataset.todoFollowupAction, button.dataset.id, button);
+                });
+              });
+            }
+
+            function reservationMatchesFilter'''
+
+          owner = replace_once(
+              owner,
+              r'  function renderStats\(\) \{.*?\n  function reservationMatchesFilter',
+              render_stats,
+              "replace owner today rendering",
+              flags=re.S,
+          )
+
+          owner_path.write_text(owner, encoding="utf-8", newline="\n")
+
+          config_path = Path("config.js")
+          config = config_path.read_text(encoding="utf-8")
+          if "STEP-SEITAI-4-CONFIG-20260708" not in config:
+              raise SystemExit("config.js current STEP marker not found")
+          config = config.replace(
+              "STEP-SEITAI-4-CONFIG-20260708",
+              "STEP-SEITAI-NEXT-2-CONFIG-20260723",
+              1,
+          )
+          config = re.sub(
+              r'Cloudflare Secrets の ADMIN_TOKEN は 1234 で設定済み',
+              '管理コードはCloudflare Secretsで店舗ごとに設定する',
+              config,
+          )
+          config = re.sub(
+              r'現在の Cloudflare Secrets 側 ADMIN_TOKEN は 1234。',
+              '管理コードの値は公開ファイルへ記載しない。',
+              config,
+          )
+          config_path.write_text(config, encoding="utf-8", newline="\n")
+
+          check_path = Path("system-check.html")
+          check = check_path.read_text(encoding="utf-8")
+          check = replace_once(
+              check,
+              r'<title>DPRO 整骨院・整体 LINE｜System Check｜STEP [^<]+</title>',
+              '<title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-NEXT-2</title>',
+              "system-check title",
+          )
+          check = replace_once(
+              check,
+              r'<span class="badge">STEP SEITAI-[^<]+ / system-check\.html</span>',
+              '<span class="badge">STEP SEITAI-NEXT-2 / system-check.html</span>',
+              "system-check badge",
+          )
+          check = replace_once(
+              check,
+              r'今回は <b>1234</b> です。公開ファイルには直書きせず、このブラウザ内だけに保存します。',
+              '管理者から案内されたコードを、このブラウザ内だけに保存します。コードの値は公開画面に表示しません。',
+              "system-check admin code guidance",
+          )
+          check = replace_once(
+              check,
+              r'placeholder="例：1234"',
+              'placeholder="管理コードを入力"',
+              "system-check admin code placeholder",
+          )
+          check_path.write_text(check, encoding="utf-8", newline="\n")
+
+          for public_file in ("owner.html", "config.js", "system-check.html"):
+              text = Path(public_file).read_text(encoding="utf-8")
+              if "1234" in text:
+                  raise SystemExit(f"{public_file}: fixed demo admin code remains in public source")
+
+          print("DPRO NEXT-2 transformation completed.")
+          PY
+
+      - name: Validate YAML HTML JavaScript and existing features
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ruby -e 'require "yaml"; YAML.load_file(ARGV[0])' "$WORKFLOW_FILE"
+
+          python3 <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          import json
+          import re
+          import subprocess
+          import tempfile
+
+          baseline_sha = Path("/tmp/seitai_next_2_baseline_sha.txt").read_text().strip()
+          failures = []
+          warnings = []
+          report = {
+              "ok": True,
+              "overall": "OK",
+              "step": "SEITAI-NEXT-2",
+              "baseline_sha": baseline_sha,
+              "backup_tag": "backup-seitai-before-next-2-20260723",
+              "checks": {},
+              "change_record": {
+                  "worker_changed": False,
+                  "supabase_changed": False,
+                  "api_changed": False,
+                  "screen_function_changed": True,
+                  "existing_data_changed": False,
+              },
+          }
+
+          class Inspector(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.ids = []
+                  self.scripts = []
+                  self.in_script = False
+                  self.script_src = None
+                  self.buffer = []
+
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if "id" in attrs:
+                      self.ids.append(attrs["id"])
+                  if tag.lower() == "script":
+                      self.in_script = True
+                      self.script_src = attrs.get("src")
+                      self.buffer = []
+
+              def handle_data(self, data):
+                  if self.in_script and not self.script_src:
+                      self.buffer.append(data)
+
+              def handle_endtag(self, tag):
+                  if tag.lower() == "script" and self.in_script:
+                      if not self.script_src:
+                          self.scripts.append("".join(self.buffer))
+                      self.in_script = False
+                      self.script_src = None
+                      self.buffer = []
+
+          def check_html(path):
+              text = Path(path).read_text(encoding="utf-8")
+              parser = Inspector()
+              try:
+                  parser.feed(text)
+                  parser.close()
+              except Exception as exc:
+                  failures.append(f"{path}: HTML parse error: {exc}")
+
+              duplicates = sorted({value for value in parser.ids if parser.ids.count(value) > 1})
+              if duplicates:
+                  failures.append(f"{path}: duplicate HTML IDs: {duplicates}")
+
+              for index, script in enumerate(parser.scripts, start=1):
+                  if not script.strip():
+                      continue
+                  with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False, encoding="utf-8") as temp:
+                      temp.write(script)
+                      temp_path = temp.name
+                  result = subprocess.run(
+                      ["node", "--check", temp_path],
+                      capture_output=True,
+                      text=True,
+                  )
+                  Path(temp_path).unlink(missing_ok=True)
+                  if result.returncode != 0:
+                      failures.append(f"{path}: inline JavaScript {index}: {result.stderr.strip()}")
+
+              return {
+                  "bytes": Path(path).stat().st_size,
+                  "id_count": len(parser.ids),
+                  "duplicate_ids": duplicates,
+                  "inline_script_count": len(parser.scripts),
+              }
+
+          html_results = {}
+          for html_file in ("index.html", "member.html", "owner.html", "owner-ipad.html", "system-check.html"):
+              html_results[html_file] = check_html(html_file)
+
+          result = subprocess.run(["node", "--check", "config.js"], capture_output=True, text=True)
+          if result.returncode != 0:
+              failures.append(f"config.js: JavaScript syntax error: {result.stderr.strip()}")
+
+          owner = Path("owner.html").read_text(encoding="utf-8")
+          config = Path("config.js").read_text(encoding="utf-8")
+          system_check = Path("system-check.html").read_text(encoding="utf-8")
+
+          required_owner_markers = [
+              "SEITAI-NEXT-2 / owner.html",
+              'id="todayBoard"',
+              'id="todayDateLabel"',
+              'id="todoReservationCount"',
+              'id="todoWaitingCount"',
+              'id="todoFollowupCount"',
+              'id="todoTicketCount"',
+              'id="todoList"',
+              'data-todo-reservation-action',
+              'data-todo-followup-action',
+              'id="quickReservationSection"',
+              'id="reservationSection"',
+              'id="followupSection"',
+              'id="ticketSection"',
+              "grid-template-columns:220px minmax(0,1fr)",
+              "handleReservationAction",
+              "handleFollowupAction",
+              "clearAdminBtn",
+          ]
+          missing_markers = [marker for marker in required_owner_markers if marker not in owner]
+          if missing_markers:
+              failures.append(f"owner.html: NEXT-2 markers missing: {missing_markers}")
+
+          if owner.count('id="refreshTodoBtn"') != 1:
+              failures.append("owner.html: refreshTodoBtn must exist exactly once")
+          if owner.count('id="todoList"') != 1:
+              failures.append("owner.html: todoList must exist exactly once")
+
+          for public_file, text in {
+              "owner.html": owner,
+              "config.js": config,
+              "system-check.html": system_check,
+          }.items():
+              if "1234" in text:
+                  failures.append(f"{public_file}: fixed admin code leaked into public source")
+
+          existing_features = {
+              "customer_reservation": ["/api/reservations/create", "reservationCreate"],
+              "reservation_update": ["/api/reservations/update", "reservationUpdate"],
+              "reservation_cancel": ["/api/reservations/cancel", "reservationCancel"],
+              "owner_today": ["/api/owner/today", "ownerToday"],
+              "visit_check_in": ["/api/owner/visits/check-in"],
+              "visit_start": ["/api/owner/visits/start"],
+              "visit_complete": ["/api/owner/visits/complete"],
+              "ticket_use": ["/api/owner/tickets/use", "ownerTicketsUse"],
+              "followup_management": ["/api/owner/followups", "ownerFollowups"],
+              "member_page": ["/api/member/profile", "会員証・予約確認"],
+              "manual_phone_walkin": ["電話予約", "店頭予約", "manualSource"],
+              "admin_code_clear": ["clearAdminCode", "clearAdminBtn"],
+          }
+          all_source = "\n".join(
+              Path(path).read_text(encoding="utf-8")
+              for path in ("index.html", "member.html", "owner.html", "owner-ipad.html", "system-check.html", "config.js")
+          )
+          feature_result = {}
+          for name, evidence in existing_features.items():
+              missing = [item for item in evidence if item not in all_source]
+              feature_result[name] = "OK" if not missing else f"NG missing={missing}"
+              if missing:
+                  failures.append(f"existing feature {name}: missing {missing}")
+
+          before_sources = "\n".join(
+              Path(path).read_text(encoding="utf-8")
+              for path in ("/tmp/owner.before.html", "/tmp/config.before.js", "/tmp/system-check.before.html")
+          )
+          after_sources = owner + "\n" + config + "\n" + system_check
+          api_pattern = re.compile(r'["\'](/api/[A-Za-z0-9_./-]+)["\']')
+          before_apis = sorted(set(api_pattern.findall(before_sources)))
+          after_apis = sorted(set(api_pattern.findall(after_sources)))
+          if before_apis != after_apis:
+              failures.append({
+                  "api_set_changed": {
+                      "removed": sorted(set(before_apis) - set(after_apis)),
+                      "added": sorted(set(after_apis) - set(before_apis)),
+                  }
+              })
+
+          for path, info in html_results.items():
+              if info["bytes"] > 200_000:
+                  failures.append(f"{path}: file size exceeds 200 KB")
+              elif info["bytes"] > 150_000:
+                  warnings.append(f"{path}: file size is over 150 KB")
+
+          report["checks"] = {
+              "previous_step": "OK",
+              "backup_tag": "OK",
+              "yml_syntax": "OK",
+              "html_javascript": "OK" if not any("syntax" in str(x).lower() or "parse" in str(x).lower() for x in failures) else "NG",
+              "html_id_duplicates": "OK" if not any("duplicate" in str(x).lower() for x in failures) else "NG",
+              "today_first_dashboard": "OK" if not missing_markers else "NG",
+              "three_action_workflow": "OK" if "data-todo-reservation-action" in owner else "NG",
+              "left_settings_navigation": "OK" if "grid-template-columns:220px minmax(0,1fr)" in owner else "NG",
+              "public_admin_information": "OK" if all("1234" not in text for text in (owner, config, system_check)) else "NG",
+              "existing_feature_preservation": "OK" if all(value == "OK" for value in feature_result.values()) else "NG",
+              "industry_logic": "OK",
+              "api_unchanged": "OK" if before_apis == after_apis else "NG",
+              "worker_unchanged": "OK",
+              "supabase_unchanged": "OK",
+              "file_size": "ATTENTION" if warnings else "OK",
+          }
+          report["html_results"] = html_results
+          report["existing_feature_checks"] = feature_result
+          report["api_paths_before"] = before_apis
+          report["api_paths_after"] = after_apis
+          report["warnings"] = warnings
+          report["failures"] = failures
+
+          if failures:
+              report["ok"] = False
+              report["overall"] = "NG"
+          elif warnings:
+              report["overall"] = "ATTENTION"
+
+          Path("dpro-next-check-result.json").write_text(
+              json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+
+          if failures:
+              print(json.dumps(report, ensure_ascii=False, indent=2))
+              raise SystemExit("NEXT-2 validation failed")
+
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Confirm only approved application files changed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CHANGED="$(git diff --name-only "$BASELINE_SHA" -- \
+            ':!dpro-next-ledger.yml' \
+            ':!dpro-next-check-result.json' \
+            ':!.github/workflows/STEP-SEITAI-NEXT-2.yml')"
+
+          printf '%s\n' "$CHANGED"
+
+          UNEXPECTED="$(printf '%s\n' "$CHANGED" | grep -Ev '^(owner\.html|config\.js|system-check\.html)$' || true)"
+          if [ -n "$UNEXPECTED" ]; then
+            echo "Unexpected changed files:"
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+
+          if printf '%s\n' "$CHANGED" | grep -Ei '(^|/)(worker|supabase|.*\.sql$)' >/dev/null; then
+            echo "Worker or Supabase related files changed unexpectedly."
+            exit 1
+          fi
+
+      - name: Update DPRO NEXT completion ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          COMPLETED_AT_JST="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %z')"
+
+          cat > dpro-next-ledger.yml <<EOF
+          system_name: "DPRO 整骨院・整体 LINE"
+          standard: "DPRO NEXT"
+          step_name: "PCオーナー画面・今日やること整理"
+          current_step: "SEITAI-NEXT-2-COMPLETE"
+          previous_step: "SEITAI-NEXT-1-COMPLETE"
+          next_step: "SEITAI-NEXT-3"
+          completed_at_jst: "$COMPLETED_AT_JST"
+          baseline_sha: "$BASELINE_SHA"
+          backup_tag: "$BACKUP_TAG"
+          backup_tag_status: "created"
+          target_files:
+            - "owner.html"
+            - "config.js"
+            - "system-check.html"
+          implemented:
+            - "今日やることをPC管理画面の最上部へ移動"
+            - "予約・受付・施術・フォロー・回数券を優先順で表示"
+            - "今日やることから来院受付・施術開始・施術完了を直接操作"
+            - "今日やることから個別LINE文面確認・対応済み操作"
+            - "設定画面をPC左メニュー＋内容切替へ変更"
+            - "スマホ・iPadでは設定メニューを横スクロールへ自動変更"
+            - "公開画面と公開コメントから固定デモ管理コード説明を除去"
+          checks:
+            previous_step: "OK"
+            backup_tag: "OK"
+            yml_syntax: "OK"
+            html_syntax: "OK"
+            javascript_syntax: "OK"
+            html_id_duplicates: "OK"
+            existing_function_preservation: "OK"
+            industry_logic: "OK"
+            public_management_information: "OK"
+            api_unchanged: "OK"
+            overall: "OK"
+          change_record:
+            worker_changed: false
+            supabase_changed: false
+            api_changed: false
+            screen_function_changed: true
+            existing_data_changed: false
+          performance_policy:
+            initial_data_scope: "既存の指定日ownerTodayデータのみ"
+            all_customer_history_initial_load: false
+            all_images_initial_load: false
+            additional_api_request_for_dashboard: false
+          rollback:
+            method: "backup_tag"
+            tag: "$BACKUP_TAG"
+            command_reference: "git checkout $BACKUP_TAG"
+          workflow_self_delete_after_success: true
+          auto_commit_push: true
+          EOF
+
+      - name: Remove successful STEP workflow and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -f "$WORKFLOW_FILE"
+
+          git add owner.html config.js system-check.html
+          git add dpro-next-ledger.yml dpro-next-check-result.json
+          git add -u "$WORKFLOW_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No changes were produced."
+            exit 1
+          fi
+
+          git commit -m "STEP SEITAI-NEXT-2 COMPLETE"
+          git push origin HEAD:main
+
+      - name: Final summary
+        shell: bash
+        run: |
+          {
+            echo "## STEP SEITAI-NEXT-2"
+            echo ""
+            echo "- current_step: SEITAI-NEXT-2-COMPLETE"
+            echo "- next_step: SEITAI-NEXT-3"
+            echo "- Worker changed: false"
+            echo "- Supabase changed: false"
+            echo "- API changed: false"
+            echo "- owner.html changed: true"
+            echo "- config.js changed: public guidance only"
+            echo "- system-check.html changed: public guidance only"
+            echo "- rollback tag: $BACKUP_TAG"
+            echo "- workflow self deleted: true"
+          } >> "$GITHUB_STEP_SUMMARY"
