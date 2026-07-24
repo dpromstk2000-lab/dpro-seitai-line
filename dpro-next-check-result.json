@@ -1,31 +1,39 @@
 {
   "ok": true,
   "system": "DPRO 整骨院・整体 LINE",
-  "step": "SEITAI-NEXT-8",
-  "current_step": "SEITAI-NEXT-8-COMPLETE",
-  "next_step": "SEITAI-NEXT-9",
+  "step": "SEITAI-NEXT-9",
+  "current_step": "SEITAI-NEXT-9-COMPLETE",
+  "next_step": "SEITAI-NEXT-10",
   "overall": "OK",
   "checks": {
+    "required_files": "OK",
     "html_syntax": "OK",
-    "javascript_extraction": "OK",
+    "javascript_syntax": "OK",
     "html_id_duplicates": "OK",
-    "existing_function_preservation": "OK",
-    "followup_metrics": "OK",
-    "followup_filters": "OK",
-    "followup_template_switch": "OK",
-    "followup_copy_done_history": "OK",
-    "next_visit_guide_reuse": "OK",
-    "api_unchanged": "OK"
+    "public_admin_code_scan": "OK",
+    "endpoint_map_unchanged": "OK",
+    "https_endpoints": "OK",
+    "admin_delete_controls": "OK",
+    "slot_30_minutes": "OK",
+    "performance_budgets": "OK",
+    "no_auto_polling": "OK",
+    "lazy_history": "OK",
+    "selected_day_scope": "OK",
+    "duplicate_action_guard": "OK",
+    "obsolete_check_removed": "OK",
+    "release_manifest": "OK"
   },
   "change_record": {
     "worker_changed": false,
     "supabase_changed": false,
     "api_changed": false,
-    "screen_function_changed": true,
     "existing_data_changed": false
   },
-  "performance": {
-    "additional_initial_api_request": false,
-    "existing_owner_today_reused": true
+  "runtime_audit": {
+    "location": "system-check.html",
+    "read_only": true,
+    "invalid_admin_rejection": true,
+    "past_date_guard": true,
+    "phone_normalization": true
   }
 }

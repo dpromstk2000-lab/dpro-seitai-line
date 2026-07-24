@@ -1,30 +1,26 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "再来院・フォローセンター"
-current_step: "SEITAI-NEXT-8-COMPLETE"
-previous_step: "SEITAI-NEXT-7-COMPLETE"
-next_step: "SEITAI-NEXT-9"
-completed_at_jst: "2026-07-23 22:27:00 +0900"
-baseline_sha: "6c3d64222d73aa698785cb934583b8f20a5f6979"
-backup_tag: "backup-seitai-before-next-8-20260723"
+step_name: "性能・セキュリティ・system-check最終監査"
+current_step: "SEITAI-NEXT-9-COMPLETE"
+previous_step: "SEITAI-NEXT-8-COMPLETE"
+next_step: "SEITAI-NEXT-10"
+completed_at_jst: "2026-07-24 11:33:50 +0900"
+baseline_sha: "30c5f8bc41753a36ff025b03bf567f5d36ac9b48"
+backup_tag: "backup-seitai-before-next-9-20260723"
 backup_tag_status: "created"
 target_files:
-  - "owner.html"
   - "config.js"
   - "system-check.html"
+  - "dpro-next-release-manifest.json"
 implemented:
-  - "期限超過・本日・7日以内・優先対応の集約"
-  - "フォロー種類別フィルター"
-  - "登録済み文面優先と施術後・久しぶり・回数券文面切替"
-  - "期限までの日数・超過日数表示"
-  - "次回来院目安の同一ブラウザ表示"
-  - "文面編集・コピー・対応済み・患者履歴の一画面操作"
-  - "対応済みの確認ダイアログ"
-data_scope:
-  followup_endpoint: "existing ownerFollowups"
-  followup_update_endpoint: "existing /api/owner/followups/update"
-  additional_initial_api_request: false
-  next_visit_scope: "same browser localStorage only"
+  - "公開ファイル静的監査結果の生成"
+  - "全画面HTML・JavaScript・重複ID検査"
+  - "固定管理コード公開残存検査"
+  - "API定義維持・HTTPS・管理コード削除操作検査"
+  - "画面別容量・合計容量の性能予算"
+  - "不要な自動監視・無制限履歴取得の防止"
+  - "無効管理コード・過去日・電話番号表記揺れの読取専用実行監査"
+  - "古いNEXT-5確認カードとsystem-check旧版表示の整理"
 checks:
   previous_step: "OK"
   backup_tag: "OK"
@@ -32,26 +28,32 @@ checks:
   html_syntax: "OK"
   javascript_syntax: "OK"
   html_id_duplicates: "OK"
-  existing_function_preservation: "OK"
-  followup_metrics: "OK"
-  followup_filters: "OK"
-  followup_template_switch: "OK"
-  followup_copy_done_history: "OK"
-  api_unchanged: "OK"
+  public_admin_code_scan: "OK"
+  endpoint_map_unchanged: "OK"
+  https_endpoints: "OK"
+  admin_delete_controls: "OK"
+  slot_30_minutes: "OK"
+  performance_budgets: "OK"
+  no_auto_polling: "OK"
+  lazy_history: "OK"
+  selected_day_scope: "OK"
+  duplicate_action_guard: "OK"
+  release_manifest: "OK"
   overall: "OK"
 change_record:
   worker_changed: false
   supabase_changed: false
   api_changed: false
   screen_function_changed: true
-  new_screen_added: false
+  new_file_added: "dpro-next-release-manifest.json"
   existing_data_changed: false
-performance_policy:
-  additional_initial_api_request: false
-  all_followups_unlimited_history_load: false
-  existing_owner_today_reused: true
+runtime_audit:
+  invalid_admin_rejection: "system-checkで実行"
+  past_date_guard: "system-checkで実行"
+  phone_normalization: "system-checkで実行"
+  write_request_used: false
 rollback:
   method: "backup_tag"
-  tag: "backup-seitai-before-next-8-20260723"
+  tag: "backup-seitai-before-next-9-20260723"
 workflow_self_delete_after_success: true
 auto_commit_push: true

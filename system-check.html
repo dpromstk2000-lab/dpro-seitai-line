@@ -1,10 +1,10 @@
-<!doctype html>　　
+<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-NEXT-6</title>
-  <script src="./config.js?v=step-seitai-next-6"></script>
+  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-NEXT-9</title>
+  <script src="./config.js?v=step-seitai-next-9"></script>
   <style>
     :root{
       --bg:#f4f7fb;
@@ -409,6 +409,65 @@
       .kv{grid-template-columns:1fr}
       .kv div:nth-child(odd){margin-top:4px}
     }
+
+    /* DPRO NEXT-9: release audit */
+    .releaseAudit{
+      border:1px solid #a7f3d0;
+      background:
+        radial-gradient(circle at top right,rgba(16,185,129,.13),transparent 340px),
+        linear-gradient(180deg,#ffffff,#f4fffb);
+      scroll-margin-top:18px;
+    }
+    .releaseAuditHead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+    .releaseAuditActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .releaseAuditMetrics{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;margin-top:14px;
+    }
+    .releaseAuditMetric{
+      border:1px solid #d1fae5;border-radius:17px;background:#fff;
+      padding:13px;min-width:0;
+    }
+    .releaseAuditMetric span{display:block;color:#64748b;font-size:11px;font-weight:900}
+    .releaseAuditMetric b{
+      display:block;margin-top:4px;font-size:25px;line-height:1.1;
+      letter-spacing:-.04em;color:#065f46;word-break:break-word;
+    }
+    .releaseAuditGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+    .releaseAuditBox{
+      border:1px solid #dbe4ef;border-radius:18px;background:#fff;padding:14px;min-width:0;
+    }
+    .releaseAuditBox h3{margin-top:0}
+    .releaseAuditList{display:grid;gap:8px;margin-top:10px}
+    .releaseAuditRow{
+      display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;
+      border:1px solid #e5edf6;border-radius:14px;background:#fbfdff;padding:11px;
+    }
+    .releaseAuditRow strong{display:block;font-size:13px;line-height:1.5}
+    .releaseAuditRow small{
+      display:block;margin-top:3px;color:#64748b;font-size:11px;
+      line-height:1.55;word-break:break-word;
+    }
+    .releaseAuditOverall{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
+      padding:12px;border:1px solid #d1fae5;border-radius:16px;
+      background:#ecfdf5;color:#065f46;font-size:13px;line-height:1.6;font-weight:900;
+    }
+    .releaseAuditOverall.warn{border-color:#fde68a;background:#fffbeb;color:#92400e}
+    .releaseAuditOverall.ng{border-color:#fecaca;background:#fff1f2;color:#991b1b}
+    .releaseAuditNote{margin-top:12px;color:#64748b;font-size:12px;line-height:1.7;font-weight:800}
+    @media(max-width:900px){
+      .releaseAuditHead{display:block}
+      .releaseAuditActions{justify-content:flex-start;margin-top:12px}
+      .releaseAuditGrid{grid-template-columns:1fr}
+    }
+    @media(max-width:560px){
+      .releaseAuditMetrics{grid-template-columns:1fr 1fr}
+      .releaseAuditActions{display:grid;grid-template-columns:1fr}
+      .releaseAuditActions .btn{width:100%}
+      .releaseAuditRow{grid-template-columns:1fr}
+    }
+
   </style>
 </head>
 <body>
@@ -416,7 +475,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-NEXT-8 / system-check.html</span>
+        <span class="badge">STEP SEITAI-NEXT-9 / system-check.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>システム確認画面</h1>
         <p class="lead">
           API接続、管理コード保存、店舗設定、予約枠、営業前デモ準備、各デモ画面の入口を確認します。
@@ -660,13 +719,69 @@
         </div>
       </div>
 
+      <div class="card span12 releaseAudit" id="releaseAuditSection">
+        <div class="releaseAuditHead">
+          <div>
+            <span class="badge">DPRO NEXT｜完成前の最終安全確認</span>
+            <h2 style="margin-top:10px;">7. 性能・セキュリティ・公開監査</h2>
+            <p class="note">GitHub Actionsの静的検査結果と、現在のWorker APIを使う読取専用の実行確認をまとめて表示します。</p>
+          </div>
+          <div class="releaseAuditActions">
+            <button class="btn primary" id="loadReleaseManifestBtn" type="button">静的監査を読込</button>
+            <button class="btn dark" id="runRuntimeAuditBtn" type="button">実行監査を開始</button>
+            <button class="btn ghost" id="copyReleaseAuditBtn" type="button">監査結果をコピー</button>
+          </div>
+        </div>
+
+        <div class="releaseAuditMetrics">
+          <div class="releaseAuditMetric"><span>監査対象ファイル</span><b id="releaseFileCount">-</b></div>
+          <div class="releaseAuditMetric"><span>公開ファイル合計</span><b id="releaseTotalSize">-</b></div>
+          <div class="releaseAuditMetric"><span>静的検査</span><b id="releaseStaticCount">-</b></div>
+          <div class="releaseAuditMetric"><span>実行検査</span><b id="releaseRuntimeCount">-</b></div>
+        </div>
+
+        <div class="releaseAuditOverall" id="releaseAuditOverall">
+          <span class="status" id="releaseAuditStatus">未確認</span>
+          <span id="releaseAuditSummary">静的監査を読み込み、管理コード保存後に実行監査を開始してください。</span>
+        </div>
+
+        <div class="releaseAuditGrid">
+          <div class="releaseAuditBox">
+            <h3>GitHub Actions静的監査</h3>
+            <div class="row">
+              <span class="status" id="releaseManifestStatus">未読込</span>
+              <span class="mini" id="releaseGeneratedAt">生成日時：-</span>
+            </div>
+            <div class="releaseAuditList" id="releaseStaticList">
+              <div class="item"><div class="mini">監査結果ファイルを読み込むと表示されます。</div></div>
+            </div>
+          </div>
+
+          <div class="releaseAuditBox">
+            <h3>Worker・ブラウザ実行監査</h3>
+            <div class="row">
+              <span class="status" id="releaseRuntimeStatus">未実行</span>
+              <span class="mini">データ作成・更新は行いません</span>
+            </div>
+            <div class="releaseAuditList" id="releaseRuntimeList">
+              <div class="item"><div class="mini">API接続、無効管理コード拒否、過去日制御、電話番号表記揺れを確認します。</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="releaseAuditNote">
+          実行監査はGETリクエストだけを使います。営業前デモ準備、予約作成、回数券使用、フォロー更新などの書込み処理は実行しません。
+        </div>
+      </div>
+
       <div class="card span6">
-        <h2>7. 操作ログ</h2>
+        <h2>8. 操作ログ</h2>
+
         <div class="logBox" id="logBox">ログ待機中...</div>
       </div>
 
       <div class="card span6">
-        <h2>8. APIレスポンス</h2>
+        <h2>9. APIレスポンス</h2>
         <div class="row" style="margin-bottom:10px;">
           <button class="btn ghost" id="copyJsonBtn">JSONコピー</button>
           <button class="btn ghost" id="clearJsonBtn">クリア</button>
@@ -697,6 +812,7 @@
       publicSettings: "/api/public/settings",
       appointmentOptions: "/api/public/appointment-options",
       ownerToday: "/api/owner/today",
+      ownerCustomerSearch: "/api/owner/customers/search",
       demoReset: "/api/admin/demo/reset",
       safetyCheck: "/api/admin/safety-check"
     }
@@ -1189,6 +1305,329 @@
     setStatus("adminStatus", code ? "管理コード保存済み" : "管理コード未保存", code ? "ok" : "warn");
   }
 
+
+  /* DPRO NEXT-9: release audit */
+  let releaseManifest = null;
+  let releaseRuntimeResults = [];
+
+  function next9HumanBytes(bytes){
+    const value=Number(bytes||0);
+    if(value<1024) return `${value} B`;
+    if(value<1024*1024) return `${(value/1024).toFixed(1)} KB`;
+    return `${(value/1024/1024).toFixed(2)} MB`;
+  }
+
+  function next9StatusClass(status){
+    if(status==="OK") return "ok";
+    if(status==="NG") return "ng";
+    return "warn";
+  }
+
+  function next9Label(key){
+    const labels={
+      html_syntax:"HTML構文",
+      javascript_syntax:"JavaScript構文",
+      html_id_duplicates:"HTML ID重複",
+      public_admin_code_scan:"公開管理コード残存",
+      endpoint_map_unchanged:"API定義維持",
+      https_endpoints:"HTTPS接続",
+      admin_delete_controls:"管理コード削除ボタン",
+      slot_30_minutes:"30分予約枠",
+      performance_budgets:"ファイル容量",
+      no_auto_polling:"不要な自動通信",
+      lazy_history:"履歴遅延読込",
+      selected_day_scope:"指定日単位の取得",
+      duplicate_action_guard:"二重操作防止",
+      required_files:"必須画面",
+      obsolete_check_removed:"旧確認カード除去",
+      release_manifest:"公開監査結果"
+    };
+    return labels[key]||key;
+  }
+
+  function next9RenderRows(containerId,rows){
+    const box=$(containerId);
+    if(!rows.length){
+      box.innerHTML=`<div class="item"><div class="mini">結果はありません。</div></div>`;
+      return;
+    }
+    box.innerHTML=rows.map(row=>`
+      <div class="releaseAuditRow">
+        <div>
+          <strong>${escapeHtml(row.label||row.key||"確認")}</strong>
+          <small>${escapeHtml(row.detail||"")}</small>
+        </div>
+        <span class="status ${next9StatusClass(row.status)}">${escapeHtml(row.status||"WARN")}</span>
+      </div>
+    `).join("");
+  }
+
+  function next9UpdateOverall(){
+    const staticRows=releaseManifest
+      ? Object.entries(releaseManifest.checks||{}).map(([key,status])=>({key,status}))
+      : [];
+    const statuses=[
+      ...staticRows.map(row=>row.status),
+      ...releaseRuntimeResults.map(row=>row.status)
+    ];
+    let overall="WARN";
+    if(statuses.includes("NG")) overall="NG";
+    else if(statuses.length && statuses.every(status=>status==="OK")) overall="OK";
+
+    const status=$("releaseAuditStatus");
+    status.textContent=overall;
+    status.className=`status ${next9StatusClass(overall)}`;
+    const box=$("releaseAuditOverall");
+    box.className=`releaseAuditOverall ${overall==="NG"?"ng":overall==="WARN"?"warn":""}`.trim();
+
+    const staticOk=staticRows.filter(row=>row.status==="OK").length;
+    const runtimeOk=releaseRuntimeResults.filter(row=>row.status==="OK").length;
+    $("releaseAuditSummary").textContent=
+      `静的検査 ${staticOk}/${staticRows.length}件、実行検査 ${runtimeOk}/${releaseRuntimeResults.length}件。`+
+      (overall==="OK" ? " DPRO NEXT公開前監査は正常です。" :
+       overall==="NG" ? " NG項目を確認してください。" :
+       " 未実行または確認待ちの項目があります。");
+  }
+
+  async function loadReleaseManifest(){
+    setStatus("releaseManifestStatus","読込中...","warn");
+    const response=await fetch(`./dpro-next-release-manifest.json?v=${Date.now()}`,{cache:"no-store"});
+    if(!response.ok) throw new Error(`監査結果を取得できませんでした（${response.status}）`);
+    const data=await response.json();
+    releaseManifest=data;
+
+    const files=Object.values(data.files||{});
+    const total=files.reduce((sum,row)=>sum+Number(row.bytes||0),0);
+    const checkRows=Object.entries(data.checks||{}).map(([key,status])=>({
+      key,
+      label:next9Label(key),
+      status,
+      detail:(data.details&&data.details[key])||"GitHub Actionsで確認済み"
+    }));
+
+    $("releaseFileCount").textContent=`${files.length}件`;
+    $("releaseTotalSize").textContent=next9HumanBytes(total);
+    $("releaseStaticCount").textContent=`${checkRows.filter(row=>row.status==="OK").length}/${checkRows.length}`;
+    $("releaseGeneratedAt").textContent=`生成日時：${data.generated_at_jst||"-"}`;
+    setStatus("releaseManifestStatus",data.overall==="OK"?"静的監査 OK":"要確認",data.overall==="OK"?"ok":"warn");
+    next9RenderRows("releaseStaticList",checkRows);
+    next9UpdateOverall();
+    log("DPRO NEXT静的監査 読込OK",data);
+    return data;
+  }
+
+  async function next9InvalidAdminCheck(){
+    const headerName=CONFIG.adminCodeHeaderName||"X-DPRO-Admin-Code";
+    const response=await fetch(apiUrl(endpoint("ownerToday"),{date:todayText()}),{
+      method:"GET",
+      headers:{[headerName]:"NEXT9_INVALID_TOKEN"}
+    });
+    const data=await response.json().catch(()=>({}));
+    const rejected=!response.ok||data.ok===false;
+    return {
+      key:"invalid_admin_rejected",
+      label:"無効な管理コードの拒否",
+      status:rejected?"OK":"NG",
+      detail:rejected?`HTTP ${response.status}で拒否されました。`:"無効な管理コードで管理APIへ接続できました。"
+    };
+  }
+
+  async function next9PastDateCheck(){
+    const date=addDaysText(todayText(),-1);
+    const response=await fetch(apiUrl(endpoint("appointmentOptions"),{
+      date,
+      menu_code:$("checkMenuInput").value||"regular_seitai",
+      staff_preference:"any"
+    }),{method:"GET"});
+    const data=await response.json().catch(()=>({}));
+    const slots=Array.isArray(data.slots)?data.slots:[];
+    const blocked=!response.ok||data.ok===false||data.is_available===false||slots.length===0;
+    return {
+      key:"past_date_guard",
+      label:"過去日の予約制御",
+      status:blocked?"OK":"NG",
+      detail:blocked?`${date}は予約不可として扱われました。`:`${date}に予約可能枠が返されました。`
+    };
+  }
+
+  function next9CustomerIdentity(row={}){
+    return String(
+      row.customer_id||row.customer_uuid||row.customer_no||
+      String(row.phone||"").replace(/\D/g,"")||row.customer_name||""
+    );
+  }
+
+  async function next9PhoneNormalizationCheck(){
+    if(!getAdminCode()){
+      return {
+        key:"phone_normalization",
+        label:"電話番号表記揺れ",
+        status:"WARN",
+        detail:"管理コード未保存のため、患者検索の実行確認を省略しました。"
+      };
+    }
+
+    const queries=["09011112222","090-1111-2222","０９０１１１１２２２","+819011112222"];
+    const sets=[];
+    for(const q of queries){
+      const data=await apiGet(endpoint("ownerCustomerSearch"),{q,limit:10},true);
+      const rows=Array.isArray(data.customers)?data.customers:[];
+      sets.push(new Set(rows.map(next9CustomerIdentity).filter(Boolean)));
+    }
+
+    if(sets.every(set=>set.size===0)){
+      return {
+        key:"phone_normalization",
+        label:"電話番号表記揺れ",
+        status:"WARN",
+        detail:"検索対象のデモ患者が見つからないため判定できません。営業前デモ準備後に再実行してください。"
+      };
+    }
+
+    const first=[...sets[0]];
+    const common=first.find(id=>sets.every(set=>set.has(id)));
+    return {
+      key:"phone_normalization",
+      label:"電話番号表記揺れ",
+      status:common?"OK":"NG",
+      detail:common?"ハイフン・全角・+81を同じ患者として検索できました。":"4種類の表記で同じ患者を確認できませんでした。"
+    };
+  }
+
+  async function next9SafetyCheck(){
+    if(!getAdminCode()){
+      return {
+        key:"worker_safety",
+        label:"Worker安全チェック",
+        status:"WARN",
+        detail:"管理コード未保存のため安全チェックAPIを省略しました。"
+      };
+    }
+    const data=await apiGet(endpoint("safetyCheck"),{},true);
+    const ok=Boolean(data.ok&&data.admin_token_configured);
+    return {
+      key:"worker_safety",
+      label:"Worker安全チェック",
+      status:ok?"OK":"NG",
+      detail:ok?"ADMIN_TOKEN設定と安全ガードを確認しました。":"安全チェックAPIの結果を確認してください。"
+    };
+  }
+
+  function next9BrowserChecks(){
+    const nav=performance.getEntriesByType("navigation")[0];
+    const domMs=nav?Math.round(nav.domContentLoadedEventEnd):0;
+    return [
+      {
+        key:"https_page",
+        label:"公開画面HTTPS",
+        status:(location.protocol==="https:"||location.hostname==="localhost")?"OK":"NG",
+        detail:`現在のプロトコル：${location.protocol}`
+      },
+      {
+        key:"admin_delete_ui",
+        label:"管理コード削除操作",
+        status:$("clearAdminBtn")?"OK":"NG",
+        detail:$("clearAdminBtn")?"削除ボタンを確認しました。":"削除ボタンが見つかりません。"
+      },
+      {
+        key:"config_policy",
+        label:"DPRO NEXT性能方針",
+        status:(CONFIG.performance&&CONFIG.security)?"OK":"WARN",
+        detail:(CONFIG.performance&&CONFIG.security)
+          ?`履歴上限 ${CONFIG.performance.patientHistoryLimit}件・自動監視なし`
+          :"NEXT-9設定を確認できません。"
+      },
+      {
+        key:"page_load_measure",
+        label:"system-check初期表示",
+        status:"OK",
+        detail:domMs?`DOMContentLoaded 約${domMs}ms（端末・回線で変動）`:"ブラウザ計測値を取得しました。"
+      }
+    ];
+  }
+
+  async function runNext9RuntimeAudit(){
+    const button=$("runRuntimeAuditBtn");
+    button.disabled=true;
+    setStatus("releaseRuntimeStatus","実行中...","warn");
+    releaseRuntimeResults=[];
+    next9RenderRows("releaseRuntimeList",[
+      {label:"実行監査",status:"WARN",detail:"読取専用チェックを実行しています。"}
+    ]);
+
+    try{
+      if(!releaseManifest) await loadReleaseManifest().catch(error=>{
+        releaseRuntimeResults.push({
+          key:"release_manifest",
+          label:"静的監査結果",
+          status:"WARN",
+          detail:error.message
+        });
+      });
+
+      try{
+        const health=await apiGet(endpoint("health"),{},false);
+        releaseRuntimeResults.push({
+          key:"api_health",
+          label:"Worker API接続",
+          status:health.ok===false?"NG":"OK",
+          detail:`version: ${health.version||"-"}`
+        });
+      }catch(error){
+        releaseRuntimeResults.push({key:"api_health",label:"Worker API接続",status:"NG",detail:error.message});
+      }
+
+      for(const check of [next9InvalidAdminCheck,next9PastDateCheck,next9SafetyCheck,next9PhoneNormalizationCheck]){
+        try{
+          releaseRuntimeResults.push(await check());
+        }catch(error){
+          releaseRuntimeResults.push({
+            key:check.name,
+            label:"実行チェック",
+            status:"NG",
+            detail:error.message
+          });
+        }
+      }
+
+      releaseRuntimeResults.push(...next9BrowserChecks());
+      const ok=releaseRuntimeResults.filter(row=>row.status==="OK").length;
+      const ng=releaseRuntimeResults.filter(row=>row.status==="NG").length;
+      $("releaseRuntimeCount").textContent=`${ok}/${releaseRuntimeResults.length}`;
+      setStatus("releaseRuntimeStatus",ng?`NG ${ng}件`:"実行監査 OK",ng?"ng":"ok");
+      next9RenderRows("releaseRuntimeList",releaseRuntimeResults);
+      next9UpdateOverall();
+      log("DPRO NEXT実行監査 完了",{results:releaseRuntimeResults});
+      showToast(ng?"実行監査にNGがあります":"実行監査が完了しました");
+    }finally{
+      button.disabled=false;
+    }
+  }
+
+  async function copyNext9Audit(){
+    const report={
+      system:"DPRO 整骨院・整体 LINE",
+      step:"SEITAI-NEXT-9",
+      copied_at:new Date().toISOString(),
+      static_manifest:releaseManifest,
+      runtime_results:releaseRuntimeResults
+    };
+    await navigator.clipboard.writeText(JSON.stringify(report,null,2)).catch(()=>{});
+    showToast("監査結果をコピーしました");
+  }
+
+  function next9InitAudit(){
+    $("loadReleaseManifestBtn").addEventListener("click",()=>wrap("静的監査読込",loadReleaseManifest));
+    $("runRuntimeAuditBtn").addEventListener("click",runNext9RuntimeAudit);
+    $("copyReleaseAuditBtn").addEventListener("click",copyNext9Audit);
+    loadReleaseManifest().catch(error=>{
+      setStatus("releaseManifestStatus","読込待ち","warn");
+      log(`静的監査の自動読込：${error.message}`);
+      next9UpdateOverall();
+    });
+  }
+
+
   function init() {
     $("apiBaseView").textContent = CONFIG.apiBaseUrl || FALLBACK_CONFIG.apiBaseUrl;
     $("shopCodeView").textContent = CONFIG.shopCode || "dpro_seitai_demo";
@@ -1200,6 +1639,7 @@
 
     updateAdminStatus();
     renderDemoLinks();
+    next9InitAudit();
 
     $("saveAdminBtn").addEventListener("click", () => {
       const code = $("adminCodeInput").value.trim();
@@ -1263,6 +1703,5 @@
 
   document.addEventListener("DOMContentLoaded", init);
 })();
-</script>
-<section class="card" id="next5StaticCheck" style="margin-top:16px;"><h2>STEP SEITAI-NEXT-5 確認</h2><p class="note">回数券の二重操作防止、更新候補、次回来院目安、LINE案内文、ブラウザ保存方式を確認します。</p></section></body>
+</script></body>
 </html>

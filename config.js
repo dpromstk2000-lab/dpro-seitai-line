@@ -23,7 +23,7 @@
 (() => {
   "use strict";
 
-  const STEP_VERSION = "STEP-SEITAI-NEXT-8-CONFIG-20260723";
+  const STEP_VERSION = "STEP-SEITAI-NEXT-9-CONFIG-20260723";
 
   const CONFIG = {
     version: STEP_VERSION,
@@ -52,7 +52,7 @@
       例：
       https://dpromstk2000-lab.github.io/dpro-seitai-line/
     */
-    pagesBaseUrl: "",
+    pagesBaseUrl: "https://dpromstk2000-lab.github.io/dpro-seitai-line/",
 
     /*
       管理コードは公開ファイルに直書きしない。
@@ -74,6 +74,22 @@
       enabled: true,
       resetEndpoint: "/api/admin/demo/reset",
       safetyCheckEndpoint: "/api/admin/safety-check"
+    },
+
+    security: {
+      prohibitEmbeddedAdminCode: true,
+      requireAdminHeader: true,
+      invalidAdminMustBeRejected: true,
+      demoOnlyReset: true
+    },
+
+    performance: {
+      initialOwnerScope: "selected-day",
+      patientSearchLimit: 20,
+      patientHistoryLimit: 40,
+      memberHistoryLimit: 20,
+      autoPolling: false,
+      imageInitialLoad: false
     },
 
     endpoints: {
