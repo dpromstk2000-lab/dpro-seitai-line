@@ -1,59 +1,49 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "性能・セキュリティ・system-check最終監査"
-current_step: "SEITAI-NEXT-9-COMPLETE"
-previous_step: "SEITAI-NEXT-8-COMPLETE"
+step_name: "Worker電話番号NFKC正規化・実行再監査"
+current_step: "SEITAI-NEXT-9-R1-COMPLETE"
+previous_step: "SEITAI-NEXT-9-COMPLETE"
 next_step: "SEITAI-NEXT-10"
-completed_at_jst: "2026-07-24 11:33:50 +0900"
-baseline_sha: "30c5f8bc41753a36ff025b03bf567f5d36ac9b48"
-backup_tag: "backup-seitai-before-next-9-20260723"
-backup_tag_status: "created"
-target_files:
-  - "config.js"
-  - "system-check.html"
-  - "dpro-next-release-manifest.json"
+completed_at_jst: "2026-07-24 13:51:24 +0900"
+baseline_sha: "0afa2eb5a4a045d0c95096ea60b8548e8436fd40"
+backup_tag: "backup-seitai-before-next-9-r1-20260724"
+backup_tag_status: "created_or_verified"
+worker:
+  name: "dpro-seitai-line-api"
+  url: "https://dpro-seitai-line-api.dpromstk2000.workers.dev"
+  previous_version: "STEP-SEITAI-10G-R2-PHONE-NORMALIZED-CUSTOMER-SEARCH-20260709"
+  current_version: "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724"
+  deploy_performed_by_user: true
 implemented:
-  - "公開ファイル静的監査結果の生成"
-  - "全画面HTML・JavaScript・重複ID検査"
-  - "固定管理コード公開残存検査"
-  - "API定義維持・HTTPS・管理コード削除操作検査"
-  - "画面別容量・合計容量の性能予算"
-  - "不要な自動監視・無制限履歴取得の防止"
-  - "無効管理コード・過去日・電話番号表記揺れの読取専用実行監査"
-  - "古いNEXT-5確認カードとsystem-check旧版表示の整理"
+  - "電話番号入力へUnicode NFKC正規化を追加"
+  - "全角数字・各種ハイフン・括弧・空白を正規化"
+  - "+81・0081を国内0始まりへ正規化"
+  - "公開会員APIで4表記が同一患者になることを自動検証"
 checks:
   previous_step: "OK"
   backup_tag: "OK"
   yml_syntax: "OK"
-  html_syntax: "OK"
-  javascript_syntax: "OK"
-  html_id_duplicates: "OK"
-  public_admin_code_scan: "OK"
-  endpoint_map_unchanged: "OK"
-  https_endpoints: "OK"
-  admin_delete_controls: "OK"
-  slot_30_minutes: "OK"
-  performance_budgets: "OK"
-  no_auto_polling: "OK"
-  lazy_history: "OK"
-  selected_day_scope: "OK"
-  duplicate_action_guard: "OK"
-  release_manifest: "OK"
+  worker_health: "OK"
+  worker_version: "OK"
+  halfwidth_digits: "OK"
+  hyphenated_phone: "OK"
+  fullwidth_digits: "OK"
+  international_plus81: "OK"
+  same_customer_identity: "OK"
+  write_request_used: "false"
   overall: "OK"
 change_record:
-  worker_changed: false
+  worker_changed: true
+  worker_behavior_changed: true
+  api_path_changed: false
+  api_response_contract_changed: false
   supabase_changed: false
-  api_changed: false
-  screen_function_changed: true
-  new_file_added: "dpro-next-release-manifest.json"
+  github_screen_changed: false
   existing_data_changed: false
-runtime_audit:
-  invalid_admin_rejection: "system-checkで実行"
-  past_date_guard: "system-checkで実行"
-  phone_normalization: "system-checkで実行"
-  write_request_used: false
 rollback:
-  method: "backup_tag"
-  tag: "backup-seitai-before-next-9-20260723"
+  worker_method: "redeploy_previous_worker"
+  previous_version: "STEP-SEITAI-10G-R2-PHONE-NORMALIZED-CUSTOMER-SEARCH-20260709"
+  github_method: "backup_tag"
+  github_tag: "backup-seitai-before-next-9-r1-20260724"
 workflow_self_delete_after_success: true
 auto_commit_push: true

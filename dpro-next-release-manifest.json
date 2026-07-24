@@ -2,8 +2,8 @@
   "ok": true,
   "system": "DPRO 整骨院・整体 LINE",
   "standard": "DPRO NEXT",
-  "step": "SEITAI-NEXT-9",
-  "current_step": "SEITAI-NEXT-9-COMPLETE",
+  "step": "SEITAI-NEXT-9-R1",
+  "current_step": "SEITAI-NEXT-9-R1-COMPLETE",
   "next_step": "SEITAI-NEXT-10",
   "overall": "OK",
   "generated_at_jst": "2026-07-24 11:33:50 +0900",
@@ -101,12 +101,21 @@
     "admin_delete_controls": true,
     "invalid_admin_runtime_check_available": true,
     "past_date_runtime_check_available": true,
-    "phone_normalization_runtime_check_available": true
+    "phone_normalization_runtime_check_available": true,
+    "phone_normalization_runtime_verified": true
   },
   "change_record": {
-    "worker_changed": false,
+    "worker_changed": true,
     "supabase_changed": false,
     "api_changed": false,
     "existing_data_changed": false
+  },
+  "worker_runtime_verification": {
+    "status": "OK",
+    "verified_at_jst": "2026-07-24 13:51:24 +0900",
+    "worker_version": "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724",
+    "phone_formats_checked": 4,
+    "same_customer": true,
+    "write_request_used": false
   }
 }
