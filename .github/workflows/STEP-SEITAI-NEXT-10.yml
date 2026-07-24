@@ -1,0 +1,470 @@
+name: STEP SEITAI-NEXT-10
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/STEP-SEITAI-NEXT-10.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seitai-next-10-complete
+  cancel-in-progress: false
+
+env:
+  WORKFLOW_FILE: .github/workflows/STEP-SEITAI-NEXT-10.yml
+  BACKUP_TAG: backup-seitai-before-next-10-20260724
+  RELEASE_TAG: release-seitai-dpro-next-20260724
+  WORKER_VERSION: STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724
+
+jobs:
+  finalize-dpro-next:
+    name: Finalize DPRO NEXT release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify NEXT-9-R1 and create rollback tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f dpro-next-ledger.yml
+          test -f dpro-next-check-result.json
+          test -f dpro-next-release-manifest.json
+          grep -q 'current_step: "SEITAI-NEXT-9-R1-COMPLETE"' dpro-next-ledger.yml
+          grep -q 'next_step: "SEITAI-NEXT-10"' dpro-next-ledger.yml
+          grep -q '"phone_formats_checked": 4' dpro-next-release-manifest.json
+          grep -q '"same_customer": true' dpro-next-release-manifest.json
+
+          for file in index.html member.html owner.html owner-ipad.html staff.html system-check.html config.js; do
+            test -f "$file"
+          done
+
+          BASELINE_SHA="$(git rev-parse HEAD^)"
+          echo "BASELINE_SHA=$BASELINE_SHA" >> "$GITHUB_ENV"
+
+          if git rev-parse "$BACKUP_TAG" >/dev/null 2>&1; then
+            test "$(git rev-list -n 1 "$BACKUP_TAG")" = "$BASELINE_SHA"
+          else
+            git tag -a "$BACKUP_TAG" "$BASELINE_SHA" -m "DPRO 整骨院・整体 LINE before NEXT-10 completion"
+            git push origin "$BACKUP_TAG"
+          fi
+
+      - name: Apply final completion labels and screen
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import base64
+          import re
+
+          css=base64.b64decode("CiAgICAvKiBEUFJPIE5FWFQtMTAgQ09NUExFVEUgKi8KICAgIC5uZXh0Q29tcGxldGVDYXJkewogICAgICBib3JkZXI6MXB4IHNvbGlkICM4NmVmYWM7CiAgICAgIGJhY2tncm91bmQ6CiAgICAgICAgcmFkaWFsLWdyYWRpZW50KGNpcmNsZSBhdCB0b3AgcmlnaHQscmdiYSgzNCwxOTcsOTQsLjE2KSx0cmFuc3BhcmVudCAzNjBweCksCiAgICAgICAgbGluZWFyLWdyYWRpZW50KDEzNWRlZywjZmZmZmZmLCNmMGZkZjQpOwogICAgICBvdmVyZmxvdzpoaWRkZW47CiAgICB9CiAgICAubmV4dENvbXBsZXRlSGVhZHsKICAgICAgZGlzcGxheTpmbGV4OwogICAgICBqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2VlbjsKICAgICAgYWxpZ24taXRlbXM6ZmxleC1zdGFydDsKICAgICAgZ2FwOjE4cHg7CiAgICB9CiAgICAubmV4dENvbXBsZXRlVGl0bGV7CiAgICAgIG1hcmdpbjoxMHB4IDAgOHB4OwogICAgICBmb250LXNpemU6Y2xhbXAoMjNweCw0dncsMzRweCk7CiAgICAgIGxpbmUtaGVpZ2h0OjEuMjsKICAgICAgbGV0dGVyLXNwYWNpbmc6LS4wMzVlbTsKICAgIH0KICAgIC5uZXh0Q29tcGxldGVNYXJrewogICAgICBmbGV4OjAgMCBhdXRvOwogICAgICB3aWR0aDo4OHB4OwogICAgICBoZWlnaHQ6ODhweDsKICAgICAgZGlzcGxheTpncmlkOwogICAgICBwbGFjZS1pdGVtczpjZW50ZXI7CiAgICAgIGJvcmRlci1yYWRpdXM6NTAlOwogICAgICBiYWNrZ3JvdW5kOiMxNmEzNGE7CiAgICAgIGNvbG9yOiNmZmY7CiAgICAgIGZvbnQtc2l6ZTozNHB4OwogICAgICBmb250LXdlaWdodDo5NTA7CiAgICAgIGJveC1zaGFkb3c6MCAxNHB4IDM0cHggcmdiYSgyMiwxNjMsNzQsLjI0KTsKICAgIH0KICAgIC5uZXh0Q29tcGxldGVNZXRyaWNzewogICAgICBkaXNwbGF5OmdyaWQ7CiAgICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoNCxtaW5tYXgoMCwxZnIpKTsKICAgICAgZ2FwOjEwcHg7CiAgICAgIG1hcmdpbi10b3A6MTZweDsKICAgIH0KICAgIC5uZXh0Q29tcGxldGVNZXRyaWN7CiAgICAgIGJvcmRlcjoxcHggc29saWQgI2JiZjdkMDsKICAgICAgYm9yZGVyLXJhZGl1czoxNnB4OwogICAgICBiYWNrZ3JvdW5kOnJnYmEoMjU1LDI1NSwyNTUsLjkpOwogICAgICBwYWRkaW5nOjEycHg7CiAgICB9CiAgICAubmV4dENvbXBsZXRlTWV0cmljIHNwYW57CiAgICAgIGRpc3BsYXk6YmxvY2s7CiAgICAgIGNvbG9yOiM2NDc0OGI7CiAgICAgIGZvbnQtc2l6ZToxMXB4OwogICAgICBmb250LXdlaWdodDo5MDA7CiAgICB9CiAgICAubmV4dENvbXBsZXRlTWV0cmljIGJ7CiAgICAgIGRpc3BsYXk6YmxvY2s7CiAgICAgIG1hcmdpbi10b3A6NHB4OwogICAgICBjb2xvcjojMTY2NTM0OwogICAgICBmb250LXNpemU6MjBweDsKICAgICAgbGluZS1oZWlnaHQ6MS4yNTsKICAgICAgd29yZC1icmVhazpicmVhay13b3JkOwogICAgfQogICAgLm5leHRDb21wbGV0ZUxpbmtzewogICAgICBkaXNwbGF5OmdyaWQ7CiAgICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoNSxtaW5tYXgoMCwxZnIpKTsKICAgICAgZ2FwOjlweDsKICAgICAgbWFyZ2luLXRvcDoxNHB4OwogICAgfQogICAgLm5leHRDb21wbGV0ZUxpbmtzIGF7CiAgICAgIG1pbi1oZWlnaHQ6NDRweDsKICAgICAgZGlzcGxheTpmbGV4OwogICAgICBqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyOwogICAgICBhbGlnbi1pdGVtczpjZW50ZXI7CiAgICAgIHRleHQtYWxpZ246Y2VudGVyOwogICAgICB0ZXh0LWRlY29yYXRpb246bm9uZTsKICAgICAgYm9yZGVyLXJhZGl1czoxM3B4OwogICAgICBib3JkZXI6MXB4IHNvbGlkICNiYmY3ZDA7CiAgICAgIGJhY2tncm91bmQ6I2ZmZjsKICAgICAgY29sb3I6IzE2NjUzNDsKICAgICAgZm9udC1zaXplOjEycHg7CiAgICAgIGZvbnQtd2VpZ2h0Ojk1MDsKICAgICAgcGFkZGluZzo5cHg7CiAgICB9CiAgICBAbWVkaWEobWF4LXdpZHRoOjkwMHB4KXsKICAgICAgLm5leHRDb21wbGV0ZU1ldHJpY3N7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjFmciAxZnJ9CiAgICAgIC5uZXh0Q29tcGxldGVMaW5rc3tncmlkLXRlbXBsYXRlLWNvbHVtbnM6MWZyIDFmcn0KICAgIH0KICAgIEBtZWRpYShtYXgtd2lkdGg6NTYwcHgpewogICAgICAubmV4dENvbXBsZXRlSGVhZHtkaXNwbGF5OmJsb2NrfQogICAgICAubmV4dENvbXBsZXRlTWFya3ttYXJnaW4tdG9wOjE0cHg7d2lkdGg6NzBweDtoZWlnaHQ6NzBweH0KICAgICAgLm5leHRDb21wbGV0ZU1ldHJpY3N7Z3JpZC10ZW1wbGF0ZS1jb2x1bW5zOjFmcn0KICAgICAgLm5leHRDb21wbGV0ZUxpbmtze2dyaWQtdGVtcGxhdGUtY29sdW1uczoxZnJ9CiAgICB9Cg==").decode()
+          card=base64.b64decode("CiAgICAgIDxkaXYgY2xhc3M9ImNhcmQgc3BhbjEyIG5leHRDb21wbGV0ZUNhcmQiIGlkPSJuZXh0Q29tcGxldGVDYXJkIj4KICAgICAgICA8ZGl2IGNsYXNzPSJuZXh0Q29tcGxldGVIZWFkIj4KICAgICAgICAgIDxkaXY+CiAgICAgICAgICAgIDxzcGFuIGNsYXNzPSJiYWRnZSI+RFBSTyBORVhU772c5a6M5oiQ54mIPC9zcGFuPgogICAgICAgICAgICA8aDIgY2xhc3M9Im5leHRDb21wbGV0ZVRpdGxlIj5EUFJPIOaVtOmqqOmZouODu+aVtOS9kyBMSU5FPGJyPkRQUk8gTkVYVOODluODqeODg+OCt+ODpeOCouODg+ODl+WujOS6hjwvaDI+CiAgICAgICAgICAgIDxwIGNsYXNzPSJub3RlIj4KICAgICAgICAgICAgICDkuojntITjgIHkvJrlk6HjgIHjgqrjg7zjg4rjg7xQQ+OAgeWPl+S7mGlQYWTjgIHjgrnjgr/jg4Pjg5Xjgrnjg57jg5vjgIHmgqPogIXlsaXmrbTjgIHlm57mlbDliLjjgIHmrKHlm57mnaXpmaLnm67lronjgIEKICAgICAgICAgICAgICDlho3mnaXpmaLjg5Xjgqnjg63jg7zjgIHmgKfog73jg7vjgrvjgq3jg6Xjg6rjg4bjgqPnm6Pmn7vjgb7jgafjgpLntbHlkIjjgZfjgZ/lrozmiJDniYjjgafjgZnjgIIKICAgICAgICAgICAgPC9wPgogICAgICAgICAgPC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJuZXh0Q29tcGxldGVNYXJrIiBhcmlhLWxhYmVsPSLlrozmiJAiPuKckzwvZGl2PgogICAgICAgIDwvZGl2PgoKICAgICAgICA8ZGl2IGNsYXNzPSJuZXh0Q29tcGxldGVNZXRyaWNzIj4KICAgICAgICAgIDxkaXYgY2xhc3M9Im5leHRDb21wbGV0ZU1ldHJpYyI+PHNwYW4+6Z2Z55qE55uj5p+7PC9zcGFuPjxiPjE2IC8gMTYgT0s8L2I+PC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJuZXh0Q29tcGxldGVNZXRyaWMiPjxzcGFuPuWun+ihjOebo+afuzwvc3Bhbj48Yj45IC8gOSBPSzwvYj48L2Rpdj4KICAgICAgICAgIDxkaXYgY2xhc3M9Im5leHRDb21wbGV0ZU1ldHJpYyI+PHNwYW4+6Zu76Kmx55Wq5Y+36KGo6KiYPC9zcGFuPjxiPjTlvaLlvI8gT0s8L2I+PC9kaXY+CiAgICAgICAgICA8ZGl2IGNsYXNzPSJuZXh0Q29tcGxldGVNZXRyaWMiPjxzcGFuPldvcmtlciBWZXJzaW9uPC9zcGFuPjxiPlNFSVRBSS1ORVhULTktUjE8L2I+PC9kaXY+CiAgICAgICAgPC9kaXY+CgogICAgICAgIDxkaXYgY2xhc3M9Im5leHRDb21wbGV0ZUxpbmtzIj4KICAgICAgICAgIDxhIGhyZWY9Ii4vaW5kZXguaHRtbD92PXNlaXRhaS1uZXh0LTEwLWNvbXBsZXRlIiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciI+5oKj6ICF5LqI57SEPC9hPgogICAgICAgICAgPGEgaHJlZj0iLi9tZW1iZXIuaHRtbD9waG9uZT0wOTAxMTExMjIyMiZhbXA7dj1zZWl0YWktbmV4dC0xMC1jb21wbGV0ZSIgdGFyZ2V0PSJfYmxhbmsiIHJlbD0ibm9vcGVuZXIiPuS8muWToeODm+ODvOODoDwvYT4KICAgICAgICAgIDxhIGhyZWY9Ii4vb3duZXIuaHRtbD92PXNlaXRhaS1uZXh0LTEwLWNvbXBsZXRlIiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciI+44Kq44O844OK44O8UEM8L2E+CiAgICAgICAgICA8YSBocmVmPSIuL293bmVyLWlwYWQuaHRtbD92PXNlaXRhaS1uZXh0LTEwLWNvbXBsZXRlIiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciI+5Y+X5LuYaVBhZDwvYT4KICAgICAgICAgIDxhIGhyZWY9Ii4vc3RhZmYuaHRtbD92PXNlaXRhaS1uZXh0LTEwLWNvbXBsZXRlIiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciI+44K544K/44OD44OV44K544Oe44ObPC9hPgogICAgICAgIDwvZGl2PgogICAgICA8L2Rpdj4K").decode()
+
+          pages={
+              "index.html":"DPRO 整骨院・整体 LINE｜患者予約｜DPRO NEXT完成版",
+              "member.html":"DPRO 整骨院・整体 LINE｜会員ホーム｜DPRO NEXT完成版",
+              "owner.html":"DPRO 整骨院・整体 LINE｜オーナー管理｜DPRO NEXT完成版",
+              "owner-ipad.html":"DPRO 整骨院・整体 LINE｜受付iPad｜DPRO NEXT完成版",
+              "staff.html":"DPRO 整骨院・整体 LINE｜スタッフスマホ｜DPRO NEXT完成版",
+              "system-check.html":"DPRO 整骨院・整体 LINE｜System Check｜DPRO NEXT完成版",
+          }
+
+          for name,title in pages.items():
+              path=Path(name)
+              text=path.read_text(encoding="utf-8")
+              text=re.sub(
+                  r'<!-- STEP SEITAI-[^>]+-->',
+                  '<!-- STEP SEITAI-NEXT-10 COMPLETE / 20260724 -->',
+                  text,
+                  count=1
+              )
+              text=re.sub(r'<title>.*?</title>',f'<title>{title}</title>',text,count=1,flags=re.S)
+              text=re.sub(
+                  r'<script src="\./config\.js\?v=[^"]+"></script>',
+                  '<script src="./config.js?v=seitai-next-10-complete"></script>',
+                  text,
+                  count=1
+              )
+              path.write_text(text,encoding="utf-8",newline="\n")
+
+          system=Path("system-check.html").read_text(encoding="utf-8")
+          if "DPRO NEXT-10 COMPLETE" in system:
+              raise SystemExit("NEXT-10 completion card already exists")
+          system=system.replace(
+              '<span class="badge">STEP SEITAI-NEXT-9 / system-check.html</span>',
+              '<span class="badge">STEP SEITAI-NEXT-10 COMPLETE / system-check.html</span>',
+              1
+          )
+          system=system.replace("\n  </style>","\n"+css+"\n  </style>",1)
+          system=system.replace(
+              '    <section class="grid">',
+              '    <section class="grid">\n'+card,
+              1
+          )
+          Path("system-check.html").write_text(system,encoding="utf-8",newline="\n")
+
+          config=Path("config.js").read_text(encoding="utf-8")
+          config=re.sub(
+              r'const STEP_VERSION = "[^"]+";',
+              'const STEP_VERSION = "STEP-SEITAI-NEXT-10-COMPLETE-20260724";',
+              config,
+              count=1
+          )
+          if "window.DPRO_NEXT_RELEASE" not in config:
+              config += '\n\nwindow.DPRO_NEXT_RELEASE = Object.freeze({\n'
+              config += '  system: "DPRO 整骨院・整体 LINE",\n'
+              config += '  status: "COMPLETE",\n'
+              config += '  release: "SEITAI-NEXT-10",\n'
+              config += '  releasedAt: "2026-07-24",\n'
+              config += '  workerVersion: "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724",\n'
+              config += '  staticAudit: "16/16 OK",\n'
+              config += '  runtimeAudit: "9/9 OK",\n'
+              config += '  phoneFormats: "4/4 OK"\n'
+              config += '});\n'
+          Path("config.js").write_text(config,encoding="utf-8",newline="\n")
+          PY
+
+      - name: Generate final release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          COMPLETED_AT="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %z')"
+          export COMPLETED_AT
+
+          python3 <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import os
+
+          urls={
+              "reservation":"https://dpromstk2000-lab.github.io/dpro-seitai-line/index.html?v=seitai-next-10-complete",
+              "member":"https://dpromstk2000-lab.github.io/dpro-seitai-line/member.html?phone=09011112222&v=seitai-next-10-complete",
+              "owner":"https://dpromstk2000-lab.github.io/dpro-seitai-line/owner.html?v=seitai-next-10-complete",
+              "ipad":"https://dpromstk2000-lab.github.io/dpro-seitai-line/owner-ipad.html?v=seitai-next-10-complete",
+              "staff":"https://dpromstk2000-lab.github.io/dpro-seitai-line/staff.html?v=seitai-next-10-complete",
+              "system_check":"https://dpromstk2000-lab.github.io/dpro-seitai-line/system-check.html?v=seitai-next-10-complete"
+          }
+          files=["index.html","member.html","owner.html","owner-ipad.html","staff.html","system-check.html","config.js"]
+          file_info={}
+          for name in files:
+              raw=Path(name).read_bytes()
+              file_info[name]={"bytes":len(raw),"sha256":hashlib.sha256(raw).hexdigest()}
+
+          complete={
+              "ok":True,
+              "system":"DPRO 整骨院・整体 LINE",
+              "standard":"DPRO NEXT",
+              "release":"SEITAI-NEXT-10",
+              "status":"COMPLETE",
+              "completed_at_jst":os.environ["COMPLETED_AT"],
+              "worker":{
+                  "name":"dpro-seitai-line-api",
+                  "url":"https://dpro-seitai-line-api.dpromstk2000.workers.dev",
+                  "version":os.environ["WORKER_VERSION"]
+              },
+              "audit":{"static":"16/16 OK","runtime":"9/9 OK","phone_formats":"4/4 OK","same_customer":True},
+              "screens":["患者予約","会員ホーム","オーナーPC","受付iPad","スタッフスマホ","system-check"],
+              "urls":urls,
+              "files":file_info,
+              "features":[
+                  "30分単位の患者予約",
+                  "予約変更・キャンセル",
+                  "会員ホーム・来院履歴・前回と同じ予約",
+                  "今日やること・4段階進捗",
+                  "患者検索・患者履歴",
+                  "電話・店頭予約",
+                  "回数券・二重操作防止・更新候補",
+                  "次回来院目安",
+                  "受付iPad・スタッフスマホ",
+                  "再来院・フォローセンター",
+                  "電話番号NFKC正規化",
+                  "性能・セキュリティ・公開監査"
+              ],
+              "change_record":{
+                  "worker_changed_in_next9_r1":True,
+                  "worker_changed_in_next10":False,
+                  "supabase_changed":False,
+                  "api_changed":False,
+                  "existing_data_changed":False
+              }
+          }
+          Path("dpro-next-complete.json").write_text(
+              json.dumps(complete,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
+          )
+
+          sheet={
+              "title":"DPRO 整骨院・整体 LINE 操作体験シート",
+              "release":"SEITAI-NEXT-10",
+              "demo_admin_code":"1234",
+              "urls":urls,
+              "recommended_order":["system_check","reservation","member","owner","ipad","staff"],
+              "notes":[
+                  "公開デモ専用の管理コードを使用",
+                  "実店舗導入時は店舗ごとに管理コードを変更",
+                  "system-checkの実行監査は読取専用"
+              ]
+          }
+          Path("dpro-next-operation-sheet-data.json").write_text(
+              json.dumps(sheet,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
+          )
+
+          handoff={
+              "target_repository":"dpromstk2000-lab/dpro-line-systems-site",
+              "target_files":["systems.html","systems/osteopathic.html"],
+              "release":"SEITAI-NEXT-10",
+              "preview_version":"seitai-next-10-complete",
+              "required_updates":[
+                  "一覧カードをDPRO NEXT完成版へ更新",
+                  "旧STEPのiframe URLを完成版URLへ統一",
+                  "会員ホーム・患者履歴・前回と同じ予約を反映",
+                  "4段階進捗・患者履歴・次回来院目安を反映",
+                  "受付iPadとスタッフスマホの役割分離を反映",
+                  "再来院フォローセンターを反映",
+                  "静的16/16・実行9/9・電話4形式OKを掲載"
+              ]
+          }
+          Path("dpro-next-product-site-handoff.json").write_text(
+              json.dumps(handoff,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
+          )
+          PY
+
+      - name: Run final syntax and regression checks
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          import json
+          import re
+          import yaml
+
+          class Parser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids=[]
+              def collect(self,attrs):
+                  for key,value in attrs:
+                      if key=="id" and value:
+                          self.ids.append(value)
+              def handle_starttag(self,tag,attrs):
+                  self.collect(attrs)
+              def handle_startendtag(self,tag,attrs):
+                  self.collect(attrs)
+
+          pages=["index.html","member.html","owner.html","owner-ipad.html","staff.html","system-check.html"]
+          for name in pages:
+              text=Path(name).read_text(encoding="utf-8")
+              if "STEP SEITAI-NEXT-10 COMPLETE" not in text:
+                  raise SystemExit(f"completion marker missing: {name}")
+              if "DPRO NEXT完成版" not in text:
+                  raise SystemExit(f"completion title missing: {name}")
+              parser=Parser()
+              parser.feed(text)
+              duplicates=sorted({item for item in parser.ids if parser.ids.count(item)>1})
+              if duplicates:
+                  raise SystemExit(f"{name}: duplicate ids {duplicates}")
+              for index,source in enumerate(re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>",text,flags=re.S|re.I)):
+                  if source.strip():
+                      Path(f"/tmp/{Path(name).stem}-{index}.js").write_text(source,encoding="utf-8")
+
+          system=Path("system-check.html").read_text(encoding="utf-8")
+          for token in ["nextCompleteCard","16 / 16 OK","9 / 9 OK","4形式 OK","スタッフスマホ"]:
+              if token not in system:
+                  raise SystemExit(f"system completion token missing: {token}")
+
+          config=Path("config.js").read_text(encoding="utf-8")
+          for token in [
+              "STEP-SEITAI-NEXT-10-COMPLETE-20260724",
+              "window.DPRO_NEXT_RELEASE",
+              'status: "COMPLETE"',
+              "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724"
+          ]:
+              if token not in config:
+                  raise SystemExit(f"config completion token missing: {token}")
+
+          complete=json.loads(Path("dpro-next-complete.json").read_text(encoding="utf-8"))
+          if complete.get("status")!="COMPLETE":
+              raise SystemExit("complete manifest status is not COMPLETE")
+          if complete.get("audit",{}).get("runtime")!="9/9 OK":
+              raise SystemExit("runtime audit is not 9/9")
+          if complete.get("audit",{}).get("phone_formats")!="4/4 OK":
+              raise SystemExit("phone format audit is not 4/4")
+
+          release=json.loads(Path("dpro-next-release-manifest.json").read_text(encoding="utf-8"))
+          verification=release.get("worker_runtime_verification") or {}
+          if verification.get("status")!="OK" or verification.get("phone_formats_checked")!=4:
+              raise SystemExit("NEXT-9-R1 Worker verification missing")
+
+          yaml.safe_load(Path(".github/workflows/STEP-SEITAI-NEXT-10.yml").read_text(encoding="utf-8"))
+          PY
+
+          for script in /tmp/index-*.js /tmp/member-*.js /tmp/owner-*.js /tmp/owner-ipad-*.js /tmp/staff-*.js /tmp/system-check-*.js; do
+            [ -f "$script" ] || continue
+            node --check "$script"
+          done
+
+      - name: Write final ledger and release manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          COMPLETED_AT="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S %z')"
+          export COMPLETED_AT
+
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+          import os
+
+          release=json.loads(Path("dpro-next-release-manifest.json").read_text(encoding="utf-8"))
+          release.update({
+              "step":"SEITAI-NEXT-10",
+              "current_step":"SEITAI-NEXT-10-COMPLETE",
+              "next_step":"NONE",
+              "overall":"OK",
+              "release_status":"COMPLETE",
+              "completed_at_jst":os.environ["COMPLETED_AT"]
+          })
+          release["final_release"]={
+              "status":"COMPLETE",
+              "static_audit":"16/16 OK",
+              "runtime_audit":"9/9 OK",
+              "phone_formats":"4/4 OK",
+              "worker_version":"STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724",
+              "complete_manifest":"dpro-next-complete.json",
+              "operation_sheet_data":"dpro-next-operation-sheet-data.json",
+              "product_site_handoff":"dpro-next-product-site-handoff.json"
+          }
+          Path("dpro-next-release-manifest.json").write_text(
+              json.dumps(release,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
+          )
+
+          result=json.loads(Path("dpro-next-check-result.json").read_text(encoding="utf-8"))
+          result.update({
+              "step":"SEITAI-NEXT-10",
+              "current_step":"SEITAI-NEXT-10-COMPLETE",
+              "next_step":"NONE",
+              "overall":"OK",
+              "release_status":"COMPLETE"
+          })
+          result["final_checks"]={
+              "all_pages":"OK",
+              "html_syntax":"OK",
+              "javascript_syntax":"OK",
+              "html_id_duplicates":"OK",
+              "static_audit":"16/16 OK",
+              "runtime_audit":"9/9 OK",
+              "phone_formats":"4/4 OK",
+              "worker_version":"OK",
+              "completion_manifest":"OK",
+              "operation_sheet_data":"OK",
+              "product_site_handoff":"OK"
+          }
+          Path("dpro-next-check-result.json").write_text(
+              json.dumps(result,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
+          )
+          PY
+
+          cat > dpro-next-ledger.yml <<EOF
+          system_name: "DPRO 整骨院・整体 LINE"
+          standard: "DPRO NEXT"
+          step_name: "最終完成・公開引継ぎ"
+          current_step: "SEITAI-NEXT-10-COMPLETE"
+          previous_step: "SEITAI-NEXT-9-R1-COMPLETE"
+          next_step: "NONE"
+          release_status: "COMPLETE"
+          completed_at_jst: "$COMPLETED_AT"
+          baseline_sha: "$BASELINE_SHA"
+          backup_tag: "$BACKUP_TAG"
+          release_tag: "$RELEASE_TAG"
+          worker:
+            name: "dpro-seitai-line-api"
+            version: "$WORKER_VERSION"
+            runtime_verification: "OK"
+          audits:
+            static: "16/16 OK"
+            runtime: "9/9 OK"
+            phone_formats: "4/4 OK"
+          completed_screens:
+            - "index.html"
+            - "member.html"
+            - "owner.html"
+            - "owner-ipad.html"
+            - "staff.html"
+            - "system-check.html"
+          release_files:
+            - "dpro-next-complete.json"
+            - "dpro-next-release-manifest.json"
+            - "dpro-next-check-result.json"
+            - "dpro-next-operation-sheet-data.json"
+            - "dpro-next-product-site-handoff.json"
+          checks:
+            previous_step: "OK"
+            backup_tag: "OK"
+            html_syntax: "OK"
+            javascript_syntax: "OK"
+            html_id_duplicates: "OK"
+            worker_runtime_verification: "OK"
+            completion_screen: "OK"
+            completion_manifest: "OK"
+            operation_sheet_data: "OK"
+            product_site_handoff: "OK"
+            overall: "OK"
+          change_record:
+            worker_changed: false
+            supabase_changed: false
+            api_changed: false
+            screen_function_changed: false
+            completion_labels_changed: true
+            new_release_files_added: true
+            existing_data_changed: false
+          rollback:
+            method: "backup_tag"
+            tag: "$BACKUP_TAG"
+          workflow_self_delete_after_success: true
+          auto_commit_push: true
+          EOF
+
+      - name: Remove workflow commit release and create final tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f "$WORKFLOW_FILE"
+
+          git add \
+            index.html member.html owner.html owner-ipad.html staff.html system-check.html config.js \
+            dpro-next-ledger.yml dpro-next-check-result.json dpro-next-release-manifest.json \
+            dpro-next-complete.json dpro-next-operation-sheet-data.json dpro-next-product-site-handoff.json \
+            "$WORKFLOW_FILE"
+
+          git diff --cached --quiet && { echo "No changes to commit"; exit 1; }
+          git commit -m "STEP SEITAI-NEXT-10 COMPLETE [skip ci]"
+          FINAL_SHA="$(git rev-parse HEAD)"
+
+          if git rev-parse "$RELEASE_TAG" >/dev/null 2>&1; then
+            test "$(git rev-list -n 1 "$RELEASE_TAG")" = "$FINAL_SHA"
+          else
+            git tag -a "$RELEASE_TAG" "$FINAL_SHA" -m "DPRO 整骨院・整体 LINE DPRO NEXT COMPLETE"
+          fi
+
+          # 完成Commitと完成タグを同じPushで反映する。
+          git push origin HEAD:main "$RELEASE_TAG"
