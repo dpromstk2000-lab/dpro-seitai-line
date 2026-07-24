@@ -1,9 +1,9 @@
 {
   "ok": true,
   "system": "DPRO 整骨院・整体 LINE",
-  "step": "SEITAI-NEXT-9-R1",
-  "current_step": "SEITAI-NEXT-9-R1-COMPLETE",
-  "next_step": "SEITAI-NEXT-10",
+  "step": "SEITAI-NEXT-10",
+  "current_step": "SEITAI-NEXT-10-COMPLETE",
+  "next_step": "NONE",
   "overall": "OK",
   "checks": {
     "required_files": "OK",
@@ -43,5 +43,19 @@
     "phone_formats_checked": 4,
     "same_customer": true,
     "write_request_used": false
+  },
+  "release_status": "COMPLETE",
+  "final_checks": {
+    "all_pages": "OK",
+    "html_syntax": "OK",
+    "javascript_syntax": "OK",
+    "html_id_duplicates": "OK",
+    "static_audit": "16/16 OK",
+    "runtime_audit": "9/9 OK",
+    "phone_formats": "4/4 OK",
+    "worker_version": "OK",
+    "completion_manifest": "OK",
+    "operation_sheet_data": "OK",
+    "product_site_handoff": "OK"
   }
 }

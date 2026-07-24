@@ -1,0 +1,18 @@
+{
+  "target_repository": "dpromstk2000-lab/dpro-line-systems-site",
+  "target_files": [
+    "systems.html",
+    "systems/osteopathic.html"
+  ],
+  "release": "SEITAI-NEXT-10",
+  "preview_version": "seitai-next-10-complete",
+  "required_updates": [
+    "一覧カードをDPRO NEXT完成版へ更新",
+    "旧STEPのiframe URLを完成版URLへ統一",
+    "会員ホーム・患者履歴・前回と同じ予約を反映",
+    "4段階進捗・患者履歴・次回来院目安を反映",
+    "受付iPadとスタッフスマホの役割分離を反映",
+    "再来院フォローセンターを反映",
+    "静的16/16・実行9/9・電話4形式OKを掲載"
+  ]
+}

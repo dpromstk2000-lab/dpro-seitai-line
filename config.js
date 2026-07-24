@@ -23,7 +23,7 @@
 (() => {
   "use strict";
 
-  const STEP_VERSION = "STEP-SEITAI-NEXT-9-CONFIG-20260723";
+  const STEP_VERSION = "STEP-SEITAI-NEXT-10-COMPLETE-20260724";
 
   const CONFIG = {
     version: STEP_VERSION,
@@ -236,3 +236,15 @@
     apiBaseUrl: CONFIG.apiBaseUrl
   });
 })();
+
+
+window.DPRO_NEXT_RELEASE = Object.freeze({
+  system: "DPRO 整骨院・整体 LINE",
+  status: "COMPLETE",
+  release: "SEITAI-NEXT-10",
+  releasedAt: "2026-07-24",
+  workerVersion: "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724",
+  staticAudit: "16/16 OK",
+  runtimeAudit: "9/9 OK",
+  phoneFormats: "4/4 OK"
+});

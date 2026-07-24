@@ -1,49 +1,57 @@
 system_name: "DPRO 整骨院・整体 LINE"
 standard: "DPRO NEXT"
-step_name: "Worker電話番号NFKC正規化・実行再監査"
-current_step: "SEITAI-NEXT-9-R1-COMPLETE"
-previous_step: "SEITAI-NEXT-9-COMPLETE"
-next_step: "SEITAI-NEXT-10"
-completed_at_jst: "2026-07-24 13:51:24 +0900"
-baseline_sha: "0afa2eb5a4a045d0c95096ea60b8548e8436fd40"
-backup_tag: "backup-seitai-before-next-9-r1-20260724"
-backup_tag_status: "created_or_verified"
+step_name: "最終完成・公開引継ぎ"
+current_step: "SEITAI-NEXT-10-COMPLETE"
+previous_step: "SEITAI-NEXT-9-R1-COMPLETE"
+next_step: "NONE"
+release_status: "COMPLETE"
+completed_at_jst: "2026-07-24 14:30:50 +0900"
+baseline_sha: "4515c75a8e289d09cee6bf1a67b9611748e49e26"
+backup_tag: "backup-seitai-before-next-10-20260724"
+release_tag: "release-seitai-dpro-next-20260724"
 worker:
   name: "dpro-seitai-line-api"
-  url: "https://dpro-seitai-line-api.dpromstk2000.workers.dev"
-  previous_version: "STEP-SEITAI-10G-R2-PHONE-NORMALIZED-CUSTOMER-SEARCH-20260709"
-  current_version: "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724"
-  deploy_performed_by_user: true
-implemented:
-  - "電話番号入力へUnicode NFKC正規化を追加"
-  - "全角数字・各種ハイフン・括弧・空白を正規化"
-  - "+81・0081を国内0始まりへ正規化"
-  - "公開会員APIで4表記が同一患者になることを自動検証"
+  version: "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724"
+  runtime_verification: "OK"
+audits:
+  static: "16/16 OK"
+  runtime: "9/9 OK"
+  phone_formats: "4/4 OK"
+completed_screens:
+  - "index.html"
+  - "member.html"
+  - "owner.html"
+  - "owner-ipad.html"
+  - "staff.html"
+  - "system-check.html"
+release_files:
+  - "dpro-next-complete.json"
+  - "dpro-next-release-manifest.json"
+  - "dpro-next-check-result.json"
+  - "dpro-next-operation-sheet-data.json"
+  - "dpro-next-product-site-handoff.json"
 checks:
   previous_step: "OK"
   backup_tag: "OK"
-  yml_syntax: "OK"
-  worker_health: "OK"
-  worker_version: "OK"
-  halfwidth_digits: "OK"
-  hyphenated_phone: "OK"
-  fullwidth_digits: "OK"
-  international_plus81: "OK"
-  same_customer_identity: "OK"
-  write_request_used: "false"
+  html_syntax: "OK"
+  javascript_syntax: "OK"
+  html_id_duplicates: "OK"
+  worker_runtime_verification: "OK"
+  completion_screen: "OK"
+  completion_manifest: "OK"
+  operation_sheet_data: "OK"
+  product_site_handoff: "OK"
   overall: "OK"
 change_record:
-  worker_changed: true
-  worker_behavior_changed: true
-  api_path_changed: false
-  api_response_contract_changed: false
+  worker_changed: false
   supabase_changed: false
-  github_screen_changed: false
+  api_changed: false
+  screen_function_changed: false
+  completion_labels_changed: true
+  new_release_files_added: true
   existing_data_changed: false
 rollback:
-  worker_method: "redeploy_previous_worker"
-  previous_version: "STEP-SEITAI-10G-R2-PHONE-NORMALIZED-CUSTOMER-SEARCH-20260709"
-  github_method: "backup_tag"
-  github_tag: "backup-seitai-before-next-9-r1-20260724"
+  method: "backup_tag"
+  tag: "backup-seitai-before-next-10-20260724"
 workflow_self_delete_after_success: true
 auto_commit_push: true

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DPRO 整骨院・整体 LINE｜System Check｜STEP SEITAI-NEXT-9</title>
-  <script src="./config.js?v=step-seitai-next-9"></script>
+  <title>DPRO 整骨院・整体 LINE｜System Check｜DPRO NEXT完成版</title>
+  <script src="./config.js?v=seitai-next-10-complete"></script>
   <style>
     :root{
       --bg:#f4f7fb;
@@ -468,6 +468,98 @@
       .releaseAuditRow{grid-template-columns:1fr}
     }
 
+
+    /* DPRO NEXT-10 COMPLETE */
+    .nextCompleteCard{
+      border:1px solid #86efac;
+      background:
+        radial-gradient(circle at top right,rgba(34,197,94,.16),transparent 360px),
+        linear-gradient(135deg,#ffffff,#f0fdf4);
+      overflow:hidden;
+    }
+    .nextCompleteHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+    }
+    .nextCompleteTitle{
+      margin:10px 0 8px;
+      font-size:clamp(23px,4vw,34px);
+      line-height:1.2;
+      letter-spacing:-.035em;
+    }
+    .nextCompleteMark{
+      flex:0 0 auto;
+      width:88px;
+      height:88px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:#16a34a;
+      color:#fff;
+      font-size:34px;
+      font-weight:950;
+      box-shadow:0 14px 34px rgba(22,163,74,.24);
+    }
+    .nextCompleteMetrics{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-top:16px;
+    }
+    .nextCompleteMetric{
+      border:1px solid #bbf7d0;
+      border-radius:16px;
+      background:rgba(255,255,255,.9);
+      padding:12px;
+    }
+    .nextCompleteMetric span{
+      display:block;
+      color:#64748b;
+      font-size:11px;
+      font-weight:900;
+    }
+    .nextCompleteMetric b{
+      display:block;
+      margin-top:4px;
+      color:#166534;
+      font-size:20px;
+      line-height:1.25;
+      word-break:break-word;
+    }
+    .nextCompleteLinks{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:9px;
+      margin-top:14px;
+    }
+    .nextCompleteLinks a{
+      min-height:44px;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      text-decoration:none;
+      border-radius:13px;
+      border:1px solid #bbf7d0;
+      background:#fff;
+      color:#166534;
+      font-size:12px;
+      font-weight:950;
+      padding:9px;
+    }
+    @media(max-width:900px){
+      .nextCompleteMetrics{grid-template-columns:1fr 1fr}
+      .nextCompleteLinks{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:560px){
+      .nextCompleteHead{display:block}
+      .nextCompleteMark{margin-top:14px;width:70px;height:70px}
+      .nextCompleteMetrics{grid-template-columns:1fr}
+      .nextCompleteLinks{grid-template-columns:1fr}
+    }
+
   </style>
 </head>
 <body>
@@ -475,7 +567,7 @@
   <div class="wrap">
     <section class="hero">
       <div>
-        <span class="badge">STEP SEITAI-NEXT-9 / system-check.html</span>
+        <span class="badge">STEP SEITAI-NEXT-10 COMPLETE / system-check.html</span>
         <h1>DPRO 整骨院・整体 LINE<br>システム確認画面</h1>
         <p class="lead">
           API接続、管理コード保存、店舗設定、予約枠、営業前デモ準備、各デモ画面の入口を確認します。
@@ -495,6 +587,36 @@
 <main>
   <div class="wrap">
     <section class="grid">
+
+      <div class="card span12 nextCompleteCard" id="nextCompleteCard">
+        <div class="nextCompleteHead">
+          <div>
+            <span class="badge">DPRO NEXT｜完成版</span>
+            <h2 class="nextCompleteTitle">DPRO 整骨院・整体 LINE<br>DPRO NEXTブラッシュアップ完了</h2>
+            <p class="note">
+              予約、会員、オーナーPC、受付iPad、スタッフスマホ、患者履歴、回数券、次回来院目安、
+              再来院フォロー、性能・セキュリティ監査までを統合した完成版です。
+            </p>
+          </div>
+          <div class="nextCompleteMark" aria-label="完成">✓</div>
+        </div>
+
+        <div class="nextCompleteMetrics">
+          <div class="nextCompleteMetric"><span>静的監査</span><b>16 / 16 OK</b></div>
+          <div class="nextCompleteMetric"><span>実行監査</span><b>9 / 9 OK</b></div>
+          <div class="nextCompleteMetric"><span>電話番号表記</span><b>4形式 OK</b></div>
+          <div class="nextCompleteMetric"><span>Worker Version</span><b>SEITAI-NEXT-9-R1</b></div>
+        </div>
+
+        <div class="nextCompleteLinks">
+          <a href="./index.html?v=seitai-next-10-complete" target="_blank" rel="noopener">患者予約</a>
+          <a href="./member.html?phone=09011112222&amp;v=seitai-next-10-complete" target="_blank" rel="noopener">会員ホーム</a>
+          <a href="./owner.html?v=seitai-next-10-complete" target="_blank" rel="noopener">オーナーPC</a>
+          <a href="./owner-ipad.html?v=seitai-next-10-complete" target="_blank" rel="noopener">受付iPad</a>
+          <a href="./staff.html?v=seitai-next-10-complete" target="_blank" rel="noopener">スタッフスマホ</a>
+        </div>
+      </div>
+
       <div class="card span4">
         <h2>1. 管理コード</h2>
         <p class="note">

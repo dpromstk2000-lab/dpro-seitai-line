@@ -1,0 +1,26 @@
+{
+  "title": "DPRO 整骨院・整体 LINE 操作体験シート",
+  "release": "SEITAI-NEXT-10",
+  "demo_admin_code": "1234",
+  "urls": {
+    "reservation": "https://dpromstk2000-lab.github.io/dpro-seitai-line/index.html?v=seitai-next-10-complete",
+    "member": "https://dpromstk2000-lab.github.io/dpro-seitai-line/member.html?phone=09011112222&v=seitai-next-10-complete",
+    "owner": "https://dpromstk2000-lab.github.io/dpro-seitai-line/owner.html?v=seitai-next-10-complete",
+    "ipad": "https://dpromstk2000-lab.github.io/dpro-seitai-line/owner-ipad.html?v=seitai-next-10-complete",
+    "staff": "https://dpromstk2000-lab.github.io/dpro-seitai-line/staff.html?v=seitai-next-10-complete",
+    "system_check": "https://dpromstk2000-lab.github.io/dpro-seitai-line/system-check.html?v=seitai-next-10-complete"
+  },
+  "recommended_order": [
+    "system_check",
+    "reservation",
+    "member",
+    "owner",
+    "ipad",
+    "staff"
+  ],
+  "notes": [
+    "公開デモ専用の管理コードを使用",
+    "実店舗導入時は店舗ごとに管理コードを変更",
+    "system-checkの実行監査は読取専用"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "ok": true,
+  "system": "DPRO 整骨院・整体 LINE",
+  "standard": "DPRO NEXT",
+  "release": "SEITAI-NEXT-10",
+  "status": "COMPLETE",
+  "completed_at_jst": "2026-07-24 14:30:50 +0900",
+  "worker": {
+    "name": "dpro-seitai-line-api",
+    "url": "https://dpro-seitai-line-api.dpromstk2000.workers.dev",
+    "version": "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724"
+  },
+  "audit": {
+    "static": "16/16 OK",
+    "runtime": "9/9 OK",
+    "phone_formats": "4/4 OK",
+    "same_customer": true
+  },
+  "screens": [
+    "患者予約",
+    "会員ホーム",
+    "オーナーPC",
+    "受付iPad",
+    "スタッフスマホ",
+    "system-check"
+  ],
+  "urls": {
+    "reservation": "https://dpromstk2000-lab.github.io/dpro-seitai-line/index.html?v=seitai-next-10-complete",
+    "member": "https://dpromstk2000-lab.github.io/dpro-seitai-line/member.html?phone=09011112222&v=seitai-next-10-complete",
+    "owner": "https://dpromstk2000-lab.github.io/dpro-seitai-line/owner.html?v=seitai-next-10-complete",
+    "ipad": "https://dpromstk2000-lab.github.io/dpro-seitai-line/owner-ipad.html?v=seitai-next-10-complete",
+    "staff": "https://dpromstk2000-lab.github.io/dpro-seitai-line/staff.html?v=seitai-next-10-complete",
+    "system_check": "https://dpromstk2000-lab.github.io/dpro-seitai-line/system-check.html?v=seitai-next-10-complete"
+  },
+  "files": {
+    "index.html": {
+      "bytes": 54895,
+      "sha256": "d4d072df862e49ec08617f84aadf7d5c99f51179d6d084d8494553de79f48d0f"
+    },
+    "member.html": {
+      "bytes": 58055,
+      "sha256": "ab1d8d1611023d61259584e156efc036c26e8611b2c1a549b4cf3af480c14b85"
+    },
+    "owner.html": {
+      "bytes": 201185,
+      "sha256": "6a1b329f2bc31bf4eb32c3687524ca11fe5fdd05161e186723336b94bb023c56"
+    },
+    "owner-ipad.html": {
+      "bytes": 101837,
+      "sha256": "df0a5952eb8885c798b46e09994fbe540a1e36672ecd90925ffc2f7767171e30"
+    },
+    "staff.html": {
+      "bytes": 20883,
+      "sha256": "5c29d0a618fbee912f4b91cc6981295ad9c46775c013faf8330c3bf0e0cf17be"
+    },
+    "system-check.html": {
+      "bytes": 64899,
+      "sha256": "8edd71a0feea4fc4f78e3c3abdbde4e4eca3b67346f7947c97653b040789af48"
+    },
+    "config.js": {
+      "bytes": 6846,
+      "sha256": "6f61011aafd110b02d93cf84c9761f8b75c4910d3b422b7d274cb21ba9462c91"
+    }
+  },
+  "features": [
+    "30分単位の患者予約",
+    "予約変更・キャンセル",
+    "会員ホーム・来院履歴・前回と同じ予約",
+    "今日やること・4段階進捗",
+    "患者検索・患者履歴",
+    "電話・店頭予約",
+    "回数券・二重操作防止・更新候補",
+    "次回来院目安",
+    "受付iPad・スタッフスマホ",
+    "再来院・フォローセンター",
+    "電話番号NFKC正規化",
+    "性能・セキュリティ・公開監査"
+  ],
+  "change_record": {
+    "worker_changed_in_next9_r1": true,
+    "worker_changed_in_next10": false,
+    "supabase_changed": false,
+    "api_changed": false,
+    "existing_data_changed": false
+  }
+}
