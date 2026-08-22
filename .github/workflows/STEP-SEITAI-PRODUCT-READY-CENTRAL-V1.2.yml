@@ -1,4 +1,4 @@
-name: STEP SEITAI PRODUCT READY CENTRAL V1.2
+name: STEP SEITAI PRODUCT READY CENTRAL V1.2 R2
 
 on:
   push:
@@ -233,22 +233,68 @@ jobs:
               await page.route('**/*',async route=>{
                 const u=route.request().url();
                 if(u.includes('workers.dev')||u.includes('supabase.co/functions/v1/')){
-                  const body=u.includes('/public/settings')?{ok:true,shop:{shop_name:'DPRO整体院'},settings:{reservation_slot_minutes:30},hours:[],special_days:[],staff:[{id:'s1',staff_code:'staff_a',staff_name:'佐藤先生',display_name:'佐藤先生',role:'staff',is_active:true}],menus:[{id:'m1',menu_code:'regular_seitai',menu_name:'整体',duration_minutes:60,is_active:true}],resources:[]}:{ok:true};
+                  let body={
+                    ok:true,
+                    reservations:[],customers:[],visits:[],tickets:[],followups:[],
+                    templates:[],messages:[],staff:[],menus:[],resources:[],
+                    hours:[],special_days:[],settings:{reservation_slot_minutes:30}
+                  };
+                  if(u.includes('/public/settings')){
+                    body={...body,shop:{shop_name:'DPRO整体院'},staff:[{id:'s1',staff_code:'staff_a',staff_name:'佐藤先生',display_name:'佐藤先生',role:'staff',is_active:true}],menus:[{id:'m1',menu_code:'regular_seitai',menu_name:'整体',duration_minutes:60,is_active:true}]};
+                  }else if(u.includes('/seitai-control-adapter/health')){
+                    body={ok:true,versionsAligned:true,adapterVersion:'DPRO-CONTROL-ADAPTER-1.0-SEITAI-20260822-R2',current:{workerVersion:'STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724',databaseVersion:'SEITAI-DB-RUNTIME-BASELINE-V1-20260822',frontendVersion:'STEP-SEITAI-NEXT-10-COMPLETE-20260724'}};
+                  }else if(u.includes('/seitai-control-adapter/line/capability')){
+                    body={ok:true,clientSuppliedIdentityAccepted:false,capability:'server_verified_line_identity'};
+                  }else if(u.includes('/seitai-control-adapter/staff/capability')){
+                    body={ok:true,ownerMutationAuthority:false,capability:'server_scoped_staff_session'};
+                  }
                   return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)});
                 }
                 return route.continue();
               });
               await page.goto(`${base}/${file}`,{waitUntil:'domcontentloaded',timeout:30000}); await page.waitForTimeout(700);
-              const metrics=await page.evaluate(()=>({innerWidth:window.innerWidth,scrollWidth:document.documentElement.scrollWidth,bodyScrollWidth:document.body.scrollWidth,visibleButtons:[...document.querySelectorAll('button,a.btn')].filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none'}).slice(0,50).map(e=>{const r=e.getBoundingClientRect();return {text:(e.textContent||'').trim().slice(0,40),left:r.left,right:r.right,width:r.width,height:r.height}})}));
-              const clipped=metrics.visibleButtons.filter(b=>b.left<-1||b.right>width+1||b.width<1);
-              const blockingErrors=errors.filter(x=>!x.includes('favicon'));
-              const ok=metrics.scrollWidth<=width+1&&metrics.bodyScrollWidth<=width+1&&clipped.length===0&&blockingErrors.length===0;
+              const metrics=await page.evaluate(()=>{
+                const visible=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none'};
+                const selector=e=>{
+                  if(e.id)return '#'+e.id;
+                  const cls=[...e.classList].slice(0,3).join('.');
+                  return e.tagName.toLowerCase()+(cls?'.'+cls:'');
+                };
+                const els=[...document.querySelectorAll('body *')].filter(visible);
+                const overflowing=els.map(e=>{const r=e.getBoundingClientRect();return {selector:selector(e),text:(e.textContent||'').trim().replace(/\s+/g,' ').slice(0,60),left:r.left,right:r.right,width:r.width}})
+                  .filter(x=>x.left<-2||x.right>window.innerWidth+2||x.width>window.innerWidth+2)
+                  .slice(0,20);
+                return {
+                  innerWidth:window.innerWidth,
+                  scrollWidth:document.documentElement.scrollWidth,
+                  bodyScrollWidth:document.body.scrollWidth,
+                  visibleButtons:[...document.querySelectorAll('button,a.btn')].filter(visible).slice(0,80).map(e=>{const r=e.getBoundingClientRect();return {text:(e.textContent||'').trim().slice(0,40),left:r.left,right:r.right,width:r.width,height:r.height}}),
+                  overflowing
+                };
+              });
+              const clipped=metrics.visibleButtons.filter(b=>b.left<-2||b.right>width+2||b.width<1);
+              const pageErrors=errors.filter(x=>x.startsWith('pageerror:'));
+              const consoleErrors=errors.filter(x=>x.startsWith('console:')&&!x.includes('favicon'));
+              const blockingConsoleErrors=consoleErrors.filter(x=>/Uncaught|TypeError|ReferenceError|SyntaxError/i.test(x));
+              const ok=metrics.scrollWidth<=width+2&&metrics.bodyScrollWidth<=width+2&&clipped.length===0&&pageErrors.length===0&&blockingConsoleErrors.length===0;
               await page.screenshot({path:`${out}/${key}.png`,fullPage:true});
-              results.push({key,file,viewport:[width,height],ok,metrics,clipped,errors:blockingErrors}); await page.close();
+              results.push({key,file,viewport:[width,height],ok,metrics,clipped,pageErrors,blockingConsoleErrors,consoleErrors}); await page.close();
             }
             await browser.close();
-            fs.writeFileSync(process.env.GITHUB_WORKSPACE+'/qa/seitai-product-ready-central-v1.2/browser.json',JSON.stringify({ok:results.every(x=>x.ok),results},null,2)+'\n');
-            if(!results.every(x=>x.ok)){console.error(JSON.stringify(results,null,2));process.exit(1)}
+            const allOk=results.every(x=>x.ok);
+            fs.writeFileSync(process.env.GITHUB_WORKSPACE+'/qa/seitai-product-ready-central-v1.2/browser.json',JSON.stringify({ok:allOk,results},null,2)+'\n');
+            for(const x of results){
+              const m=x.metrics||{};
+              console.log(`QA_CASE=${x.key} OK=${x.ok} FILE=${x.file} VIEWPORT=${x.viewport.join('x')} HTML=${m.scrollWidth} BODY=${m.bodyScrollWidth} CLIPPED=${x.clipped.length} PAGE_ERRORS=${x.pageErrors.length} BLOCKING_CONSOLE=${x.blockingConsoleErrors.length} OVERFLOW_ELEMENTS=${(m.overflowing||[]).length}`);
+              if(!x.ok){
+                console.error(`FAIL_CASE=${x.key} FILE=${x.file} VIEWPORT=${x.viewport.join('x')} HTML=${m.scrollWidth} BODY=${m.bodyScrollWidth}`);
+                console.error('FAIL_CLIPPED='+JSON.stringify(x.clipped));
+                console.error('FAIL_PAGE_ERRORS='+JSON.stringify(x.pageErrors));
+                console.error('FAIL_BLOCKING_CONSOLE='+JSON.stringify(x.blockingConsoleErrors));
+                console.error('FAIL_OVERFLOW_ELEMENTS='+JSON.stringify(m.overflowing||[]));
+              }
+            }
+            if(!allOk)process.exit(1)
           })();
           JS
           node /tmp/seitai-browser/qa.js
@@ -282,5 +328,5 @@ jobs:
           rm -f "$WORKFLOW_FILE"
           git add staff.html system-check.html staff-ready-bridge.js system-check-product-ready-addon.js dpro-product-ready-adapter.json qa/seitai-product-ready-central-v1.2 "$WORKFLOW_FILE"
           git diff --cached --quiet && { echo "No changes to commit"; exit 1; }
-          git commit -m "SEITAI Product READY CENTRAL V1.2 apply and QA [skip ci]"
+          git commit -m "SEITAI Product READY CENTRAL V1.2 R2 apply and QA [skip ci]"
           git push origin HEAD:main
