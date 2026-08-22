@@ -42,12 +42,17 @@ jobs:
           test -f dpro-next-ledger.yml
           grep -q 'STEP-SEITAI-NEXT-10-COMPLETE-20260724' config.js
           grep -q 'current_step: "SEITAI-NEXT-10-COMPLETE"' dpro-next-ledger.yml
-          BASELINE_SHA="$(git rev-parse HEAD^)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BASELINE_SHA="9dbe7abc821eb45ee93d1525f41921f3ca98f260"
+          git cat-file -e "$BASELINE_SHA^{commit}"
           echo "BASELINE_SHA=$BASELINE_SHA" >> "$GITHUB_ENV"
+          UNEXPECTED="$(git diff --name-only "$BASELINE_SHA"..HEAD | grep -v '^.github/workflows/STEP-SEITAI-PRODUCT-READY-CENTRAL-V1.2.yml$' || true)"
+          test -z "$UNEXPECTED" || { echo "Unexpected drift before Product READY:"; echo "$UNEXPECTED"; exit 1; }
           if git rev-parse "$BACKUP_TAG" >/dev/null 2>&1; then
             test "$(git rev-list -n 1 "$BACKUP_TAG")" = "$BASELINE_SHA"
           else
-            git tag -a "$BACKUP_TAG" "$BASELINE_SHA" -m "SEITAI before Product READY CENTRAL V1.1"
+            git tag -a "$BACKUP_TAG" "$BASELINE_SHA" -m "SEITAI before Product READY CENTRAL V1.2"
             git push origin "$BACKUP_TAG"
           fi
 
@@ -277,5 +282,5 @@ jobs:
           rm -f "$WORKFLOW_FILE"
           git add staff.html system-check.html staff-ready-bridge.js system-check-product-ready-addon.js dpro-product-ready-adapter.json qa/seitai-product-ready-central-v1.2 "$WORKFLOW_FILE"
           git diff --cached --quiet && { echo "No changes to commit"; exit 1; }
-          git commit -m "SEITAI Product READY CENTRAL V1.1 apply and QA [skip ci]"
+          git commit -m "SEITAI Product READY CENTRAL V1.2 apply and QA [skip ci]"
           git push origin HEAD:main
