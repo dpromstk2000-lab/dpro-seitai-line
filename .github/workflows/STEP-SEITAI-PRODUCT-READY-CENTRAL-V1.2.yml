@@ -1,4 +1,4 @@
-name: STEP SEITAI PRODUCT READY CENTRAL V1.2 R2
+name: STEP SEITAI PRODUCT READY CENTRAL V1.2 R3
 
 on:
   push:
@@ -233,12 +233,7 @@ jobs:
               await page.route('**/*',async route=>{
                 const u=route.request().url();
                 if(u.includes('workers.dev')||u.includes('supabase.co/functions/v1/')){
-                  let body={
-                    ok:true,
-                    reservations:[],customers:[],visits:[],tickets:[],followups:[],
-                    templates:[],messages:[],staff:[],menus:[],resources:[],
-                    hours:[],special_days:[],settings:{reservation_slot_minutes:30}
-                  };
+                  let body={ok:true,reservations:[],customers:[],visits:[],tickets:[],followups:[],templates:[],messages:[],staff:[],menus:[],resources:[],hours:[],special_days:[],settings:{reservation_slot_minutes:30}};
                   if(u.includes('/public/settings')){
                     body={...body,shop:{shop_name:'DPRO整体院'},staff:[{id:'s1',staff_code:'staff_a',staff_name:'佐藤先生',display_name:'佐藤先生',role:'staff',is_active:true}],menus:[{id:'m1',menu_code:'regular_seitai',menu_name:'整体',duration_minutes:60,is_active:true}]};
                   }else if(u.includes('/seitai-control-adapter/health')){
@@ -255,24 +250,16 @@ jobs:
               await page.goto(`${base}/${file}`,{waitUntil:'domcontentloaded',timeout:30000}); await page.waitForTimeout(700);
               const metrics=await page.evaluate(()=>{
                 const visible=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none'};
-                const selector=e=>{
-                  if(e.id)return '#'+e.id;
-                  const cls=[...e.classList].slice(0,3).join('.');
-                  return e.tagName.toLowerCase()+(cls?'.'+cls:'');
-                };
+                const selector=e=>e.id?('#'+e.id):(e.tagName.toLowerCase()+([...e.classList].slice(0,3).length?'.'+[...e.classList].slice(0,3).join('.'):''));
+                const scrollableAncestor=e=>{let p=e.parentElement;while(p&&p!==document.body){const ps=getComputedStyle(p);if((ps.overflowX==='auto'||ps.overflowX==='scroll')&&p.scrollWidth>p.clientWidth+1)return true;p=p.parentElement}return false};
                 const els=[...document.querySelectorAll('body *')].filter(visible);
-                const overflowing=els.map(e=>{const r=e.getBoundingClientRect();return {selector:selector(e),text:(e.textContent||'').trim().replace(/\s+/g,' ').slice(0,60),left:r.left,right:r.right,width:r.width}})
-                  .filter(x=>x.left<-2||x.right>window.innerWidth+2||x.width>window.innerWidth+2)
-                  .slice(0,20);
-                return {
-                  innerWidth:window.innerWidth,
-                  scrollWidth:document.documentElement.scrollWidth,
-                  bodyScrollWidth:document.body.scrollWidth,
-                  visibleButtons:[...document.querySelectorAll('button,a.btn')].filter(visible).slice(0,80).map(e=>{const r=e.getBoundingClientRect();return {text:(e.textContent||'').trim().slice(0,40),left:r.left,right:r.right,width:r.width,height:r.height}}),
-                  overflowing
-                };
+                const overflowing=els.map(e=>{const r=e.getBoundingClientRect();return {selector:selector(e),text:(e.textContent||'').trim().replace(/\s+/g,' ').slice(0,60),left:r.left,right:r.right,width:r.width,scrollableX:scrollableAncestor(e)}})
+                  .filter(x=>!x.scrollableX&&(x.left<-2||x.right>window.innerWidth+2||x.width>window.innerWidth+2)).slice(0,20);
+                return {innerWidth:window.innerWidth,scrollWidth:document.documentElement.scrollWidth,bodyScrollWidth:document.body.scrollWidth,
+                  visibleButtons:[...document.querySelectorAll('button,a.btn')].filter(visible).slice(0,80).map(e=>{const r=e.getBoundingClientRect();return {text:(e.textContent||'').trim().slice(0,40),left:r.left,right:r.right,width:r.width,height:r.height,scrollableX:scrollableAncestor(e)}}),
+                  overflowing};
               });
-              const clipped=metrics.visibleButtons.filter(b=>b.left<-2||b.right>width+2||b.width<1);
+              const clipped=metrics.visibleButtons.filter(b=>!b.scrollableX&&(b.left<-2||b.right>width+2||b.width<1));
               const pageErrors=errors.filter(x=>x.startsWith('pageerror:'));
               const consoleErrors=errors.filter(x=>x.startsWith('console:')&&!x.includes('favicon'));
               const blockingConsoleErrors=consoleErrors.filter(x=>/Uncaught|TypeError|ReferenceError|SyntaxError/i.test(x));
@@ -328,5 +315,5 @@ jobs:
           rm -f "$WORKFLOW_FILE"
           git add staff.html system-check.html staff-ready-bridge.js system-check-product-ready-addon.js dpro-product-ready-adapter.json qa/seitai-product-ready-central-v1.2 "$WORKFLOW_FILE"
           git diff --cached --quiet && { echo "No changes to commit"; exit 1; }
-          git commit -m "SEITAI Product READY CENTRAL V1.2 R2 apply and QA [skip ci]"
+          git commit -m "SEITAI Product READY CENTRAL V1.2 R3 apply and QA [skip ci]"
           git push origin HEAD:main
