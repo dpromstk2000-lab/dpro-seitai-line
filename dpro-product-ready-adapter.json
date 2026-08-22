@@ -1,0 +1,13 @@
+{
+  "systemCode": "SEITAI",
+  "standard": "DPRO-CONTROL-ADAPTER-1.0",
+  "adapterVersion": "DPRO-CONTROL-ADAPTER-1.0-SEITAI-20260822-R2",
+  "adapterUrl": "https://cbknucemarcpbscirzyv.supabase.co/functions/v1/seitai-control-adapter",
+  "databaseBaseline": "SEITAI-DB-RUNTIME-BASELINE-V1-20260822",
+  "lineIdentity": "server_verified_id_token",
+  "lineCustomerBinding": "deferred_until_contract",
+  "staffBoundary": "server_scoped_signed_session",
+  "staffOwnerMutationAuthority": false,
+  "staffCustomerBinding": "deferred_until_contract",
+  "centralPolicy": "PRECONTRACT_CAPABILITY_CUSTOMER_BINDING_DEFERRED"
+}

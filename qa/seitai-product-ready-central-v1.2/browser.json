@@ -1,0 +1,1509 @@
+{
+  "ok": true,
+  "results": [
+    {
+      "key": "pc-owner",
+      "file": "owner.html",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 1440,
+        "scrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "visibleButtons": [
+          {
+            "text": "今日の状況を更新",
+            "left": 839.421875,
+            "right": 979.421875,
+            "width": 140,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "電話・店頭予約",
+            "left": 987.421875,
+            "right": 1115.421875,
+            "width": 128,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "予約一覧",
+            "left": 1123.421875,
+            "right": 1209.421875,
+            "width": 86,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "iPad受付",
+            "left": 1217.421875,
+            "right": 1305,
+            "width": 87.578125,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "スタッフスマホ",
+            "left": 1177,
+            "right": 1305,
+            "width": 128,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "保存",
+            "left": 433,
+            "right": 489,
+            "width": 56,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "表示/非表示",
+            "left": 135,
+            "right": 220.34375,
+            "width": 85.34375,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "削除",
+            "left": 230.34375,
+            "right": 274.34375,
+            "width": 44,
+            "height": 33,
+            "scrollableX": false
+          },
+          {
+            "text": "この日の予約を表示",
+            "left": 783,
+            "right": 937,
+            "width": 154,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "今日",
+            "left": 947,
+            "right": 1005,
+            "width": 58,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "明日",
+            "left": 1015,
+            "right": 1073,
+            "width": 58,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "予約がある日を探す",
+            "left": 1083,
+            "right": 1237,
+            "width": 154,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "system-check",
+            "left": 543,
+            "right": 665.625,
+            "width": 122.625,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "店舗設定",
+            "left": 675.625,
+            "right": 759.625,
+            "width": 84,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "1\n            予約\n            -\n         ",
+            "left": 135,
+            "right": 420,
+            "width": 285,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "2\n            来院\n            -\n         ",
+            "left": 430,
+            "right": 715,
+            "width": 285,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "3\n            施術中\n            -\n        ",
+            "left": 725,
+            "right": 1010,
+            "width": 285,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "4\n            完了\n            -\n         ",
+            "left": 1020,
+            "right": 1305,
+            "width": 285,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "患者を検索",
+            "left": 1097,
+            "right": 1195,
+            "width": 98,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "最近の患者",
+            "left": 1205,
+            "right": 1305,
+            "width": 100,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "電話予約を追加",
+            "left": 1050.375,
+            "right": 1176.375,
+            "width": 126,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "店頭予約を追加",
+            "left": 1050.375,
+            "right": 1176.375,
+            "width": 126,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "有効予約",
+            "left": 547.3125,
+            "right": 619.3125,
+            "width": 72,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "すべて",
+            "left": 627.3125,
+            "right": 687.3125,
+            "width": 60,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "予約済み",
+            "left": 695.3125,
+            "right": 767.3125,
+            "width": 72,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "来院",
+            "left": 775.3125,
+            "right": 823.3125,
+            "width": 48,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "施術中",
+            "left": 831.3125,
+            "right": 891.3125,
+            "width": 60,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "完了",
+            "left": 547.3125,
+            "right": 595.3125,
+            "width": 48,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "編集後の文面をコピー",
+            "left": 951,
+            "right": 1119,
+            "width": 168,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "初期文面に戻す",
+            "left": 1129,
+            "right": 1257,
+            "width": 128,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "クリア",
+            "left": 951,
+            "right": 1023,
+            "width": 72,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "フォローを再読込",
+            "left": 1163,
+            "right": 1305,
+            "width": 142,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "すべて",
+            "left": 148,
+            "right": 210,
+            "width": 62,
+            "height": 37,
+            "scrollableX": false
+          },
+          {
+            "text": "期限超過",
+            "left": 218,
+            "right": 292,
+            "width": 74,
+            "height": 37,
+            "scrollableX": false
+          },
+          {
+            "text": "本日",
+            "left": 300,
+            "right": 350,
+            "width": 50,
+            "height": 37,
+            "scrollableX": false
+          },
+          {
+            "text": "優先",
+            "left": 358,
+            "right": 408,
+            "width": 50,
+            "height": 37,
+            "scrollableX": false
+          },
+          {
+            "text": "施術後",
+            "left": 416,
+            "right": 478,
+            "width": 62,
+            "height": 37,
+            "scrollableX": false
+          },
+          {
+            "text": "久しぶり",
+            "left": 486,
+            "right": 560,
+            "width": 74,
+            "height": 37,
+            "scrollableX": false
+          },
+          {
+            "text": "回数券",
+            "left": 568,
+            "right": 630,
+            "width": 62,
+            "height": 37,
+            "scrollableX": false
+          },
+          {
+            "text": "JSONコピー",
+            "left": 135,
+            "right": 225.6875,
+            "width": 90.6875,
+            "height": 35,
+            "scrollableX": false
+          },
+          {
+            "text": "クリア",
+            "left": 235.6875,
+            "right": 293.6875,
+            "width": 58,
+            "height": 35,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "key": "customer-390",
+      "file": "index.html",
+      "viewport": [
+        390,
+        844
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "visibleButtons": [
+          {
+            "text": "整体\n              60分 / \n            \n   ",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "おまかせ\n                    一番取りやすい時間で予約します",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "前回と同じ担当\n                    再来店の方向け。初回はお",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "スタッフ指名\n                    院長・スタッフを選んで予約",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "女性スタッフ希望\n                    対応可能な場合に女性ス",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "肩こり",
+            "left": 29,
+            "right": 92,
+            "width": 63,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "首まわり",
+            "left": 100,
+            "right": 176,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "腰痛",
+            "left": 184,
+            "right": 234,
+            "width": 50,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "膝",
+            "left": 242,
+            "right": 279,
+            "width": 37,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "産後骨盤",
+            "left": 29,
+            "right": 105,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "姿勢改善",
+            "left": 113,
+            "right": 189,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "全身疲労",
+            "left": 197,
+            "right": 273,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "メンテナンス",
+            "left": 29,
+            "right": 131,
+            "width": 102,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "鍼灸相談",
+            "left": 139,
+            "right": 215,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "相談したい",
+            "left": 223,
+            "right": 312,
+            "width": 89,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "この日の時間を再確認",
+            "left": 29,
+            "right": 219,
+            "width": 190,
+            "height": 45,
+            "scrollableX": false
+          },
+          {
+            "text": "次の空き日を探す",
+            "left": 29,
+            "right": 189,
+            "width": 160,
+            "height": 47,
+            "scrollableX": false
+          },
+          {
+            "text": "予約内容を確認する",
+            "left": 29,
+            "right": 203,
+            "width": 174,
+            "height": 45,
+            "scrollableX": false
+          },
+          {
+            "text": "お客様情報を保存",
+            "left": 29,
+            "right": 189,
+            "width": 160,
+            "height": 47,
+            "scrollableX": false
+          },
+          {
+            "text": "この内容で予約する",
+            "left": 29,
+            "right": 203,
+            "width": 174,
+            "height": 45,
+            "scrollableX": false
+          },
+          {
+            "text": "上に戻って修正",
+            "left": 213,
+            "right": 357,
+            "width": 144,
+            "height": 47,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "key": "customer-320",
+      "file": "index.html",
+      "viewport": [
+        320,
+        720
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 320,
+        "scrollWidth": 320,
+        "bodyScrollWidth": 320,
+        "visibleButtons": [
+          {
+            "text": "整体\n              60分 / \n            \n   ",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "おまかせ\n                    一番取りやすい時間で予約します",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 96.78125,
+            "scrollableX": false
+          },
+          {
+            "text": "前回と同じ担当\n                    再来店の方向け。初回はお",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "スタッフ指名\n                    院長・スタッフを選んで予約",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 92,
+            "scrollableX": false
+          },
+          {
+            "text": "女性スタッフ希望\n                    対応可能な場合に女性ス",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 96.78125,
+            "scrollableX": false
+          },
+          {
+            "text": "肩こり",
+            "left": 29,
+            "right": 92,
+            "width": 63,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "首まわり",
+            "left": 100,
+            "right": 176,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "腰痛",
+            "left": 184,
+            "right": 234,
+            "width": 50,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "膝",
+            "left": 242,
+            "right": 279,
+            "width": 37,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "産後骨盤",
+            "left": 29,
+            "right": 105,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "姿勢改善",
+            "left": 113,
+            "right": 189,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "全身疲労",
+            "left": 197,
+            "right": 273,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "メンテナンス",
+            "left": 29,
+            "right": 131,
+            "width": 102,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "鍼灸相談",
+            "left": 139,
+            "right": 215,
+            "width": 76,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "相談したい",
+            "left": 29,
+            "right": 118,
+            "width": 89,
+            "height": 38,
+            "scrollableX": false
+          },
+          {
+            "text": "この日の時間を再確認",
+            "left": 29,
+            "right": 219,
+            "width": 190,
+            "height": 45,
+            "scrollableX": false
+          },
+          {
+            "text": "次の空き日を探す",
+            "left": 29,
+            "right": 189,
+            "width": 160,
+            "height": 47,
+            "scrollableX": false
+          },
+          {
+            "text": "予約内容を確認する",
+            "left": 29,
+            "right": 203,
+            "width": 174,
+            "height": 45,
+            "scrollableX": false
+          },
+          {
+            "text": "お客様情報を保存",
+            "left": 29,
+            "right": 189,
+            "width": 160,
+            "height": 47,
+            "scrollableX": false
+          },
+          {
+            "text": "この内容で予約する",
+            "left": 29,
+            "right": 203,
+            "width": 174,
+            "height": 45,
+            "scrollableX": false
+          },
+          {
+            "text": "上に戻って修正",
+            "left": 29,
+            "right": 173,
+            "width": 144,
+            "height": 47,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "key": "member-390",
+      "file": "member.html",
+      "viewport": [
+        390,
+        844
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "visibleButtons": [
+          {
+            "text": "会員情報を確認",
+            "left": 29,
+            "right": 157,
+            "width": 128,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "予約時の情報を使う",
+            "left": 167,
+            "right": 325,
+            "width": 158,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "テスト太郎で確認",
+            "left": 29,
+            "right": 173,
+            "width": 144,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "クリア",
+            "left": 183,
+            "right": 257,
+            "width": 74,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "内容を選んで新しく予約",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 54,
+            "scrollableX": false
+          },
+          {
+            "text": "最新情報に更新",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 54,
+            "scrollableX": false
+          },
+          {
+            "text": "新しく予約する",
+            "left": 185.28125,
+            "right": 361,
+            "width": 175.71875,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "LINEで店舗へ連絡",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 54,
+            "scrollableX": false
+          },
+          {
+            "text": "連絡文面をコピー",
+            "left": 29,
+            "right": 361,
+            "width": 332,
+            "height": 54,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "key": "member-320",
+      "file": "member.html",
+      "viewport": [
+        320,
+        720
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 320,
+        "scrollWidth": 320,
+        "bodyScrollWidth": 320,
+        "visibleButtons": [
+          {
+            "text": "会員情報を確認",
+            "left": 29,
+            "right": 157,
+            "width": 128,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "予約時の情報を使う",
+            "left": 29,
+            "right": 187,
+            "width": 158,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "テスト太郎で確認",
+            "left": 29,
+            "right": 173,
+            "width": 144,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "クリア",
+            "left": 183,
+            "right": 257,
+            "width": 74,
+            "height": 46,
+            "scrollableX": false
+          },
+          {
+            "text": "内容を選んで新しく予約",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 54,
+            "scrollableX": false
+          },
+          {
+            "text": "最新情報に更新",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 54,
+            "scrollableX": false
+          },
+          {
+            "text": "新しく予約する",
+            "left": 164.875,
+            "right": 291,
+            "width": 126.125,
+            "height": 60,
+            "scrollableX": false
+          },
+          {
+            "text": "LINEで店舗へ連絡",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 54,
+            "scrollableX": false
+          },
+          {
+            "text": "連絡文面をコピー",
+            "left": 29,
+            "right": 291,
+            "width": 262,
+            "height": 54,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "key": "ipad",
+      "file": "owner-ipad.html",
+      "viewport": [
+        1024,
+        768
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 1024,
+        "scrollWidth": 1024,
+        "bodyScrollWidth": 1024,
+        "visibleButtons": [
+          {
+            "text": "保存",
+            "left": 37,
+            "right": 99,
+            "width": 62,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "表示/非表示",
+            "left": 109,
+            "right": 222.171875,
+            "width": 113.171875,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "削除",
+            "left": 232.171875,
+            "right": 294.171875,
+            "width": 62,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "この日の予約",
+            "left": 611.65625,
+            "right": 733.65625,
+            "width": 122,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "今日",
+            "left": 743.65625,
+            "right": 807.65625,
+            "width": 64,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "明日",
+            "left": 817.65625,
+            "right": 881.65625,
+            "width": 64,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "予約がある日を探す",
+            "left": 371.65625,
+            "right": 538.65625,
+            "width": 167,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "PC管理画面へ",
+            "left": 548.65625,
+            "right": 678.5,
+            "width": 129.84375,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "スタッフスマホ画面",
+            "left": 688.5,
+            "right": 855.5,
+            "width": 167,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "スタッフスマホ画面",
+            "left": 820,
+            "right": 987,
+            "width": 167,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "-受付確認・来院待ち",
+            "left": 37,
+            "right": 347,
+            "width": 310,
+            "height": 81,
+            "scrollableX": false
+          },
+          {
+            "text": "-受付済み・施術待ち",
+            "left": 357,
+            "right": 667,
+            "width": 310,
+            "height": 81,
+            "scrollableX": false
+          },
+          {
+            "text": "-現在施術中",
+            "left": 677,
+            "right": 987,
+            "width": 310,
+            "height": 81,
+            "scrollableX": false
+          },
+          {
+            "text": "1\n            予約\n            -\n         ",
+            "left": 37,
+            "right": 267,
+            "width": 230,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "2\n            来院\n            -\n         ",
+            "left": 277,
+            "right": 507,
+            "width": 230,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "3\n            施術中\n            -\n        ",
+            "left": 517,
+            "right": 747,
+            "width": 230,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "4\n            完了\n            -\n         ",
+            "left": 757,
+            "right": 987,
+            "width": 230,
+            "height": 145.5,
+            "scrollableX": false
+          },
+          {
+            "text": "電話予約を追加",
+            "left": 37,
+            "right": 506,
+            "width": 469,
+            "height": 58,
+            "scrollableX": false
+          },
+          {
+            "text": "店頭予約を追加",
+            "left": 518,
+            "right": 987,
+            "width": 469,
+            "height": 58,
+            "scrollableX": false
+          },
+          {
+            "text": "更新",
+            "left": 923,
+            "right": 987,
+            "width": 64,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "有効予約",
+            "left": 37,
+            "right": 117,
+            "width": 80,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "予約済み",
+            "left": 125,
+            "right": 205,
+            "width": 80,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "来院",
+            "left": 213,
+            "right": 267,
+            "width": 54,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "施術中",
+            "left": 275,
+            "right": 342,
+            "width": 67,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "完了",
+            "left": 350,
+            "right": 404,
+            "width": 54,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "すべて",
+            "left": 412,
+            "right": 479,
+            "width": 67,
+            "height": 40,
+            "scrollableX": false
+          },
+          {
+            "text": "その他業務を表示",
+            "left": 833,
+            "right": 987,
+            "width": 154,
+            "height": 48,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "key": "staff-mobile",
+      "file": "staff.html",
+      "viewport": [
+        390,
+        844
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 390,
+        "scrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "visibleButtons": [
+          {
+            "text": "保存",
+            "left": 31,
+            "right": 91,
+            "width": 60,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "表示/非表示",
+            "left": 99,
+            "right": 213.453125,
+            "width": 114.453125,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "削除",
+            "left": 221.453125,
+            "right": 281.453125,
+            "width": 60,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "最新状況に更新",
+            "left": 31,
+            "right": 171,
+            "width": 140,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "対応中",
+            "left": 14,
+            "right": 76,
+            "width": 62,
+            "height": 42,
+            "scrollableX": true
+          },
+          {
+            "text": "施術待ち",
+            "left": 83,
+            "right": 157,
+            "width": 74,
+            "height": 42,
+            "scrollableX": true
+          },
+          {
+            "text": "施術中",
+            "left": 164,
+            "right": 226,
+            "width": 62,
+            "height": 42,
+            "scrollableX": true
+          },
+          {
+            "text": "来院待ち",
+            "left": 233,
+            "right": 307,
+            "width": 74,
+            "height": 42,
+            "scrollableX": true
+          },
+          {
+            "text": "完了",
+            "left": 314,
+            "right": 364,
+            "width": 50,
+            "height": 42,
+            "scrollableX": true
+          },
+          {
+            "text": "すべて",
+            "left": 371,
+            "right": 433,
+            "width": 62,
+            "height": 42,
+            "scrollableX": true
+          },
+          {
+            "text": "iPad受付画面",
+            "left": 31,
+            "right": 359,
+            "width": 328,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "オーナーPC",
+            "left": 31,
+            "right": 359,
+            "width": 328,
+            "height": 48,
+            "scrollableX": false
+          },
+          {
+            "text": "system-check",
+            "left": 31,
+            "right": 359,
+            "width": 328,
+            "height": 48,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    },
+    {
+      "key": "system-check",
+      "file": "system-check.html",
+      "viewport": [
+        1200,
+        900
+      ],
+      "ok": true,
+      "metrics": {
+        "innerWidth": 1200,
+        "scrollWidth": 1200,
+        "bodyScrollWidth": 1200,
+        "visibleButtons": [
+          {
+            "text": "PRODUCT READY確認",
+            "left": 59,
+            "right": 237.125,
+            "width": 178.125,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "保存",
+            "left": 59,
+            "right": 115,
+            "width": 56,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "表示/非表示",
+            "left": 125,
+            "right": 228.890625,
+            "width": 103.890625,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "削除",
+            "left": 238.890625,
+            "right": 294.890625,
+            "width": 56,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "API接続確認",
+            "left": 437.65625,
+            "right": 545,
+            "width": 107.34375,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "店舗設定取得",
+            "left": 555,
+            "right": 667,
+            "width": 112,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "安全チェック",
+            "left": 677,
+            "right": 789,
+            "width": 112,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "まとめて確認",
+            "left": 799,
+            "right": 911,
+            "width": 112,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "予約枠を確認",
+            "left": 59,
+            "right": 171,
+            "width": 112,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "空き日を探す",
+            "left": 181,
+            "right": 295,
+            "width": 114,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "予約データ確認",
+            "left": 626.984375,
+            "right": 752.984375,
+            "width": 126,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "予約がある日を探す",
+            "left": 762.984375,
+            "right": 918.984375,
+            "width": 156,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "営業前デモ準備を実行",
+            "left": 59,
+            "right": 227,
+            "width": 168,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "確認文言をコピー",
+            "left": 237,
+            "right": 379,
+            "width": 142,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "開く",
+            "left": 74,
+            "right": 305.5,
+            "width": 231.5,
+            "height": 44,
+            "scrollableX": false
+          },
+          {
+            "text": "開く",
+            "left": 347.5,
+            "right": 579,
+            "width": 231.5,
+            "height": 44,
+            "scrollableX": false
+          },
+          {
+            "text": "開く",
+            "left": 621,
+            "right": 852.5,
+            "width": 231.5,
+            "height": 44,
+            "scrollableX": false
+          },
+          {
+            "text": "開く",
+            "left": 894.5,
+            "right": 1126,
+            "width": 231.5,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "開く",
+            "left": 74,
+            "right": 305.5,
+            "width": 231.5,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "営業用URLをまとめてコピー",
+            "left": 59,
+            "right": 269.78125,
+            "width": 210.78125,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "URLを再表示",
+            "left": 279.78125,
+            "right": 394.5625,
+            "width": 114.78125,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "静的監査を読込",
+            "left": 731,
+            "right": 857,
+            "width": 126,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "実行監査を開始",
+            "left": 865,
+            "right": 991,
+            "width": 126,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "監査結果をコピー",
+            "left": 999,
+            "right": 1141,
+            "width": 142,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "JSONコピー",
+            "left": 626.984375,
+            "right": 737.109375,
+            "width": 110.125,
+            "height": 42,
+            "scrollableX": false
+          },
+          {
+            "text": "クリア",
+            "left": 747.109375,
+            "right": 819.109375,
+            "width": 72,
+            "height": 42,
+            "scrollableX": false
+          }
+        ],
+        "overflowing": []
+      },
+      "clipped": [],
+      "pageErrors": [],
+      "blockingConsoleErrors": [],
+      "consoleErrors": []
+    }
+  ]
+}

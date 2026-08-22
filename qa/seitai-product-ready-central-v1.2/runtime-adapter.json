@@ -1,0 +1,108 @@
+{
+  "ok": true,
+  "health": {
+    "ok": true,
+    "systemCode": "SEITAI",
+    "adapterVersion": "DPRO-CONTROL-ADAPTER-1.0-SEITAI-20260822-R2",
+    "standard": "DPRO-CONTROL-ADAPTER-1.0",
+    "productionGuard": true,
+    "versionsAligned": true,
+    "current": {
+      "workerVersion": "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724",
+      "databaseVersion": "SEITAI-DB-RUNTIME-BASELINE-V1-20260822",
+      "frontendVersion": "STEP-SEITAI-NEXT-10-COMPLETE-20260724"
+    },
+    "expected": {
+      "workerVersion": "STEP-SEITAI-NEXT-9-R1-PHONE-NFKC-20260724",
+      "databaseVersion": "SEITAI-DB-RUNTIME-BASELINE-V1-20260822",
+      "frontendVersion": "STEP-SEITAI-NEXT-10-COMPLETE-20260724"
+    },
+    "worker": {
+      "ok": true,
+      "httpStatus": 200
+    },
+    "database": {
+      "ok": true,
+      "databaseVersion": "SEITAI-DB-RUNTIME-BASELINE-V1-20260822",
+      "probeCount": 4,
+      "checks": [
+        {
+          "name": "shop_settings_contract",
+          "ok": true,
+          "error": null
+        },
+        {
+          "name": "staff_role_contract",
+          "ok": true,
+          "error": null
+        },
+        {
+          "name": "special_day_contract",
+          "ok": true,
+          "error": null
+        },
+        {
+          "name": "operation_audit_contract",
+          "ok": true,
+          "error": null
+        }
+      ],
+      "rlsBoundary": {
+        "auditedAt": "2026-08-22",
+        "tableCount": 17,
+        "rlsEnabledCount": 17,
+        "publicPolicyCount": 0,
+        "serviceRoleOnly": true
+      }
+    },
+    "frontend": {
+      "ok": true,
+      "httpStatus": 200
+    },
+    "capabilities": {
+      "systemCheckReady": true,
+      "lineVerifiedIdentityReady": true,
+      "lineCustomerBindingDeferred": true,
+      "staffScopedRoleReady": true,
+      "staffCustomerBindingDeferred": true,
+      "operationAuditReady": true,
+      "calendarExceptionSchemaReady": true,
+      "corsAllowlistReady": true
+    }
+  },
+  "line": {
+    "ok": true,
+    "capability": "server_verified_line_identity",
+    "verification": "LINE ID Token -> server-side LINE verify API",
+    "channelBindingConfigured": false,
+    "customerBindingDeferredUntilContract": true,
+    "clientSuppliedIdentityAccepted": false,
+    "rejectedIdentityInputs": [
+      "line_user_id_only",
+      "phone_only",
+      "customer_no_only"
+    ]
+  },
+  "line_unsafe_identity_status": 400,
+  "staff": {
+    "ok": true,
+    "capability": "server_scoped_staff_session",
+    "demoReady": true,
+    "productionStaffBindingConfigured": false,
+    "productionOwnerProxyBindingConfigured": false,
+    "customerBindingDeferredUntilContract": true,
+    "scopes": [
+      "staff.read_today",
+      "staff.visit_start",
+      "staff.visit_complete"
+    ],
+    "ownerMutationAuthority": false,
+    "criticalOperationAudit": "seitai_operation_logs"
+  },
+  "staff_demo_read": {
+    "ok": true,
+    "role": "staff",
+    "readScope": "assigned_staff_only",
+    "ownerMutationAuthority": false
+  }
+}
