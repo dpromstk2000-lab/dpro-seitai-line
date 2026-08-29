@@ -1,0 +1,76 @@
+{
+  "schema": "DPRO_TUTORIAL_SEITAI_R4_LIVE_QA_V1.0",
+  "generatedAt": "2026-08-29T05:47:25.407Z",
+  "guideCount": 10,
+  "alignment": true,
+  "start": true,
+  "resume": true,
+  "replay": true,
+  "crossPageResume": true,
+  "keyboardFocus": true,
+  "viewports": [
+    {
+      "name": "1440x1000",
+      "width": 1440,
+      "height": 1000,
+      "overflow": {
+        "innerWidth": 1440,
+        "documentElementScrollWidth": 1440,
+        "bodyScrollWidth": 1440
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    },
+    {
+      "name": "1024x768",
+      "width": 1024,
+      "height": 768,
+      "overflow": {
+        "innerWidth": 1024,
+        "documentElementScrollWidth": 1024,
+        "bodyScrollWidth": 1024
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    },
+    {
+      "name": "390x844",
+      "width": 390,
+      "height": 844,
+      "overflow": {
+        "innerWidth": 390,
+        "documentElementScrollWidth": 390,
+        "bodyScrollWidth": 390
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    },
+    {
+      "name": "320x720",
+      "width": 320,
+      "height": 720,
+      "overflow": {
+        "innerWidth": 320,
+        "documentElementScrollWidth": 320,
+        "bodyScrollWidth": 320
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    }
+  ],
+  "pageErrors": 0,
+  "consoleErrors": 0,
+  "unsafeWriteRequests": [],
+  "businessMutation": 0,
+  "productRegression": true,
+  "failures": [],
+  "pass": true
+}
