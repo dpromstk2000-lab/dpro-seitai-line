@@ -1,0 +1,2 @@
+TUTORIAL_URL=https://dpromstk2000-lab.github.io/dpro-seitai-line/index.html
+GUIDE_URL=https://dpromstk2000-lab.github.io/dpro-seitai-line/guide-center.html

@@ -1,0 +1,41 @@
+{
+  "expected": "https://dpromstk2000-lab.github.io/dpro-seitai-line/guide-center.html",
+  "decodedQRCount": 3,
+  "allExactPublic": true,
+  "records": [
+    {
+      "page": "qa/tutorial-r5/renders/detailed/page-1.png",
+      "decoded": [
+        "https://dpromstk2000-lab.github.io/dpro-seitai-line/guide-center.html"
+      ]
+    },
+    {
+      "page": "qa/tutorial-r5/renders/detailed/page-2.png",
+      "decoded": []
+    },
+    {
+      "page": "qa/tutorial-r5/renders/detailed/page-3.png",
+      "decoded": []
+    },
+    {
+      "page": "qa/tutorial-r5/renders/detailed/page-4.png",
+      "decoded": []
+    },
+    {
+      "page": "qa/tutorial-r5/renders/detailed/page-5.png",
+      "decoded": []
+    },
+    {
+      "page": "qa/tutorial-r5/renders/detailed/page-6.png",
+      "decoded": [
+        "https://dpromstk2000-lab.github.io/dpro-seitai-line/guide-center.html"
+      ]
+    },
+    {
+      "page": "qa/tutorial-r5/renders/quick/page-1.png",
+      "decoded": [
+        "https://dpromstk2000-lab.github.io/dpro-seitai-line/guide-center.html"
+      ]
+    }
+  ]
+}

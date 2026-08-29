@@ -1,0 +1,175 @@
+{
+  "quickPages": 1,
+  "detailedPages": 6,
+  "quickA4": [
+    [
+      594.96,
+      841.92
+    ]
+  ],
+  "detailedA4": [
+    [
+      594.96,
+      841.92
+    ],
+    [
+      594.96,
+      841.92
+    ],
+    [
+      594.96,
+      841.92
+    ],
+    [
+      594.96,
+      841.92
+    ],
+    [
+      594.96,
+      841.92
+    ],
+    [
+      594.96,
+      841.92
+    ]
+  ],
+  "renderedAllPages": true,
+  "renderChecks": [
+    {
+      "file": "qa/tutorial-r5/renders/quick/page-1.png",
+      "width": 1405,
+      "height": 1988,
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "qa/tutorial-r5/renders/detailed/page-1.png",
+      "width": 1405,
+      "height": 1988,
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "qa/tutorial-r5/renders/detailed/page-2.png",
+      "width": 1405,
+      "height": 1988,
+      "extrema": [
+        [
+          15,
+          255
+        ],
+        [
+          33,
+          255
+        ],
+        [
+          11,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "qa/tutorial-r5/renders/detailed/page-3.png",
+      "width": 1405,
+      "height": 1988,
+      "extrema": [
+        [
+          15,
+          255
+        ],
+        [
+          33,
+          255
+        ],
+        [
+          61,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "qa/tutorial-r5/renders/detailed/page-4.png",
+      "width": 1405,
+      "height": 1988,
+      "extrema": [
+        [
+          15,
+          255
+        ],
+        [
+          32,
+          255
+        ],
+        [
+          46,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "qa/tutorial-r5/renders/detailed/page-5.png",
+      "width": 1405,
+      "height": 1988,
+      "extrema": [
+        [
+          15,
+          255
+        ],
+        [
+          32,
+          255
+        ],
+        [
+          46,
+          255
+        ]
+      ]
+    },
+    {
+      "file": "qa/tutorial-r5/renders/detailed/page-6.png",
+      "width": 1405,
+      "height": 1988,
+      "extrema": [
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ],
+        [
+          0,
+          255
+        ]
+      ]
+    }
+  ],
+  "clippingAutomatedGuard": "PASS",
+  "brokenImageAutomatedGuard": "PASS",
+  "accidentalBlankAutomatedGuard": "PASS"
+}
