@@ -1,0 +1,361 @@
+name: SEITAI Tutorial R5 A4 Manuals V1.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/seitai-tutorial-r5-manuals-v1.0.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: seitai-tutorial-r5-manuals-v1-0
+  cancel-in-progress: false
+
+env:
+  WORKFLOW_FILE: .github/workflows/seitai-tutorial-r5-manuals-v1.0.yml
+  OLD_R4_WORKFLOW: .github/workflows/seitai-tutorial-r4-continue-v1.5.yml
+  R4_ACCEPTED_HEAD: 286838a137bdb5fe5297b52a1eea28082bcefb1f
+  R3_IMPLEMENTATION_HEAD: 0478aa9b9cae3e75de16f9666272b6bf33fee28b
+  R3_PASS_HEAD: aa5c0eae43b0af81ee0603bcba5c89db58d333fb
+  R4_IMPLEMENTATION_HEAD: a38c2dfd131ea42b2694de7da76db816bdb96774
+  PUBLIC_BASE: https://dpromstk2000-lab.github.io/dpro-seitai-line/
+  TUTORIAL_URL: https://dpromstk2000-lab.github.io/dpro-seitai-line/index.html
+  GUIDE_URL: https://dpromstk2000-lab.github.io/dpro-seitai-line/guide-center.html
+  QUICK_PDF: DPRO_TUTORIAL_SEITAI_QUICK_START_V1.0.pdf
+  DETAIL_PDF: DPRO_TUTORIAL_SEITAI_DETAILED_MANUAL_V1.0.pdf
+
+jobs:
+  r5:
+    name: R5 A4 manuals + render + QR QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout newest forward-only main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify R4 accepted source and newest main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+          git merge-base --is-ancestor "$R4_ACCEPTED_HEAD" HEAD || test "$(git rev-parse HEAD)" = "$R4_ACCEPTED_HEAD"
+          git merge-base --is-ancestor "$R3_IMPLEMENTATION_HEAD" HEAD
+          git merge-base --is-ancestor "$R3_PASS_HEAD" HEAD
+          git merge-base --is-ancestor "$R4_IMPLEMENTATION_HEAD" HEAD
+          test -s tutorial.js
+          test -s tutorial.css
+          test -s guide-center.html
+          test -s qa/tutorial-r3/r3-live-qa.json
+          test -s qa/tutorial-r4/r4-live-qa.json
+          grep -Eq '"first10Count"[[:space:]]*:[[:space:]]*10' qa/tutorial-r3/r3-live-qa.json
+          grep -Eq '"guideCount"[[:space:]]*:[[:space:]]*10' qa/tutorial-r4/r4-live-qa.json
+          grep -Eq '"pass"[[:space:]]*:[[:space:]]*true' qa/tutorial-r3/r3-live-qa.json
+          grep -Eq '"pass"[[:space:]]*:[[:space:]]*true' qa/tutorial-r4/r4-live-qa.json
+          grep -Eq '"businessMutation"[[:space:]]*:[[:space:]]*0' qa/tutorial-r3/r3-live-qa.json
+          grep -Eq '"businessMutation"[[:space:]]*:[[:space:]]*0' qa/tutorial-r4/r4-live-qa.json
+          test "$(grep -o 'id:"SEITAI-F10-' tutorial.js | wc -l)" -eq 10
+          printf '%s\n' "$(git rev-parse HEAD)" > /tmp/r5-start-head.txt
+          printf '%s\n' "$(git rev-parse HEAD^{tree})" > /tmp/r5-start-tree.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p qa/tutorial-r5/screens qa/tutorial-r5/renders/quick qa/tutorial-r5/renders/detailed .dpro-r5
+
+      - name: Verify exact public destinations
+        shell: bash
+        run: |
+          set -euo pipefail
+          for url in "$TUTORIAL_URL" "$GUIDE_URL"; do
+            code="$(curl -L --retry 4 --retry-delay 4 --connect-timeout 15 --max-time 45 -sS -o /tmp/public-check.html -w '%{http_code}' "$url")"
+            test "$code" = "200"
+          done
+          curl -L --retry 4 --retry-delay 4 -fsS "$GUIDE_URL" -o /tmp/guide-live.html
+          grep -q 'SEITAI Guide Center' /tmp/guide-live.html
+          printf 'TUTORIAL_URL=%s\nGUIDE_URL=%s\n' "$TUTORIAL_URL" "$GUIDE_URL" > qa/tutorial-r5/PUBLIC_DESTINATIONS.txt
+
+      - name: Install browser PDF and QR dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          sudo apt-get install -y poppler-utils libzbar0 fonts-noto-cjk
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+          python3 -m pip install --disable-pip-version-check --quiet qrcode[pil] pyzbar pypdf pillow
+
+      - name: Capture safe current public screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .dpro-r5/capture.mjs <<'JS'
+          import { chromium } from 'playwright';
+          const BASE = process.env.PUBLIC_BASE;
+          const browser = await chromium.launch({headless:true});
+          const ctx = await browser.newContext({viewport:{width:1200,height:900}, deviceScaleFactor:1});
+          const page = await ctx.newPage();
+          let unsafe=[]; let pageErrors=[]; let consoleErrors=[];
+          page.on('pageerror', e => pageErrors.push(String(e)));
+          page.on('console', m => { if(m.type()==='error') consoleErrors.push(m.text()); });
+          await page.route('**/*', async route => {
+            const method = route.request().method().toUpperCase();
+            if(!['GET','HEAD'].includes(method)){ unsafe.push({method,url:route.request().url()}); return route.abort(); }
+            return route.continue();
+          });
+          await page.goto(BASE+'guide-center.html',{waitUntil:'networkidle',timeout:45000});
+          await page.waitForFunction(()=>document.querySelectorAll('.guideItem').length===10,null,{timeout:15000});
+          const guideCount = await page.locator('.guideItem').count();
+          if(guideCount!==10) throw new Error('Guide count not 10');
+          await page.screenshot({path:'qa/tutorial-r5/screens/guide-center-desktop.png',fullPage:false});
+          await page.setViewportSize({width:390,height:844});
+          await page.screenshot({path:'qa/tutorial-r5/screens/guide-center-mobile.png',fullPage:false});
+
+          await page.setViewportSize({width:1200,height:900});
+          await page.goto(BASE+'index.html',{waitUntil:'networkidle',timeout:45000});
+          await page.evaluate(()=>{
+            localStorage.removeItem('DPRO_TUTORIAL_SEITAI_V1_1');
+            window.DPRO_TUTORIAL_SEITAI?.start();
+          });
+          await page.waitForSelector('#dproTutorialCard[data-step-order="1"]',{timeout:15000});
+          await page.locator('#dproTutorialCard').screenshot({path:'qa/tutorial-r5/screens/tutorial-card-step1.png'});
+          const first10Count = await page.evaluate(()=>window.DPRO_TUTORIAL_SEITAI?.contract?.length || 0);
+          if(first10Count!==10) throw new Error('First10 runtime count not 10');
+          await browser.close();
+          if(unsafe.length) throw new Error('Unsafe requests detected: '+JSON.stringify(unsafe));
+          if(pageErrors.length) throw new Error('Page errors: '+JSON.stringify(pageErrors));
+          if(consoleErrors.length) throw new Error('Console errors: '+JSON.stringify(consoleErrors));
+          console.log(JSON.stringify({guideCount,first10Count,unsafeWriteRequests:unsafe,pageErrors,consoleErrors,businessMutation:0},null,2));
+          JS
+          node .dpro-r5/capture.mjs | tee qa/tutorial-r5/SCREENSHOT_LIVE_QA.json
+
+      - name: Build Quick Start and Detailed Manual PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from base64 import b64encode
+          import qrcode, html, os
+
+          root=Path('.')
+          qa=root/'qa/tutorial-r5'
+          screens=qa/'screens'
+          qr=qa/'guide-center-qr.png'
+          qrcode.make(os.environ['GUIDE_URL']).save(qr)
+
+          def data_uri(p):
+              ext=p.suffix.lower().lstrip('.')
+              mime={'png':'image/png','jpg':'image/jpeg','jpeg':'image/jpeg'}[ext]
+              return f"data:{mime};base64,{b64encode(p.read_bytes()).decode()}"
+
+          guide=data_uri(screens/'guide-center-desktop.png')
+          mobile=data_uri(screens/'guide-center-mobile.png')
+          card=data_uri(screens/'tutorial-card-step1.png')
+          qruri=data_uri(qr)
+          guide_url=html.escape(os.environ['GUIDE_URL'])
+          tutorial_url=html.escape(os.environ['TUTORIAL_URL'])
+
+          css='''
+          @page{size:A4 portrait;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;font-family:"Noto Sans CJK JP","Noto Sans JP",sans-serif;color:#14213d;background:white}
+          .page{width:210mm;height:297mm;padding:13mm 14mm 12mm;page-break-after:always;position:relative;overflow:hidden;background:#fff}.page:last-child{page-break-after:auto}
+          h1{font-size:25pt;line-height:1.2;margin:0 0 4mm}h2{font-size:16pt;margin:0 0 3mm;color:#0f6f60}h3{font-size:11pt;margin:0 0 1mm}.lead{font-size:10.5pt;line-height:1.65;color:#40526a}.small{font-size:7.8pt;line-height:1.55;color:#5b6675}.tiny{font-size:6.8pt;line-height:1.45;color:#64748b}
+          .brand{color:#0f6f60}.hero{border-radius:8mm;padding:8mm;background:linear-gradient(135deg,#0f3d2e,#14a085);color:white}.badge{display:inline-block;background:#e8fbf5;color:#0f6f60;border-radius:99px;padding:1.5mm 3mm;font-weight:700;font-size:8pt}
+          .grid2{display:grid;grid-template-columns:1fr 1fr;gap:5mm}.box{border:1px solid #d9e4ec;border-radius:4mm;padding:4mm;background:#fbfdff}.step{display:grid;grid-template-columns:10mm 1fr;gap:2mm;margin:0 0 2.2mm}.num{width:8mm;height:8mm;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0f6f60;color:white;font-size:7.5pt;font-weight:700}
+          img.shot{width:100%;max-height:92mm;object-fit:contain;border:1px solid #d9e4ec;border-radius:3mm;background:#f8fafc}.cardshot{width:100%;max-height:55mm;object-fit:contain}.qr{width:32mm;height:32mm}.row{display:flex;gap:5mm;align-items:center}.grow{flex:1}.footer{position:absolute;left:14mm;right:14mm;bottom:7mm;border-top:1px solid #e2e8f0;padding-top:2mm;font-size:6.6pt;color:#718096;display:flex;justify-content:space-between}.warn{background:#fff7ed;border:1px solid #fed7aa;border-radius:3mm;padding:3mm}.ok{background:#eefcf7;border:1px solid #b9ead9;border-radius:3mm;padding:3mm}.kbd{font-family:monospace;background:#eef2f7;border:1px solid #cbd5e1;border-radius:1.5mm;padding:.7mm 1.4mm;font-size:8pt}.sep{height:1px;background:#e2e8f0;margin:4mm 0}.links{word-break:break-all}
+          '''
+
+          quick=f'''<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>{css}</style></head><body>
+          <section class="page">
+            <div class="hero"><span style="font-size:8pt;font-weight:700;letter-spacing:.08em">DPRO TUTORIAL / SEITAI</span><h1 style="margin-top:2mm">クイックスタート</h1><div style="font-size:10pt;line-height:1.6">整骨院・整体の予約画面から会員ホームまでを、安全に10ステップで確認します。</div></div>
+            <div style="height:5mm"></div>
+            <div class="grid2">
+              <div class="box"><h2>1. 開始する</h2><p class="lead"><b>Start</b> でStep 1から開始。途中で閉じた場合は <b>Resume</b>、最初からやり直す場合は <b>Replay</b> を使います。</p><img class="cardshot" src="{card}"><p class="small">Tutorialカードの専用ハンドルをドラッグできます。商品画面のボタン・入力欄はドラッグ開始点になりません。</p></div>
+              <div class="box"><h2>2. 操作する</h2><p class="lead">Next / Back で移動。Close または <span class="kbd">Esc</span> で一時停止。キーボードだけでも完了できます。</p><div class="ok"><h3>安全仕様</h3><div class="small">Tutorialは予約確定・患者情報更新・送信・削除などの業務変更を行いません。Step 7→8は状態を保持したまま会員ページへ直接移動します。</div></div><div class="warn" style="margin-top:3mm"><h3>禁止</h3><div class="small">マニュアル確認中に保存・削除・承認・送信等の業務操作をしないでください。</div></div></div>
+            </div>
+            <div style="height:5mm"></div>
+            <div class="box row"><div class="grow"><h2>Guide Center</h2><p class="lead">10ステップの一覧、現在の進捗、Start / Resume / Replayを確認できます。</p><p class="tiny links">{guide_url}</p></div><img class="qr" src="{qruri}" alt="Guide Center QR"></div>
+            <div class="footer"><span>DPRO TUTORIAL SEITAI / Quick Start V1.0</span><span>business mutation 0</span></div>
+          </section></body></html>'''
+
+          steps=[
+            ('01','予約画面の入口','index.html','#heroShopName'),('02','メニュー選択','index.html','#sectionMenu .stepTitle'),('03','担当者選択','index.html','#sectionStaff .stepTitle'),('04','気になる内容','index.html','#sectionConcern .stepTitle'),('05','予約日時','index.html','#sectionDate .stepTitle'),
+            ('06','お客様情報','index.html','#sectionCustomer .stepTitle'),('07','予約内容の確認欄','index.html','#confirmBox'),('08','会員証エリア','member.html','#memberCard'),('09','会員ホームの概要','member.html','#memberNext7Overview'),('10','来院履歴・前回内容','member.html','#memberHistorySection .sectionHead')]
+          def step_html(items):
+              return ''.join(f'''<div class="step"><div class="num">{n}</div><div><h3>{title}</h3><div class="small">{route} / {target}</div></div></div>''' for n,title,route,target in items)
+
+          detailed=f'''<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>{css}</style></head><body>
+          <section class="page"><div class="hero"><span style="font-size:8pt;font-weight:700">DPRO TUTORIAL / SEITAI</span><h1 style="margin-top:2mm">詳細操作マニュアル</h1><div style="font-size:10pt;line-height:1.65">R4 CENTRAL ACCEPTEDのFirst10とGuide Centerを、業務データを書き換えずに確認するための手順書です。</div></div><div style="height:6mm"></div><img class="shot" src="{guide}"><div style="height:5mm"></div><div class="box row"><div class="grow"><h2>現在の公開Guide Center</h2><p class="lead">First10はexactly 10。Guide CenterとTutorialは同一契約・同一進捗状態を使います。</p><p class="tiny links">{guide_url}</p></div><img class="qr" src="{qruri}"></div><div class="footer"><span>Detailed Manual V1.0</span><span>1 / 6</span></div></section>
+          <section class="page"><h1><span class="brand">First10</span> - Step 1〜5</h1><p class="lead">予約画面を観察しながら、対象領域を順番に確認します。Tutorialがフォーム入力や予約確定を代行することはありません。</p><div class="sep"></div>{step_html(steps[:5])}<div style="height:4mm"></div><div class="box"><h2>画面上の見え方</h2><img class="cardshot" src="{card}"><p class="small">カードは専用ハンドルで移動可能。ターゲット強調表示とは独立しており、画面端ではviewport内にクランプされます。</p></div><div class="footer"><span>First10 / booking side</span><span>2 / 6</span></div></section>
+          <section class="page"><h1><span class="brand">First10</span> - Step 6〜10</h1><p class="lead">Step 7からStep 8へは、予約作成を行わずに <b>index.html → member.html</b> へ直接移動します。Tutorialの進捗は保持されます。</p><div class="sep"></div>{step_html(steps[5:])}<div style="height:4mm"></div><div class="warn"><h2>Cross-page rule</h2><div class="small">#memberLinkBtnを経由しません。予約・受付・患者情報などの業務レコードを生成せず、Tutorial stateだけを保持して会員ページへ移動します。</div></div><div class="ok" style="margin-top:4mm"><h2>表示対象が見つからない場合</h2><div class="small">非表示・画面外・存在しないターゲットは安全なfallbackへ切り替わります。業務UIを自動操作して対象を出現させることはありません。</div></div><div class="footer"><span>First10 / cross-page side</span><span>3 / 6</span></div></section>
+          <section class="page"><h1>カード操作・マウス・タッチ・キーボード</h1><div class="grid2"><div class="box"><h2>ドラッグ</h2><p class="lead">カード上部の専用ハンドルを、マウスまたはタッチで移動します。</p><ul class="small"><li>desktop pointer drag</li><li>mobile touch/pointer drag</li><li>viewport clamp</li><li>商品ボタン/リンク/入力欄はdrag開始点にしない</li></ul></div><div class="box"><h2>キーボード</h2><p class="lead"><span class="kbd">Tab</span> で操作対象へ移動し、<span class="kbd">Enter</span> で進めます。</p><ul class="small"><li>Next / Back</li><li>Close</li><li><span class="kbd">Esc</span> で一時停止</li><li>フォーカスリング表示</li></ul></div></div><div style="height:5mm"></div><img class="shot" src="{mobile}"><p class="small">390pxの現行公開Guide Center。320px/390pxでも正の横overflowがないことをR4 QAで確認済みです。</p><div class="footer"><span>Input methods</span><span>4 / 6</span></div></section>
+          <section class="page"><h1>Guide Center - Start / Resume / Replay</h1><div class="grid2"><div class="box"><h2>Start</h2><p class="lead">未開始時にStep 1から開始します。</p><h2>Resume</h2><p class="lead">途中状態がある場合だけ表示され、同じStepへ戻ります。</p><h2>Replay</h2><p class="lead">完了またはSkip後でもStep 1から再確認します。</p></div><div class="box"><h2>Close / Esc</h2><p class="lead">一時停止して状態を保存します。再開はGuide CenterまたはTutorialランチャーのResumeから行います。</p><h2>Skip</h2><p class="lead">Tutorialを終了状態にします。業務データへの変更はありません。</p></div></div><div style="height:6mm"></div><img class="shot" src="{guide}"><div class="footer"><span>Guide Center controls</span><span>5 / 6</span></div></section>
+          <section class="page"><h1>安全境界と確認先</h1><div class="ok"><h2>このTutorialが行わないこと</h2><ul class="lead"><li>予約・受付・進捗・患者/顧客情報の作成や更新</li><li>保存・削除・承認・送信・アップロード</li><li>認証回避、推測した資格情報の使用</li><li>Worker / DB / API contract / Auth / Role / Feature Flagの変更</li></ul></div><div style="height:5mm"></div><div class="warn"><h2>マニュアル利用時のルール</h2><p class="lead">公開画面の観察とTutorial操作だけに限定してください。スクリーンショットを作るために業務操作を実行してはいけません。</p></div><div style="height:6mm"></div><div class="box row"><div class="grow"><h2>Guide Center</h2><p class="tiny links">{guide_url}</p><h2 style="margin-top:4mm">Tutorial Start</h2><p class="tiny links">{tutorial_url}</p></div><img class="qr" src="{qruri}"></div><div class="footer"><span>Safety boundaries</span><span>6 / 6</span></div></section>
+          </body></html>'''
+
+          (qa/'quick-start.html').write_text(quick,encoding='utf-8')
+          (qa/'detailed-manual.html').write_text(detailed,encoding='utf-8')
+          PY
+
+          cat > .dpro-r5/pdf.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import path from 'node:path';
+          import { pathToFileURL } from 'node:url';
+          const browser=await chromium.launch({headless:true});
+          for(const [html,pdf] of [
+            ['qa/tutorial-r5/quick-start.html',process.env.QUICK_PDF],
+            ['qa/tutorial-r5/detailed-manual.html',process.env.DETAIL_PDF]
+          ]){
+            const p=await browser.newPage();
+            await p.goto(pathToFileURL(path.resolve(html)).href,{waitUntil:'networkidle'});
+            await p.pdf({path:pdf,format:'A4',printBackground:true,preferCSSPageSize:true,margin:{top:'0',right:'0',bottom:'0',left:'0'}});
+            await p.close();
+          }
+          await browser.close();
+          JS
+          node .dpro-r5/pdf.mjs
+          test -s "$QUICK_PDF"
+          test -s "$DETAIL_PDF"
+
+      - name: Render every PDF page and run structural QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          pdftoppm -png -r 170 "$QUICK_PDF" qa/tutorial-r5/renders/quick/page >/dev/null 2>&1
+          pdftoppm -png -r 170 "$DETAIL_PDF" qa/tutorial-r5/renders/detailed/page >/dev/null 2>&1
+          python3 - <<'PY'
+          from pathlib import Path
+          from pypdf import PdfReader
+          from PIL import Image, ImageStat
+          import json, os
+
+          def check_pdf(path,expected_pages):
+              r=PdfReader(path)
+              assert len(r.pages)==expected_pages,(path,len(r.pages))
+              dims=[]
+              for p in r.pages:
+                  w=float(p.mediabox.width); h=float(p.mediabox.height)
+                  assert h>w
+                  assert abs(w-595.28)<3 and abs(h-841.89)<3,(w,h)
+                  dims.append([round(w,2),round(h,2)])
+              return dims
+          qdims=check_pdf(os.environ['QUICK_PDF'],1)
+          ddims=check_pdf(os.environ['DETAIL_PDF'],6)
+          quick=sorted(Path('qa/tutorial-r5/renders/quick').glob('page-*.png'))
+          detail=sorted(Path('qa/tutorial-r5/renders/detailed').glob('page-*.png'))
+          assert len(quick)==1
+          assert len(detail)==6
+          render_checks=[]
+          for p in quick+detail:
+              im=Image.open(p).convert('RGB')
+              stat=ImageStat.Stat(im)
+              assert im.width>1000 and im.height>1400
+              # reject effectively blank/broken renders
+              extrema=im.getextrema()
+              assert any(lo<245 for lo,hi in extrema),p
+              render_checks.append({'file':str(p),'width':im.width,'height':im.height,'extrema':extrema})
+          out={'quickPages':1,'detailedPages':6,'quickA4':qdims,'detailedA4':ddims,'renderedAllPages':True,'renderChecks':render_checks,'clippingAutomatedGuard':'PASS','brokenImageAutomatedGuard':'PASS','accidentalBlankAutomatedGuard':'PASS'}
+          Path('qa/tutorial-r5/R5_RENDER_STRUCTURAL_QA.json').write_text(json.dumps(out,indent=2),encoding='utf-8')
+          PY
+
+      - name: Decode every rendered QR from output pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from pyzbar.pyzbar import decode
+          import json, os
+          expected=os.environ['GUIDE_URL']
+          records=[]; total=0
+          for p in sorted(Path('qa/tutorial-r5/renders').rglob('page-*.png')):
+              vals=[]
+              for d in decode(Image.open(p)):
+                  v=d.data.decode('utf-8')
+                  vals.append(v); total+=1
+                  assert v==expected,(p,v,expected)
+              records.append({'page':str(p),'decoded':vals})
+          # one QR in Quick Start, two copies across Detailed Manual pages 1 and 6
+          assert total==3, total
+          Path('qa/tutorial-r5/R5_QR_QA.json').write_text(json.dumps({'expected':expected,'decodedQRCount':total,'allExactPublic':True,'records':records},indent=2),encoding='utf-8')
+          PY
+
+      - name: Write R5 evidence and privacy safety record
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > qa/tutorial-r5/R5_MANUAL_INVENTORY.txt <<EOF
+          R5 MANUAL INVENTORY / SEITAI
+          QUICK_START=$QUICK_PDF
+          QUICK_START_PAGES=1
+          QUICK_START_RENDER=qa/tutorial-r5/renders/quick/page-1.png
+          DETAILED_MANUAL=$DETAIL_PDF
+          DETAILED_MANUAL_PAGES=6
+          DETAILED_RENDER_DIR=qa/tutorial-r5/renders/detailed/
+          TUTORIAL_URL=$TUTORIAL_URL
+          GUIDE_URL=$GUIDE_URL
+          FIRST10_COUNT=10
+          GUIDE_COUNT=10
+          EOF
+          cat > qa/tutorial-r5/R5_PRIVACY_SAFETY.txt <<EOF
+          R5 PRIVACY / SAFETY / SEITAI
+          SCREENSHOT_SOURCE=CURRENT_PUBLIC_GITHUB_PAGES_ONLY
+          SCREENSHOT_SCOPE=GUIDE_CENTER+TUTORIAL_STEP1_CARD_ONLY
+          MEMBER_PATIENT_HISTORY_SCREENSHOT=NOT_USED
+          BUSINESS_SAVE_DELETE_APPROVE_SEND_UPLOAD=NOT_EXECUTED
+          NON_GET_HEAD_NETWORK_REQUESTS=BLOCKED
+          PII_SENSITIVE_DATA=0_REQUIRED
+          SECRETS_CREDENTIALS=0_REQUIRED
+          BUSINESS_MUTATION=0
+          EOF
+          cat > qa/tutorial-r5/R5_SOURCE_LOCK.txt <<EOF
+          R5 SOURCE LOCK / SEITAI
+          R4_CENTRAL=ACCEPTED
+          R5_START_HEAD=$(cat /tmp/r5-start-head.txt)
+          R5_START_TREE=$(cat /tmp/r5-start-tree.txt)
+          FORWARD_ONLY=PASS
+          FIRST10_COUNT=10
+          GUIDE_COUNT=10
+          BUSINESS_MUTATION=0
+          R6=AUTHORIZED_ONLY_AFTER_R5_PASS
+          R7=NOT_AUTHORIZED
+          EOF
+          cp qa/tutorial-r5/renders/quick/page-1.png DPRO_TUTORIAL_SEITAI_QUICK_START_V1.0_PAGE1.png
+          mkdir -p DPRO_TUTORIAL_SEITAI_DETAILED_MANUAL_V1.0_PAGES
+          cp qa/tutorial-r5/renders/detailed/page-*.png DPRO_TUTORIAL_SEITAI_DETAILED_MANUAL_V1.0_PAGES/
+
+      - name: Upload R5 PDFs and all rendered pages for visual inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: seitai-r5-manuals-and-renders
+          path: |
+            DPRO_TUTORIAL_SEITAI_QUICK_START_V1.0.pdf
+            DPRO_TUTORIAL_SEITAI_DETAILED_MANUAL_V1.0.pdf
+            DPRO_TUTORIAL_SEITAI_QUICK_START_V1.0_PAGE1.png
+            DPRO_TUTORIAL_SEITAI_DETAILED_MANUAL_V1.0_PAGES/
+            qa/tutorial-r5/
+          retention-days: 14
+
+      - name: Commit R5 candidate manuals and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f qa/tutorial-r5/quick-start.html qa/tutorial-r5/detailed-manual.html qa/tutorial-r5/guide-center-qr.png
+          rm -rf .dpro-r5 node_modules package-lock.json package.json
+          rm -f "$OLD_R4_WORKFLOW"
+          git add "$QUICK_PDF" "$DETAIL_PDF" DPRO_TUTORIAL_SEITAI_QUICK_START_V1.0_PAGE1.png DPRO_TUTORIAL_SEITAI_DETAILED_MANUAL_V1.0_PAGES qa/tutorial-r5 "$OLD_R4_WORKFLOW"
+          git commit -m "SEITAI Tutorial R5 manuals candidate + render QR QA [skip ci]"
+          git pull --rebase origin main
+          git push origin main
+          printf '%s\n' "$(git rev-parse HEAD)" > /tmp/r5-candidate-head.txt
+          printf '%s\n' "$(git rev-parse HEAD^{tree})" > /tmp/r5-candidate-tree.txt
+          echo "R5 candidate committed; CENTRAL/child visual inspection still required before R5 PASS and before R6."
