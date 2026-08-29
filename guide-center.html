@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>DPRO 整骨院・整体 LINE｜Guide Center</title>
+  <link rel="stylesheet" href="./tutorial.css?v=seitai-tutorial-v1-1">
+  <style>
+    :root{--bg:#f4f8fb;--card:#fff;--ink:#102033;--muted:#64748b;--line:#dbe4ef;--brand:#14a085;--deep:#0f3d2e;--soft:#e9fbf6}
+    *{box-sizing:border-box}html{background:var(--bg)}body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:linear-gradient(180deg,#fff,#f4f8fb)}
+    button,a{font:inherit}.wrap{width:min(1040px,calc(100% - 24px));margin:0 auto;padding:20px 0 48px}
+    .hero{padding:28px;border-radius:26px;background:linear-gradient(135deg,var(--deep),var(--brand));color:#fff;box-shadow:0 20px 56px rgba(15,61,46,.2)}
+    .hero small{font-size:11px;font-weight:900;letter-spacing:.13em}.hero h1{margin:9px 0 7px;font-size:clamp(28px,5vw,46px);line-height:1.15}.hero p{margin:0;max-width:760px;opacity:.9;line-height:1.75}
+    .controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.btn{min-height:46px;padding:10px 15px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:#fff;color:var(--deep);font-weight:900;cursor:pointer}.btn.ghost{background:transparent;color:#fff}.btn[hidden]{display:none}
+    .btn:focus,.guideItem:focus{outline:3px solid #f59e0b;outline-offset:3px}
+    .status{margin-top:16px;padding:13px 15px;border:1px solid #cde7df;border-radius:15px;background:#fff;color:#334155;font-size:13px;font-weight:800}
+    .head{margin:28px 0 13px}.head h2{margin:0;font-size:26px}.head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.guideItem{padding:17px;border:1px solid var(--line);border-radius:18px;background:var(--card);box-shadow:0 8px 24px rgba(15,23,42,.05)}
+    .guideItem.current{border-color:var(--brand);box-shadow:0 0 0 3px rgba(20,160,133,.12)}.guideItem.done{background:#f0fdf4}
+    .guideNo{color:var(--brand);font-size:11px;font-weight:950;letter-spacing:.08em}.guideItem h3{margin:7px 0 5px;font-size:18px}.guideItem p{margin:0;color:var(--muted);font-size:12px;line-height:1.7}.route{margin-top:10px;color:#64748b;font-size:10px;word-break:break-all}
+    .footer{margin-top:22px;color:#64748b;font-size:11px;text-align:center}
+    @media(max-width:680px){.wrap{width:min(100% - 16px,1040px);padding-top:8px}.hero{padding:20px;border-radius:20px}.grid{grid-template-columns:1fr}.controls{display:grid}.btn{width:100%}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <small>DPRO TUTORIAL / GUIDE CENTER / STANDARD V1.1</small>
+    <h1>SEITAI Guide Center</h1>
+    <p>患者予約から会員ホームまで、業務データを書き換えずに10ステップで確認します。Tutorialと同じFirst10契約・同じ進捗状態を使用します。</p>
+    <div class="controls">
+      <button class="btn" id="guideStartBtn" type="button">Start</button>
+      <button class="btn" id="guideResumeBtn" type="button" hidden>Resume</button>
+      <button class="btn ghost" id="guideReplayBtn" type="button">Replay</button>
+      <a class="btn ghost" href="./demo-guide.html">公開デモ一覧へ</a>
+    </div>
+  </section>
+  <div class="status" id="guideState">進捗を確認しています。</div>
+  <div class="head"><h2>First10</h2><p>Guide item count = exactly 10。順序・step ID・route・target・説明はTutorialと同じ契約から表示します。</p></div>
+  <section class="grid" id="guideGrid" aria-label="SEITAI First10 Guide"></section>
+  <div class="footer">DPRO 整骨院・整体 LINE / business mutation 0 tutorial guide</div>
+</main>
+<script src="./tutorial.js?v=seitai-tutorial-v1-1"></script>
+<script>
+(() => {
+  "use strict";
+  const api = window.DPRO_TUTORIAL_SEITAI;
+  const grid = document.getElementById("guideGrid");
+  const stateBox = document.getElementById("guideState");
+  const resumeBtn = document.getElementById("guideResumeBtn");
+  function render(){
+    const state = api.getState();
+    grid.innerHTML = "";
+    api.contract.forEach((step,index)=>{
+      const article=document.createElement("article");
+      article.className="guideItem";
+      article.tabIndex=0;
+      article.dataset.stepId=step.id;
+      article.dataset.stepOrder=String(step.order);
+      article.dataset.route=step.route;
+      article.dataset.primary=step.primary;
+      if(state && !state.completed && state.step===index) article.classList.add("current");
+      if(state && (state.completed || state.step>index)) article.classList.add("done");
+      article.innerHTML=`<div class="guideNo">STEP ${step.order} / 10 · ${step.id}</div><h3>${step.title}</h3><p>${step.copy}</p><div class="route">${step.route}${step.hash} · ${step.primary}</div>`;
+      grid.appendChild(article);
+    });
+    const resumable=api.hasResumableState();
+    resumeBtn.hidden=!resumable;
+    if(!state) stateBox.textContent="未開始です。StartでStep 1から開始できます。";
+    else if(state.completed) stateBox.textContent=state.skipped?"Skip済みです。ReplayでStep 1から再開できます。":"完了済みです。ReplayでStep 1から再確認できます。";
+    else stateBox.textContent=`保存中の進捗：Step ${state.step+1} / 10。Resumeで同じStepから続けられます。`;
+  }
+  document.getElementById("guideStartBtn").addEventListener("click",()=>api.start());
+  resumeBtn.addEventListener("click",()=>api.resume());
+  document.getElementById("guideReplayBtn").addEventListener("click",()=>api.replay());
+  window.addEventListener("dpro-tutorial-state",render);
+  render();
+})();
+</script>
+</body>
+</html>
