@@ -1,0 +1,292 @@
+{
+  "schema": "DPRO_TUTORIAL_SEITAI_R3_LIVE_QA_V1.0",
+  "generatedAt": "2026-08-29T05:42:10.319Z",
+  "base": "https://dpromstk2000-lab.github.io/dpro-seitai-line/",
+  "first10Count": 10,
+  "viewports": [
+    {
+      "name": "1440x1000",
+      "width": 1440,
+      "height": 1000,
+      "overflow": {
+        "innerWidth": 1440,
+        "documentElementScrollWidth": 1440,
+        "bodyScrollWidth": 1440
+      },
+      "resolved": [
+        {
+          "order": 1,
+          "id": "SEITAI-F10-01",
+          "target": "#heroShopName"
+        },
+        {
+          "order": 2,
+          "id": "SEITAI-F10-02",
+          "target": "#sectionMenu .stepTitle"
+        },
+        {
+          "order": 3,
+          "id": "SEITAI-F10-03",
+          "target": "#sectionStaff .stepTitle"
+        },
+        {
+          "order": 4,
+          "id": "SEITAI-F10-04",
+          "target": "#sectionConcern .stepTitle"
+        },
+        {
+          "order": 5,
+          "id": "SEITAI-F10-05",
+          "target": "#sectionDate .stepTitle"
+        },
+        {
+          "order": 6,
+          "id": "SEITAI-F10-06",
+          "target": "#sectionCustomer .stepTitle"
+        },
+        {
+          "order": 7,
+          "id": "SEITAI-F10-07",
+          "target": "#confirmBox"
+        },
+        {
+          "order": 8,
+          "id": "SEITAI-F10-08",
+          "target": "#memberCard"
+        },
+        {
+          "order": 9,
+          "id": "SEITAI-F10-09",
+          "target": "#memberNext7Overview"
+        },
+        {
+          "order": 10,
+          "id": "SEITAI-F10-10",
+          "target": "#memberHistorySection .sectionHead"
+        }
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    },
+    {
+      "name": "1024x768",
+      "width": 1024,
+      "height": 768,
+      "overflow": {
+        "innerWidth": 1024,
+        "documentElementScrollWidth": 1024,
+        "bodyScrollWidth": 1024
+      },
+      "resolved": [
+        {
+          "order": 1,
+          "id": "SEITAI-F10-01",
+          "target": "#heroShopName"
+        },
+        {
+          "order": 2,
+          "id": "SEITAI-F10-02",
+          "target": "#sectionMenu .stepTitle"
+        },
+        {
+          "order": 3,
+          "id": "SEITAI-F10-03",
+          "target": "#sectionStaff .stepTitle"
+        },
+        {
+          "order": 4,
+          "id": "SEITAI-F10-04",
+          "target": "#sectionConcern .stepTitle"
+        },
+        {
+          "order": 5,
+          "id": "SEITAI-F10-05",
+          "target": "#sectionDate .stepTitle"
+        },
+        {
+          "order": 6,
+          "id": "SEITAI-F10-06",
+          "target": "#sectionCustomer .stepTitle"
+        },
+        {
+          "order": 7,
+          "id": "SEITAI-F10-07",
+          "target": "#confirmBox"
+        },
+        {
+          "order": 8,
+          "id": "SEITAI-F10-08",
+          "target": "#memberCard"
+        },
+        {
+          "order": 9,
+          "id": "SEITAI-F10-09",
+          "target": "#memberNext7Overview"
+        },
+        {
+          "order": 10,
+          "id": "SEITAI-F10-10",
+          "target": "#memberHistorySection .sectionHead"
+        }
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    },
+    {
+      "name": "390x844",
+      "width": 390,
+      "height": 844,
+      "overflow": {
+        "innerWidth": 390,
+        "documentElementScrollWidth": 390,
+        "bodyScrollWidth": 390
+      },
+      "resolved": [
+        {
+          "order": 1,
+          "id": "SEITAI-F10-01",
+          "target": "#heroShopName"
+        },
+        {
+          "order": 2,
+          "id": "SEITAI-F10-02",
+          "target": "#sectionMenu .stepTitle"
+        },
+        {
+          "order": 3,
+          "id": "SEITAI-F10-03",
+          "target": "#sectionStaff .stepTitle"
+        },
+        {
+          "order": 4,
+          "id": "SEITAI-F10-04",
+          "target": "#sectionConcern .stepTitle"
+        },
+        {
+          "order": 5,
+          "id": "SEITAI-F10-05",
+          "target": "#sectionDate .stepTitle"
+        },
+        {
+          "order": 6,
+          "id": "SEITAI-F10-06",
+          "target": "#sectionCustomer .stepTitle"
+        },
+        {
+          "order": 7,
+          "id": "SEITAI-F10-07",
+          "target": "#confirmBox"
+        },
+        {
+          "order": 8,
+          "id": "SEITAI-F10-08",
+          "target": "#memberCard"
+        },
+        {
+          "order": 9,
+          "id": "SEITAI-F10-09",
+          "target": "#memberNext7Overview"
+        },
+        {
+          "order": 10,
+          "id": "SEITAI-F10-10",
+          "target": "#memberHistorySection .sectionHead"
+        }
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    },
+    {
+      "name": "320x720",
+      "width": 320,
+      "height": 720,
+      "overflow": {
+        "innerWidth": 320,
+        "documentElementScrollWidth": 320,
+        "bodyScrollWidth": 320
+      },
+      "resolved": [
+        {
+          "order": 1,
+          "id": "SEITAI-F10-01",
+          "target": "#heroShopName"
+        },
+        {
+          "order": 2,
+          "id": "SEITAI-F10-02",
+          "target": "#sectionMenu .stepTitle"
+        },
+        {
+          "order": 3,
+          "id": "SEITAI-F10-03",
+          "target": "#sectionStaff .stepTitle"
+        },
+        {
+          "order": 4,
+          "id": "SEITAI-F10-04",
+          "target": "#sectionConcern .stepTitle"
+        },
+        {
+          "order": 5,
+          "id": "SEITAI-F10-05",
+          "target": "#sectionDate .stepTitle"
+        },
+        {
+          "order": 6,
+          "id": "SEITAI-F10-06",
+          "target": "#sectionCustomer .stepTitle"
+        },
+        {
+          "order": 7,
+          "id": "SEITAI-F10-07",
+          "target": "#confirmBox"
+        },
+        {
+          "order": 8,
+          "id": "SEITAI-F10-08",
+          "target": "#memberCard"
+        },
+        {
+          "order": 9,
+          "id": "SEITAI-F10-09",
+          "target": "#memberNext7Overview"
+        },
+        {
+          "order": 10,
+          "id": "SEITAI-F10-10",
+          "target": "#memberHistorySection .sectionHead"
+        }
+      ],
+      "pageErrors": [],
+      "consoleErrors": [],
+      "unsafe": [],
+      "pass": true
+    }
+  ],
+  "checks": {
+    "mousePointerDrag": true,
+    "touchPointerDrag": true,
+    "viewportClamp": true,
+    "nextBack": true,
+    "close": true,
+    "esc": true,
+    "skip": true,
+    "resume": true,
+    "replay": true,
+    "keyboardOnly": true,
+    "focusVisibleRecoverable": true,
+    "crossPageResume": true
+  },
+  "tutorialPageErrors": 0,
+  "tutorialConsoleErrors": 0,
+  "unsafeWriteRequests": [],
+  "businessMutation": 0,
+  "failures": [],
+  "pass": true
+}
